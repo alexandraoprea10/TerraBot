@@ -1,12 +1,12 @@
 package main;
 
-public class GrasslandSoil extends Soil {
+public final class GrasslandSoil extends Soil {
     private double rootDensity;
     // constructori
-    public GrasslandSoil(String name, double mass) {
+    public GrasslandSoil(final String name, final double mass) {
         super(name, mass);
     }
-    public GrasslandSoil(String name, double mass, double nitrogen, double waterRetention, double solidpH, double organicMatter, double rootDensity) {
+    public GrasslandSoil(final String name, final double mass, final double nitrogen, final double waterRetention, final double solidpH, final double organicMatter, final double rootDensity) {
         super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
         this.rootDensity = rootDensity;
     }
@@ -15,7 +15,7 @@ public class GrasslandSoil extends Soil {
         return rootDensity;
     }
     // setter
-    public void setRootDensity(double rootDensity) {
+    public void setRootDensity(final double rootDensity) {
         this.rootDensity = rootDensity;
     }
     @Override

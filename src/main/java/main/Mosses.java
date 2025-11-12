@@ -2,8 +2,8 @@ package main;
 
 public class Mosses extends Plant {
     // constructor
-    public Mosses(String name, double mass, double oxygen, String maturity_level){
-        super(name,mass, "young", 0);
+    public Mosses(String name, double mass, double oxygen, String maturity_level) {
+        super(name, mass, "young", 0);
     }
     // aflu oxigenul din fiecare categorie
     @Override

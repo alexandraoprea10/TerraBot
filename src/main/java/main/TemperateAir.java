@@ -1,6 +1,6 @@
 package main;
 
-public class TemperateAir extends Air{
+public class TemperateAir extends Air {
     private double pollenLevel;
     private String season;
     // constructori
@@ -53,8 +53,10 @@ public class TemperateAir extends Air{
     @Override
     public double update_air_quality() {
         double seasonPenalty = 0.0;
-        if (season.equalsIgnoreCase("Spring"))
-            seasonPenalty = 15.0;
+        if (season != null) {
+            if (season.equalsIgnoreCase("Spring"))
+                seasonPenalty = 15.0;
+        }
         double result = getAir_quality() - seasonPenalty;
         return result;
     }

@@ -1,9 +1,9 @@
 package main;
 
-public class Ferns extends Plant{
+public class Ferns extends Plant {
     // constructor
-    public Ferns(String name, double mass, double oxygen, String maturity_level){
-        super(name,mass,maturity_level, oxygen);
+    public Ferns(String name, double mass, double oxygen, String maturity_level) {
+        super(name, mass, maturity_level, oxygen);
     }
     // aflu oxigenul din fiecare categorie
     @Override

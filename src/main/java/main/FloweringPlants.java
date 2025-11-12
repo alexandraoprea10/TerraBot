@@ -1,9 +1,9 @@
 package main;
 
-public class FloweringPlants extends Plant{
+public class FloweringPlants extends Plant {
     // constructor
-    public FloweringPlants(String name, double mass, double oxygen, String maturity_level){
-        super(name,mass,maturity_level, oxygen);
+    public FloweringPlants(String name, double mass, double oxygen, String maturity_level) {
+        super(name, mass, maturity_level, oxygen);
     }
     // aflu oxigenul din fiecare categorie
     @Override

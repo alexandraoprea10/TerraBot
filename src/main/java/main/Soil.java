@@ -1,6 +1,6 @@
 package main;
 
-public abstract class Soil extends Entity{
+public abstract class Soil extends Entity {
     private double nitrogen;
     private double waterRetention;
     private double soilPh;

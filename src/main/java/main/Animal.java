@@ -1,8 +1,7 @@
 package main;
 
-public abstract class Animal extends Entity{
+public abstract class Animal extends Entity {
     private String state;
-    private boolean isScanned;
     // constructori
     public Animal(String name, double mass) {
         super(name, mass, 0);
@@ -16,15 +15,9 @@ public abstract class Animal extends Entity{
     public String getState() {
         return state;
     }
-    public boolean getisScanned() {
-        return isScanned;
-    }
     // setter
     public void setState(String state) {
         this.state = state;
-    }
-    public void setIsScanned(boolean isScanned) {
-        this.isScanned = isScanned;
     }
     public abstract double probability_attack();
     @Override

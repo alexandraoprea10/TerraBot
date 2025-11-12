@@ -1,6 +1,6 @@
 package main;
 
-public class DesertAir extends Air{
+public class DesertAir extends Air {
     private double dustParticles;
     private boolean desertStorm;
     // constructori

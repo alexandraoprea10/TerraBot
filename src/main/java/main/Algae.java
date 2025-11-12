@@ -2,8 +2,8 @@ package main;
 
 public class Algae extends Plant {
     // constructor
-    public Algae(String name, double mass, double oxygen, String maturity_level){
-        super(name,mass,maturity_level, oxygen);
+    public Algae(String name, double mass, double oxygen, String maturity_level) {
+        super(name, mass, maturity_level, oxygen);
     }
     // aflu oxigenul din fiecare categorie
     @Override

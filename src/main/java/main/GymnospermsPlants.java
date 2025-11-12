@@ -2,8 +2,8 @@ package main;
 
 public class GymnospermsPlants extends Plant {
     // constructor
-    public GymnospermsPlants(String name, double mass, double oxygen, String maturity_level){
-        super(name,mass,maturity_level, 0);
+    public GymnospermsPlants(String name, double mass, double oxygen, String maturity_level) {
+        super(name, mass, maturity_level, 0);
     }
     // aflu oxigenul din fiecare categorie
     @Override

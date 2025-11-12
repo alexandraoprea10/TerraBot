@@ -4,7 +4,6 @@ public abstract class Plant extends Entity {
     private String maturity_level;
     private double nivel_crestere;
     private double oxygen_curent;
-    private boolean isScanned;
     private int moment_scanare;
     // constructor
     public Plant(String name, double mass, String maturity_level,  double oxygen_curent) {
@@ -22,9 +21,6 @@ public abstract class Plant extends Entity {
     public double getNivel_crestere() {
         return nivel_crestere;
     }
-    public boolean getisScanned() {
-        return isScanned;
-    }
     public int getMoment_scanare() {
         return moment_scanare;
     }
@@ -38,16 +34,13 @@ public abstract class Plant extends Entity {
     public void setNivel_crestere(double nivel_crestere) {
         this.nivel_crestere = nivel_crestere;
     }
-    public void setIsScanned(boolean isScanned) {
-        this.isScanned = isScanned;
-    }
     public void setMoment_scanare(int moment_scanare) {
         this.moment_scanare = moment_scanare;
     }
     // oxigenul din fiecare categorie
     public double maturity_oxigen_level() {
         double result = 0.0;
-        if (maturity_level.equals("young")){
+        if (maturity_level.equals("young")) {
             result = 0.2;
         }
         else if (maturity_level.equals("mature")) {

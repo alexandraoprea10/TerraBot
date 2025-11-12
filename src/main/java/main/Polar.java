@@ -1,6 +1,6 @@
 package main;
 
-public class Polar extends Air{
+public class Polar extends Air {
     private double iceCrystalConcentration;
     private double windSpeed;
     // constructori

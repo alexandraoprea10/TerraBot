@@ -1,7 +1,6 @@
 package main;
 
-public class Detritivores extends Animal{
-    private static final double posibility = (100.0 - 90.0) / 10.0;
+public class Detritivores extends Animal {
     // constructor
     public Detritivores(String name, double mass, String state) {
         super(name, mass, state);

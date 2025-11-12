@@ -1,6 +1,6 @@
 package main;
 
-abstract public class Air extends Entity{
+abstract public class Air extends Entity {
     private double humidity;
     private double temperature;
     private double oxygenLevel;

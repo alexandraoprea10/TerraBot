@@ -1,6 +1,6 @@
 package main;
 
-public class MountainAir extends Air{
+public class MountainAir extends Air {
     private double altitude;
     private int numberOfHikers;
     // constructori

@@ -1,6 +1,6 @@
 package main;
 
-public class Omnivores extends Animal{
+public class Omnivores extends Animal {
     private static final double posibility = (100.0 - 60.0) / 10.0;
     // constructor
     public Omnivores(String name, double mass, String state) {

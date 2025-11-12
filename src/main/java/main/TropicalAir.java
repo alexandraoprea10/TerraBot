@@ -1,6 +1,6 @@
 package main;
 
-public class TropicalAir extends Air{
+public class TropicalAir extends Air {
     private double co2Level;
     private double rainfall;
     // constructori

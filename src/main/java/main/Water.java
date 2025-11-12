@@ -1,6 +1,6 @@
 package main;
 
-public class Water extends Entity{
+public class Water extends Entity {
     private String type;
     private double salinity;
     private double pH;
@@ -8,7 +8,6 @@ public class Water extends Entity{
     private double turbidity;
     private double contaminantIndex;
     private boolean isFrozen;
-    private boolean isScanned;
     private int moment_scanare;
     // constructori
     public Water(String name, double mass) {
@@ -52,9 +51,6 @@ public class Water extends Entity{
     public boolean isFrozen() {
         return isFrozen;
     }
-    public boolean getisScanned() {
-        return isScanned;
-    }
     public int  getMoment_scanare() {
         return moment_scanare;
     }
@@ -79,9 +75,6 @@ public class Water extends Entity{
     }
     public void setIsFrozen(boolean isFrozen) {
         this.isFrozen = isFrozen;
-    }
-    public void setIsScanned(boolean isScanned) {
-        this.isScanned = isScanned;
     }
     public void setMoment_scanare(int moment_scanare) {
         this.moment_scanare = moment_scanare;

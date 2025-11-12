@@ -16,13 +16,13 @@ import java.io.IOException;
  */
 public class Main {
 
-    private Main(){
+    private Main() {
     }
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     public static final ObjectWriter WRITER = MAPPER.writer().withDefaultPrettyPrinter();
 
-    public static double calculate_probabilitate(List <Entity> entities) {
+    public static double calculate_probabilitate(List<Entity> entities) {
         double calcul_probabilitate = 0.0;
         for (int k = 0; k < entities.size(); k++) {
             Entity entity = entities.get(k);
@@ -42,7 +42,7 @@ public class Main {
         }
         return calcul_probabilitate;
     }
-    public static int calculate_objects(List <Entity> entities) {
+    public static int calculate_objects(List<Entity> entities) {
         int objects = 0;
         for (int k = 0; k < entities.size(); k++) {
             Entity entity = entities.get(k);
@@ -141,68 +141,73 @@ public class Main {
         else if (airut.isDesert())
             airNode.put("desertStorm", ((DesertAir) airut).getDesertStorm());
     }
-    public static boolean exist_plant(List <Entity> entities) {
-        for (int i = 0 ; i <  entities.size() ; i++) {
-            if (entities.get(i).isPlant())
+    public static boolean exist_plant(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).isPlant()) {
                 return true;
+            }
         }
         return false;
     }
-    public static boolean exist_animal(List <Entity> entities) {
-        for (int i = 0 ; i <  entities.size() ; i++) {
+    public static boolean exist_animal(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).isAnimal())
                 return true;
         }
         return false;
     }
-    public static boolean exist_water(List <Entity> entities) {
-        for (int i = 0 ; i <  entities.size() ; i++) {
+    public static boolean exist_water(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).isWater())
                 return true;
         }
         return false;
     }
-    public static Plant return_plant(List <Entity> entities) {
-        for (int i = 0 ; i <   entities.size() ; i++) {
+    public static Plant return_plant(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.isPlant())
                 return (Plant) entity;
         }
         return null;
     }
-    public static Animal return_animal(List <Entity> entities) {
-        for (int i = 0 ; i <   entities.size() ; i++) {
+    public static Animal return_animal(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
-            if (entity.isAnimal())
+            if (entity.isAnimal()) {
                 return (Animal) entity;
+            }
         }
         return null;
     }
-    public static Soil return_soil(List <Entity> entities) {
-        for (int i = 0 ; i <   entities.size() ; i++) {
+    public static Soil return_soil(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
-            if (entity.isSoil())
+            if (entity.isSoil()) {
                 return (Soil) entity;
+            }
         }
         return null;
     }
-    public static Water return_water(List <Entity> entities) {
-        for (int i = 0 ; i <   entities.size() ; i++) {
+    public static Water return_water(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
-            if (entity.isWater())
+            if (entity.isWater()) {
                 return (Water) entity;
+            }
         }
         return null;
     }
-    public static Air return_air(List <Entity> entities) {
-        for (int i = 0 ; i <   entities.size() ; i++) {
+    public static Air return_air(List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
-            if (entity.isAir())
+            if (entity.isAir()) {
                 return (Air) entity;
+            }
         }
         return null;
     }
-    public static void interactiuni_every_iteration(List <Entity> entities, int ok_inter_animal) {
+    public static void interactiuni_every_iteration(List<Entity> entities, int ok_inter_animal) {
         Plant planta =  return_plant(entities);
         Animal animal =  return_animal(entities);
         Soil soil =  return_soil(entities);
@@ -242,7 +247,7 @@ public class Main {
         if (animal != null && water != null && animal.getisScanned())
             animal.setMass(animal.getMass() + water.getMass());
     }
-    public static void interactiuni_every_two_iterations(List <Entity> entities) {
+    public static void interactiuni_every_two_iterations(List<Entity> entities) {
         Plant planta = return_plant(entities);
         Animal animal = return_animal(entities);
         Soil soil = return_soil(entities);
@@ -258,7 +263,7 @@ public class Main {
             soil.setWaterRetention(result);
         }
     }
-    public static void muta_robotelul(Robot robotel, List <Entity>[][] mat, int dimension) {
+    public static void muta_robotelul(Robot robotel, List<Entity>[][] mat, int dimension) {
         int pos_stanga_i = robotel.getPoz_x();
         int pos_stanga_j = robotel.getPoz_y() - 1;
 
@@ -360,28 +365,28 @@ public class Main {
 //        output.add(node);
 //        node.put("timestamp", "1");
 //        output.add(node);
-        List <SimulationInput> simulations = inputLoader.getSimulations();
+        List<SimulationInput> simulations = inputLoader.getSimulations();
         SimulationInput simInput = simulations.get(0);
         String dimension_string = simInput.getTerritoryDim();
         int battery = simInput.getEnergyPoints();
         Robot robotel = new Robot(battery, 0, 0, false);
         int dimension = Integer.parseInt(dimension_string.split("x")[0]);
         List<Entity>[][] mat = new List[dimension][dimension];
-        for (int i = 0 ; i < dimension; i++){
-            for (int j = 0 ; j < dimension; j++){
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
                 mat[i][j] = new ArrayList<>();
             }
         }
         int energyPoints = simInput.getEnergyPoints();
         TerritorySectionParamsInput territory = simInput.getTerritorySectionParams();
-        List <SoilInput> soil = territory.getSoil();
-        List <PlantInput> plant = territory.getPlants();
-        List <AnimalInput> animal = territory.getAnimals();
-        List <WaterInput> water = territory.getWater();
-        List <AirInput> air = territory.getAir();
-        for (int i = 0 ; i < territory.getSoil().size() ; i++) {
+        List<SoilInput> soil = territory.getSoil();
+        List<PlantInput> plant = territory.getPlants();
+        List<AnimalInput> animal = territory.getAnimals();
+        List<WaterInput> water = territory.getWater();
+        List<AirInput> air = territory.getAir();
+        for (int i = 0; i < territory.getSoil().size(); i++) {
             SoilInput sol = territory.getSoil().get(i);
-            for (int k = 0 ; k < sol.getSections().size(); k++) {
+            for (int k = 0; k < sol.getSections().size(); k++) {
                 PairInput loc = sol.getSections().get(k);
             Soil solul = null;
             if (sol.getType().equals("ForestSoil")) {
@@ -402,80 +407,68 @@ public class Main {
                 mat[loc.getX()][loc.getY()].add(solul);
             }
         }
-        for (int i = 0 ; i < territory.getPlants().size() ; i++) {
+        for (int i = 0; i < territory.getPlants().size(); i++) {
             PlantInput planta = territory.getPlants().get(i);
-            for (int k = 0 ; k < planta.getSections().size(); k++) {
+            for (int k = 0; k < planta.getSections().size(); k++) {
                 PairInput loc = planta.getSections().get(k);
             Plant plantuta = null;
             if (planta.getType().equals("FloweringPlants")) {
-                plantuta = new FloweringPlants(planta.getName(), planta.getMass(), 0,"young");
-            }
-            else if (planta.getType().equals("GymnospermsPlants")) {
+                plantuta = new FloweringPlants(planta.getName(), planta.getMass(), 0, "young");
+            } else if (planta.getType().equals("GymnospermsPlants")) {
                 plantuta = new GymnospermsPlants(planta.getName(), planta.getMass(), 0, "young");
-            }
-            else if (planta.getType().equals("Ferns")) {
+            } else if (planta.getType().equals("Ferns")) {
                 plantuta = new Ferns(planta.getName(), planta.getMass(), 0, "young");
-            }
-            else if (planta.getType().equals("Mosses")) {
+            } else if (planta.getType().equals("Mosses")) {
                 plantuta = new Mosses(planta.getName(), planta.getMass(), 0, "young");
-            }
-            else if (planta.getType().equals("Algae")) {
+            } else if (planta.getType().equals("Algae")) {
                 plantuta = new Algae(planta.getName(), planta.getMass(), 0, "young");
             }
                 mat[loc.getX()][loc.getY()].add(plantuta);
             }
 
         }
-        for (int i = 0 ; i < territory.getAnimals().size() ; i++){
+        for (int i = 0; i < territory.getAnimals().size(); i++) {
             AnimalInput animalul = territory.getAnimals().get(i);
-            for (int k = 0 ; k < animalul.getSections().size(); k++) {
+            for (int k = 0; k < animalul.getSections().size(); k++) {
                 PairInput loc = animalul.getSections().get(k);
             Animal animalut = null;
             if (animalul.getType().equals("Herbivores")) {
                 animalut = new Herbivores(animalul.getName(), animalul.getMass(), "hungry");
-            }
-            else if (animalul.getType().equals("Carnivores")) {
+            } else if (animalul.getType().equals("Carnivores")) {
                 animalut = new Carnivores(animalul.getName(), animalul.getMass(), "hungry");
-            }
-            else if (animalul.getType().equals("Omnivores")) {
+            } else if (animalul.getType().equals("Omnivores")) {
                 animalut = new Omnivores(animalul.getName(), animalul.getMass(), "hungry");
-            }
-            else if (animalul.getType().equals("Detritivores")) {
+            } else if (animalul.getType().equals("Detritivores")) {
                 animalut = new Detritivores(animalul.getName(), animalul.getMass(), "hungry");
-            }
-            else if (animalul.getType().equals("Parasites")) {
+            } else if (animalul.getType().equals("Parasites")) {
                 animalut = new Parasites(animalul.getName(), animalul.getMass(), "hungry");
             }
                 mat[loc.getX()][loc.getY()].add(animalut);
             }
         }
-        for (int i = 0 ; i < territory.getWater().size() ; i++){
+        for (int i = 0; i < territory.getWater().size(); i++) {
             WaterInput apa = territory.getWater().get(i);
-            for (int k = 0 ; k < apa.getSections().size(); k++) {
+            for (int k = 0; k < apa.getSections().size(); k++) {
                 PairInput loc = apa.getSections().get(k);
             Water apita = new Water(apa.getName(), apa.getMass(), apa.getType(), apa.getSalinity(), apa.getPH(), apa.getPurity(), apa.getTurbidity(), apa.getContaminantIndex(), apa.isFrozen());
                 mat[loc.getX()][loc.getY()].add(apita);
             }
         }
-        for (int i = 0 ; i < territory.getAir().size() ; i++){
+        for (int i = 0; i < territory.getAir().size(); i++) {
             AirInput aer = territory.getAir().get(i);
-            for (int k = 0 ; k < aer.getSections().size(); k++) {
+            for (int k = 0; k < aer.getSections().size(); k++) {
                 PairInput loc = aer.getSections().get(k);
             Air aerut = null;
             if (aer.getType().equals("TropicalAir")) {
                 // String nume, double mass, double humidity, double temperature, double oxygenLevel,
                 aerut = new TropicalAir(aer.getName(), aer.getMass(), aer.getHumidity(), aer.getTemperature(), aer.getOxygenLevel(), aer.getCo2Level());
-            }
-            else if (aer.getType().equals("PolarAir")) {
+            } else if (aer.getType().equals("PolarAir")) {
                 aerut = new Polar(aer.getName(), aer.getMass(), aer.getHumidity(), aer.getTemperature(), aer.getOxygenLevel(), aer.getIceCrystalConcentration());
-            }
-            else if (aer.getType().equals("TemperateAir")) {
+            } else if (aer.getType().equals("TemperateAir")) {
                 aerut = new TemperateAir(aer.getName(), aer.getMass(), aer.getHumidity(), aer.getTemperature(), aer.getOxygenLevel(), aer.getPollenLevel());
-            }
-            else if (aer.getType().equals("DesertAir")) {
+            } else if (aer.getType().equals("DesertAir")) {
                 aerut = new DesertAir(aer.getName(), aer.getMass(), aer.getHumidity(), aer.getTemperature(), aer.getOxygenLevel(), aer.getDustParticles());
-            }
-            else if (aer.getType().equals("MountainAir")) {
+            } else if (aer.getType().equals("MountainAir")) {
                 aerut = new MountainAir(aer.getName(), aer.getMass(), aer.getHumidity(), aer.getTemperature(), aer.getOxygenLevel(), aer.getAltitude());
             }
                 aerut.setAir_quality(aerut.air_quality());
@@ -491,7 +484,7 @@ public class Main {
         int previous_stamp = 0;
         int ok_inter_animal = 0;
         int inceput_iteratie_animal = 0;
-        List <CommandInput> commands = inputLoader.getCommands();
+        List<CommandInput> commands = inputLoader.getCommands();
         int ok_simulation = 0;
         for (int i = 0; i < commands.size(); i++) {
             // double soilQuality = 0.0;
@@ -725,7 +718,142 @@ public class Main {
                     robotel.setBattery(robotel.getBattery() - 7);
                 }
             } else if (command.getCommand().equals("learnFact")) {
-            } else if (command.getCommand().equals("improveEnvConditions")) {
+                if (ok_simulation == 0) {
+                    node.put("message", "ERROR: Simulation not started. Cannot perform action");
+                } else if (robotel.isCharging() == true) {
+                    node.put("message", "ERROR: Robot still charging. Cannot perform action");
+                } else {
+                    String fact = command.getComponents();
+                    String subj = command.getSubject();
+                    for (int a = 0; a < dimension; a++) {
+                        for (int b = 0; b < dimension; b++) {
+                            List<Entity> entities = mat[a][b];
+                            for (int p = 0; p < entities.size(); p++) {
+                                Entity entity = entities.get(p);
+                                if (entity.isAir()) {
+                                    Air aer =  (Air) entity;
+                                    if (aer.getName().equals(fact)) {
+                                        aer.set_subject(subj);
+                                    }
+                                }
+                                else if (entity.isSoil()) {
+                                    Soil sol = (Soil) entity;
+                                    if (sol.getName().equals(fact)) {
+                                        sol.set_subject(subj);
+                                    }
+                                }
+                                else if (entity.isWater()) {
+                                    Water apa = (Water) entity;
+                                    if (apa.getName().equals(fact)) {
+                                        apa.set_subject(subj);
+                                    }
+                                }
+                                else if (entity.isPlant()) {
+                                    Plant planta =  (Plant) entity;
+                                    if (planta.getName().equals(fact)) {
+                                        planta.set_subject(subj);
+                                    }
+                                }
+                                else if (entity.isAnimal()) {
+                                    Animal anim =  (Animal) entity;
+                                    if (anim.getName().equals(fact)) {
+                                        anim.set_subject(subj);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    node.put("message", "The fact has been successfully saved in the database.");
+                    robotel.setBattery(robotel.getBattery() - 2);
+                }
+            } else if (command.getCommand().equals("printKnowledgeBase")) {
+                if (ok_simulation == 0) {
+                    node.put("message", "ERROR: Simulation not started. Cannot perform action");
+                } else {
+                ArrayNode subiecte = MAPPER.createArrayNode();
+                for (int a = 0; a < dimension; a++) {
+                    for (int b = 0; b < dimension; b++) {
+                        List<Entity> entities = mat[a][b];
+                        for (int k = 0; k < entities.size(); k++) {
+                            Entity entity = entities.get(k);
+                            if (entity.getisScanned() && entity.get_subject() != null && !entity.get_subject().isEmpty()) {
+                                ObjectNode adauga_comp = MAPPER.createObjectNode();
+                                String component = entity.getName();
+                                adauga_comp.put("topic", component);
+                                ArrayNode adauga_subj = MAPPER.createArrayNode();
+                                List<String> subjects = entity.get_subject();
+                                for (int p = 0; p < subjects.size(); p++) {
+                                    String subiect =  subjects.get(p);
+                                    adauga_subj.add(subiect);
+                                }
+                                adauga_comp.put("facts", adauga_subj);
+                                subiecte.add(adauga_comp);
+                            }
+                        }
+                    }
+                }
+                    for (int m = 0; m < subiecte.size() - 1; m++) {
+                        for (int n = m + 1; n < subiecte.size(); n++) {
+                            String primul_fact = subiecte.get(m).get("topic").asText();
+                            String al_doilea = subiecte.get(n).get("facts").asText();
+                            if (primul_fact.compareTo(al_doilea) > 0) {
+                                ObjectNode tmp = (ObjectNode) subiecte.get(m);
+                                subiecte.set(m, subiecte.get(n));
+                                subiecte.set(n, tmp);
+                            }
+                        }
+                }
+                node.set("output",  subiecte);
+                }
+            }
+            else if (command.getCommand().equals("improveEnvConditions")) {
+                if (ok_simulation == 0) {
+                    node.put("message", "ERROR: Simulation not started. Cannot perform action");
+                } else if (robotel.isCharging() == true) {
+                    node.put("message", "ERROR: Robot still charging. Cannot perform action");
+                } else {
+                    List<Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
+                    String improvment = command.getImprovementType();
+                    for (int p = 0; p < entities.size(); p++) {
+                        Entity entity = entities.get(p);
+                        if (entity.getisScanned() && entity.get_subject() != null && !entity.get_subject().isEmpty()) {
+                            for (int k = 0; k < entity.get_subject().size(); k++) {
+                                String subject = entity.get_subject().get(k);
+                                String[] imparte = subject.split(" ");
+                                String ce_modific = imparte[imparte.length - 1];
+                                if (improvment.equals("plantVegetation")) {
+                                    Air aer =  (Air) entity;
+                                    if (aer != null) {
+                                        aer.setOxygenLevel(aer.getOxygenLevel() + 0.3);
+                                        node.put("message", "The " + ce_modific + "was planted successfully");
+                                    }
+                                }
+                                else if (improvment.equals("fertilizeSoil")) {
+                                    Soil sol =  (Soil) entity;
+                                    if (sol != null) {
+                                        sol.setOrganicMatter(sol.getOrganicMatter() + 0.3);
+                                        node.put("message", "The soil was successfully fertilized using " + ce_modific);
+                                    }
+                                }
+                                else if (improvment.equals("increaseHumidity")) {
+                                    Air aer =  (Air) entity;
+                                    if (aer != null) {
+                                        aer.setHumidity(aer.getHumidity() + 0.2);
+                                        node.put("message", "The air humidity was successfully increased using " + ce_modific);
+                                    }
+                                }
+                                else if (improvment.equals("increaseMoisture")) {
+                                    Soil sol =   (Soil) entity;
+                                    if (sol != null) {
+                                        sol.setWaterRetention(sol.getWaterRetention() + 0.2);
+                                        node.put("message", "The soil moisture was successfully increased using " + ce_modific);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    robotel.setBattery(robotel.getBattery() - 10);
+                }
             } else if (command.getCommand().equals("getEnergyStatus")) {
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
@@ -804,7 +932,7 @@ public class Main {
             }
 //            node.put("baterie", robotel.getBattery());
 //            node.put("scor", mat[0][1].get(0).get_attack());
-            List <Entity> entities = mat[0][0];
+            List<Entity> entities = mat[0][0];
             Animal animalul = return_animal(entities);
             if (animalul != null && animalul.getisScanned()) {
                 if (inceput_iteratie_animal < iteratii && (iteratii - inceput_iteratie_animal) % 2 == 0 && animalul.getisScanned()) {
