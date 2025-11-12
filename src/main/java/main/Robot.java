@@ -5,6 +5,7 @@ public class Robot {
     private int poz_x;
     private int poz_y;
     private boolean isCharging;
+    private int fosta_baterie;
 
     // constructor
     public Robot(int battery, int poz_x, int poz_y, boolean isCharging) {
@@ -26,6 +27,9 @@ public class Robot {
     public boolean isCharging() {
         return isCharging;
     }
+    public int getFosta_baterie() {
+        return fosta_baterie;
+    }
     // setteri
     public void setBattery(int battery) {
         this.battery = battery;
@@ -38,5 +42,8 @@ public class Robot {
     }
     public void setIsCharging(boolean isCharging) {
         this.isCharging = isCharging;
+    }
+    public void setFosta_baterie(int fosta_baterie) {
+        this.fosta_baterie = fosta_baterie;
     }
 }

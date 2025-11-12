@@ -202,7 +202,7 @@ public class Main {
         }
         return null;
     }
-    public static void interactiuni_every_iteration(List <Entity> entities) {
+    public static void interactiuni_every_iteration(List <Entity> entities, int ok_inter_animal) {
         Plant planta =  return_plant(entities);
         Animal animal =  return_animal(entities);
         Soil soil =  return_soil(entities);
@@ -231,9 +231,14 @@ public class Main {
             air.setOxygenLevel(Math.round((air.getOxygenLevel() + planta.oxigen_from_plant() + planta.maturity_oxigen_level()) * 100.0) / 100.0);
             air.setAir_quality(Math.round(air.air_quality() * 100.0) / 100.0);
         }
-//        if (animal != null && water!= null && animal.getisScanned()) {
-//            if (animal.getState().equals("well-fed"))
-//        }
+        if (ok_inter_animal == 1) {
+            if (planta != null && water != null) {
+                soil.setOrganicMatter(soil.getOrganicMatter() + 0.8);
+            }
+            else if (planta != null || water != null) {
+                soil.setOrganicMatter(soil.getOrganicMatter() + 0.5);
+            }
+        }
         if (animal != null && water != null && animal.getisScanned())
             animal.setMass(animal.getMass() + water.getMass());
     }
@@ -252,6 +257,78 @@ public class Main {
             double result = Math.round((soil.getWaterRetention() + 0.1) * 100.0) / 100.0;
             soil.setWaterRetention(result);
         }
+    }
+    public static void muta_robotelul(Robot robotel, List <Entity>[][] mat, int dimension) {
+        int pos_stanga_i = robotel.getPoz_x();
+        int pos_stanga_j = robotel.getPoz_y() - 1;
+
+        int pos_sus_i = robotel.getPoz_x() - 1;
+        int pos_sus_j = robotel.getPoz_y();
+
+        int pos_dreapta_i = robotel.getPoz_x();
+        int pos_dreapta_j = robotel.getPoz_y() + 1;
+
+        int pos_jos_i = robotel.getPoz_x() + 1;
+        int pos_jos_j = robotel.getPoz_y();
+
+        int scor_stanga = -2;
+        int scor_dreapta = -2;
+        int scor_jos = -2;
+        int scor_sus = -2;
+        int pozitie_mutare_i = 0;
+        int pozitie_mutare_j = 0;
+        int scor_minim = 9999;
+        // verific pentru STANGA
+        ObjectNode neighbors = MAPPER.createObjectNode();
+        if (pos_jos_i >= 0 && pos_jos_j >= 0 && pos_jos_i < dimension && pos_jos_j < dimension) {
+            // iau scorul
+            List<Entity> entities = mat[pos_jos_i][pos_jos_j];
+            scor_jos = entities.get(0).get_attack();
+            // node.put("jos", scor_jos);
+        }
+        if (pos_dreapta_i >= 0 && pos_dreapta_j >= 0 && pos_dreapta_i < dimension && pos_dreapta_j < dimension) {
+            // iau scorul
+            List<Entity> entities = mat[pos_dreapta_i][pos_dreapta_j];
+            scor_dreapta = entities.get(0).get_attack();
+            // node.put("dreapta", scor_dreapta);
+        }
+        if (pos_sus_i >= 0 && pos_sus_j >= 0 && pos_sus_i < dimension && pos_sus_j < dimension) {
+            // iau scorul
+            List<Entity> entities = mat[pos_sus_i][pos_sus_j];
+            scor_sus = entities.get(0).get_attack();
+            // node.put("sus", scor_sus);
+        }
+        if (pos_stanga_i >= 0 && pos_stanga_j >= 0 && pos_stanga_i < dimension && pos_stanga_j < dimension) {
+            List<Entity> entities = mat[pos_stanga_i][pos_stanga_j];
+            scor_stanga = entities.get(0).get_attack();
+            // node.put("stanga", scor_stanga);
+        }
+        if (scor_dreapta >= 0 && scor_dreapta < scor_minim) {
+            scor_minim = scor_dreapta;
+            pozitie_mutare_i = pos_dreapta_i;
+            pozitie_mutare_j = pos_dreapta_j;
+        }
+        if (scor_jos >= 0 && scor_jos < scor_minim) {
+            List<Entity> entities = mat[pos_jos_i][pos_jos_j];
+            scor_minim = scor_jos;
+            pozitie_mutare_i = pos_jos_i;
+            pozitie_mutare_j = pos_jos_j;
+        }
+        if (scor_sus >= 0 && scor_sus < scor_minim) {
+            scor_minim = scor_sus;
+            pozitie_mutare_i = pos_sus_i;
+            pozitie_mutare_j = pos_sus_j;
+        }
+        if (scor_stanga >= 0 && scor_stanga < scor_minim) {
+            scor_minim = scor_stanga;
+            pozitie_mutare_i = pos_stanga_i;
+            pozitie_mutare_j = pos_stanga_j;
+        }
+        if (robotel.getBattery() - scor_minim >= 0) {
+            robotel.setPoz_x(pozitie_mutare_i);
+            robotel.setPoz_y(pozitie_mutare_j);
+        }
+        robotel.setBattery(robotel.getBattery() - scor_minim);
     }
     public static void action(final String inputPath,
                               final String outputPath) throws IOException {
@@ -412,6 +489,8 @@ public class Main {
         int s_a_scanat = 0;
         int incepe_iteratie = 0;
         int previous_stamp = 0;
+        int ok_inter_animal = 0;
+        int inceput_iteratie_animal = 0;
         List <CommandInput> commands = inputLoader.getCommands();
         int ok_simulation = 0;
         for (int i = 0; i < commands.size(); i++) {
@@ -428,14 +507,14 @@ public class Main {
                     s_a_scanat = 1;
                     incepe_iteratie = iteratii;
                 }
-                iteratii++;
             }
+            iteratii++;
             if (ok_scanari == 1) {
                 for (int a = 0; a < dimension; a++) {
-                    for (int b = 0 ; b < dimension; b++) {
+                    for (int b = 0; b < dimension; b++) {
                         List<Entity> entities = mat[a][b];
                         // node.put("adauga", return_plant(entities).getOxygen_curent());
-                        interactiuni_every_iteration(entities);
+                        interactiuni_every_iteration(entities, ok_inter_animal);
                         if (iteratii > incepe_iteratie && (iteratii - incepe_iteratie) % 2 == 0) {
 //                            Water api =  return_water(entities);
 //                            node.put("message", "Am intrat");
@@ -491,10 +570,9 @@ public class Main {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
                 } else if (robotel.getBattery() <= 0) {
                     node.put("message", "ERROR: Not enough battery left. Cannot perform action");
-                }  else if (robotel.isCharging() == true) {
+                } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
-                }
-                else {
+                } else {
                     ObjectNode env = MAPPER.createObjectNode();
                     List<Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
                     for (int k = 0; k < entities.size(); k++) {
@@ -520,8 +598,7 @@ public class Main {
                             ObjectNode airNode = print_air(airut);
                             if (ok_schimbari_meteo == 0) {
                                 print_air_without_event(airut, airNode);
-                            }
-                            else {
+                            } else {
                                 print_air_with_event(airut, airNode);
                             }
                             env.set("air", airNode);
@@ -539,10 +616,9 @@ public class Main {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
                 } else if (robotel.getBattery() <= 0) {
                     node.put("message", "ERROR: Not enough battery left. Cannot perform action");
-                }  else if (robotel.isCharging() == true) {
+                } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
-                }
-                else {
+                } else {
                     ArrayNode mapNode = MAPPER.createArrayNode();
                     for (int a = 0; a < dimension; a++) {
                         for (int b = 0; b < dimension; b++) {
@@ -576,6 +652,7 @@ public class Main {
                                     soil_quality = sol.result_soil(valoare_sol);
                                 }
                             }
+                            // entityNode.put("scor", entities.get(0).get_attack());
                             entityNode.put("airQuality", air_quality);
                             entityNode.put("soilQuality", soil_quality);
                             mapNode.add(entityNode);
@@ -583,137 +660,86 @@ public class Main {
                     }
                     node.set("output", mapNode);
                 }
-            }
-            else if (command.getCommand().equals("endSimulation")) {
+            } else if (command.getCommand().equals("endSimulation")) {
                 ok_simulation = 0;
                 node.put("message", "Simulation has ended.");
             }
             else if (command.getCommand().equals("moveRobot")) {
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
-                } else if (robotel.getBattery() <= 0) {
+                } else if (robotel.getBattery() < 0) {
                     node.put("message", "ERROR: Not enough battery left. Cannot perform action");
                 } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
                 } else {
-                    int pos_stanga_i = robotel.getPoz_x();
-                    int pos_stanga_j = robotel.getPoz_y() - 1;
-
-                    int pos_sus_i = robotel.getPoz_x() - 1;
-                    int pos_sus_j = robotel.getPoz_y();
-
-                    int pos_dreapta_i = robotel.getPoz_x();
-                    int pos_dreapta_j = robotel.getPoz_y() + 1;
-
-                    int pos_jos_i = robotel.getPoz_x() + 1;
-                    int pos_jos_j = robotel.getPoz_y();
-
-                    int scor_stanga = -2;
-                    int scor_dreapta = -2;
-                    int scor_jos = -2;
-                    int scor_sus = -2;
-                    int pozitie_mutare_i = 0;
-                    int pozitie_mutare_j = 0;
-                    int scor_minim = 9999;
-                    // verific pentru STANGA
-                    ObjectNode neighbors = MAPPER.createObjectNode();
-                    if (pos_jos_i >= 0 && pos_jos_j >= 0 && pos_jos_i < dimension && pos_jos_j < dimension) {
-                        // iau scorul
-                        List<Entity> entities = mat[pos_jos_i][pos_jos_j];
-                        scor_jos = entities.get(0).get_attack();
-                        // node.put("jos", scor_jos);
-                    }
-                    if (pos_dreapta_i >= 0 && pos_dreapta_j >= 0 && pos_dreapta_i < dimension && pos_dreapta_j < dimension) {
-                        // iau scorul
-                        List<Entity> entities = mat[pos_dreapta_i][pos_dreapta_j];
-                        scor_dreapta = entities.get(0).get_attack();
-                        // node.put("dreapta", scor_dreapta);
-                    }
-                    if (pos_sus_i >= 0 && pos_sus_j >= 0 && pos_sus_i < dimension && pos_sus_j < dimension) {
-                        // iau scorul
-                        List<Entity> entities = mat[pos_sus_i][pos_sus_j];
-                        scor_sus = entities.get(0).get_attack();
-                        // node.put("sus", scor_sus);
-                    }
-                    if (pos_stanga_i >= 0 && pos_stanga_j >= 0 && pos_stanga_i < dimension && pos_stanga_j < dimension) {
-                        List<Entity> entities = mat[pos_stanga_i][pos_stanga_j];
-                        scor_stanga = entities.get(0).get_attack();
-                        // node.put("stanga", scor_stanga);
-                    }
-                    if (scor_jos >= 0 && scor_jos < scor_minim) {
-                        List<Entity> entities = mat[pos_jos_i][pos_jos_j];
-                        scor_minim = scor_jos;
-                        pozitie_mutare_i = pos_jos_i;
-                        pozitie_mutare_j = pos_jos_j;
-                    }
-                    if (scor_dreapta >= 0 && scor_dreapta <= scor_minim) {
-                        scor_minim = scor_dreapta;
-                        pozitie_mutare_i = pos_dreapta_i;
-                        pozitie_mutare_j = pos_dreapta_j;
-                    }
-                    if (scor_sus >= 0 && scor_sus < scor_minim) {
-                        scor_minim = scor_sus;
-                        pozitie_mutare_i = pos_sus_i;
-                        pozitie_mutare_j = pos_sus_j;
-                    }
-                    if (scor_stanga >= 0 && scor_stanga < scor_minim) {
-                        scor_minim = scor_stanga;
-                        pozitie_mutare_i = pos_stanga_i;
-                        pozitie_mutare_j = pos_stanga_j;
-                    }
-                    robotel.setPoz_x(pozitie_mutare_i);
-                    robotel.setPoz_y(pozitie_mutare_j);
-                    robotel.setBattery(robotel.getBattery() - scor_minim);
+                    robotel.setFosta_baterie(robotel.getBattery());
+                    muta_robotelul(robotel, mat, dimension);
                     node.put("command", command.getCommand());
-                    node.put("message", "The robot has successfully moved to position (" + robotel.getPoz_x() + ", " + robotel.getPoz_y() + ").");
+                    if (robotel.getBattery() < 0) {
+                        robotel.setBattery(robotel.getFosta_baterie());
+                        node.put("message", "ERROR: Not enough battery left. Cannot perform action");
+                    } else {
+                        node.put("message", "The robot has successfully moved to position (" + robotel.getPoz_x() + ", " + robotel.getPoz_y() + ").");
+                    }
                 }
             }
             else if (command.getCommand().equals("scanObject")) {
-                ok_scanari = 1;
-                List <Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
-                String color = command.getColor();
-                String smell = command.getSmell();
-                String sound = command.getSound();
-                if (exist_water(entities) && (color.equals("none")) && (smell.equals("none") && (sound.equals("none")))) {
-                    Water apa = return_water(entities);
-                    apa.setIsScanned(true);
-                    // node.put("apa", apa.getisScanned());
-                    node.put("message", "The scanned object is water.");
-                }
-                else if (exist_plant(entities) && !(color.equals("none")) && !(smell.equals("none") && (sound.equals("none")))) {
-                    Plant planta =  return_plant(entities);
-                    planta.setIsScanned(true);
-                    node.put("message", "The scanned object is a plant.");
-                }
-                else if (exist_animal(entities) && !(color.equals("none")) && !(smell.equals("none") && !(sound.equals("none")))) {
-                    Animal animalul = return_animal(entities);
-                    animalul.setIsScanned(true);
-                    node.put("message", "The scanned object is an animal.");
-                }
-                robotel.setBattery(robotel.getBattery() - 7);
-            }
-            else if (command.getCommand().equals("learnFact")) {
-            }
-            else if (command.getCommand().equals("improveEnvConditions")) {
-            }
-            else if (command.getCommand().equals("getEnergyStatus")) {
+                int se_poate = 0;
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
-                }
-                else if (robotel.isCharging() == true) {
+                } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
+                } else if (robotel.getBattery() < 7) {
+                    node.put("message", "ERROR: Not enough battery left. Cannot perform action");
                 }
                 else {
+                    ok_scanari = 1;
+                    List<Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
+                    String color = command.getColor();
+                    String smell = command.getSmell();
+                    String sound = command.getSound();
+                    if (exist_water(entities) && (color.equals("none")) && (smell.equals("none") && (sound.equals("none")))) {
+                        se_poate = 1;
+                        Water apa = return_water(entities);
+                        apa.setIsScanned(true);
+                        apa.setMoment_scanare(iteratii);
+                        // node.put("apa", apa.getisScanned());
+                        node.put("message", "The scanned object is water.");
+                    } else if (exist_plant(entities) && (!color.equals("none")) && (!smell.equals("none") && (sound.equals("none")))) {
+                        se_poate = 1;
+                        Plant planta = return_plant(entities);
+                        planta.setIsScanned(true);
+                        planta.setMoment_scanare(iteratii);
+                        node.put("message", "The scanned object is a plant.");
+                    } else if (exist_animal(entities) && (!color.equals("none")) && (!smell.equals("none") && (!sound.equals("none")))) {
+                        se_poate = 1;
+                        Animal animalul = return_animal(entities);
+                        animalul.setIsScanned(true);
+                        node.put("message", "The scanned object is an animal.");
+                        inceput_iteratie_animal = iteratii;
+                    }
+                    else {
+                        node.put("message", "ERROR: Object not found. Cannot perform action");
+                    }
+                    if (se_poate == 1)
+                    robotel.setBattery(robotel.getBattery() - 7);
+                }
+            } else if (command.getCommand().equals("learnFact")) {
+            } else if (command.getCommand().equals("improveEnvConditions")) {
+            } else if (command.getCommand().equals("getEnergyStatus")) {
+                if (ok_simulation == 0) {
+                    node.put("message", "ERROR: Simulation not started. Cannot perform action");
+                } else if (robotel.isCharging() == true) {
+                    node.put("message", "ERROR: Robot still charging. Cannot perform action");
+                } else {
                     node.put("command", "getEnergyStatus");
                     node.put("message", "TerraBot has " + robotel.getBattery() + " energy points left.");
                 }
             }
-
             else if (command.getCommand().equals("rechargeBattery")) {
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
-                }
-                else if (robotel.isCharging() == true) {
+                } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
                 } else {
                     robotel.setBattery(robotel.getBattery() + command.getTimeToCharge());
@@ -726,13 +752,12 @@ public class Main {
             else if (command.getCommand().equals("changeWeatherConditions")) {
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
-                }
-                else if (robotel.isCharging() == true) {
+                } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
                 } else {
                     ok_schimbari_meteo = 1;
-                    List <Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
-                    for (int k = 0 ; k < entities.size() ; k++) {
+                    List<Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
+                    for (int k = 0; k < entities.size(); k++) {
                         Entity entity = entities.get(k);
                         if (entity.isAir()) {
                             Air aer = (Air) entity;
@@ -743,32 +768,28 @@ public class Main {
                                 trop.setEvent(eveniment);
                                 trop.setRainfall(rainfall);
                                 trop.setAir_quality(trop.update_air_quality());
-                            }
-                            else if (aer.isPolar()) {
+                            } else if (aer.isPolar()) {
                                 Polar polar = (Polar) aer;
                                 String eveniment = command.getImprovementType();
                                 double wind = command.getWindSpeed();
                                 polar.setEvent(eveniment);
                                 polar.setWindSpeed(wind);
                                 polar.setAir_quality(polar.update_air_quality());
-                            }
-                            else if (aer.isTemperate()) {
+                            } else if (aer.isTemperate()) {
                                 TemperateAir temperate = (TemperateAir) aer;
                                 String eveniment = command.getImprovementType();
                                 String seas = command.getSeason();
                                 temperate.setEvent(eveniment);
                                 temperate.setSeason(seas);
                                 temperate.setAir_quality(temperate.update_air_quality());
-                            }
-                            else if (aer.isDesert()) {
+                            } else if (aer.isDesert()) {
                                 DesertAir desert = (DesertAir) aer;
                                 String eveniment = command.getImprovementType();
                                 boolean deser = command.isDesertStorm();
                                 desert.setEvent(eveniment);
                                 desert.setDesertStorm(deser);
                                 desert.setAir_quality(desert.update_air_quality());
-                            }
-                            else if (aer.isMountain()) {
+                            } else if (aer.isMountain()) {
                                 MountainAir mountain = (MountainAir) aer;
                                 String eveniment = command.getImprovementType();
                                 int number = command.getNumberOfHikers();
@@ -783,10 +804,252 @@ public class Main {
             }
 //            node.put("baterie", robotel.getBattery());
 //            node.put("scor", mat[0][1].get(0).get_attack());
+            List <Entity> entities = mat[0][0];
+            Animal animalul = return_animal(entities);
+            if (animalul != null && animalul.getisScanned()) {
+                if (inceput_iteratie_animal < iteratii && (iteratii - inceput_iteratie_animal) % 2 == 0 && animalul.getisScanned()) {
+                    int exista_stanga = 1;
+                    int exista_dreapta = 1;
+                    int exista_sus = 1;
+                    int exista_jos = 1;
+                    int pos_stanga_i = robotel.getPoz_x();
+                    int pos_stanga_j = robotel.getPoz_y() - 1;
+                    if (pos_stanga_j < 0 || pos_stanga_j >= dimension)
+                        exista_stanga = 0;
+                    int pos_sus_i = robotel.getPoz_x() - 1;
+                    int pos_sus_j = robotel.getPoz_y();
+                    if (pos_sus_i < 0 || pos_sus_i >= dimension)
+                        exista_sus = 0;
+                    int pos_dreapta_i = robotel.getPoz_x();
+                    int pos_dreapta_j = robotel.getPoz_y() + 1;
+                    if (pos_dreapta_j < 0 || pos_dreapta_j >= dimension)
+                        exista_dreapta = 0;
+                    int pos_jos_i = robotel.getPoz_x() + 1;
+                    int pos_jos_j = robotel.getPoz_y();
+                    if (pos_jos_i < 0 || pos_jos_i >= dimension)
+                        exista_jos = 0;
+                    Plant planta_stanga = null;
+                    Water apa_stanga = null;
+                    Plant planta_dreapta = null;
+                    Water apa_dreapta = null;
+                    Plant planta_jos = null;
+                    Water apa_jos = null;
+                    Plant planta_sus = null;
+                    Water apa_sus = null;
+                    if (exista_stanga != 0) {
+                        List<Entity> entities_stanga = mat[pos_stanga_i][pos_stanga_j];
+                        apa_stanga = return_water(entities_stanga);
+                        planta_stanga = return_plant(entities_stanga);
+                    }
+                    if (exista_dreapta != 0) {
+                        List<Entity> entities_dreapta = mat[pos_dreapta_i][pos_dreapta_j];
+                        apa_dreapta = return_water(entities_dreapta);
+                        planta_dreapta = return_plant(entities_dreapta);
+                    }
+                    if (exista_jos != 0) {
+                        List<Entity> entities_jos = mat[pos_jos_i][pos_jos_j];
+                        apa_jos = return_water(entities_jos);
+                        planta_jos = return_plant(entities_jos);
+                    }
+                    if (exista_sus != 0) {
+                        List<Entity> entities_sus = mat[pos_sus_i][pos_sus_j];
+                        apa_sus = return_water(entities_sus);
+                        planta_sus = return_plant(entities_sus);
+                    }
+                    double calitate_apa = 0.0;
+                    int poz_x = -1, poz_y = -1;
+                    if (apa_sus != null && planta_sus != null) {
+                        if (apa_sus.water_quality() > calitate_apa) {
+                            calitate_apa = apa_sus.water_quality();
+                            poz_x = pos_sus_i;
+                            poz_y = pos_sus_j;
+                        }
+                    }
+                    if (apa_jos != null && planta_jos != null) {
+                        if (apa_jos.water_quality() > calitate_apa) {
+                            calitate_apa = apa_jos.water_quality();
+                            poz_x = pos_jos_i;
+                            poz_y = pos_jos_j;
+                        }
+                    }
+                    if (apa_dreapta != null && planta_dreapta != null) {
+                        if (apa_dreapta.water_quality() > calitate_apa) {
+                            calitate_apa = apa_dreapta.water_quality();
+                            poz_x = pos_dreapta_i;
+                            poz_y = pos_dreapta_j;
+                        }
+                    }
+                    if (apa_stanga != null && planta_stanga != null) {
+                        if (apa_stanga.water_quality() > calitate_apa) {
+                            calitate_apa = apa_stanga.water_quality();
+                            poz_x = pos_stanga_i;
+                            poz_y = pos_stanga_j;
+                        }
+                    }
+                    if (poz_x == -1) {
+                        if (apa_sus != null && planta_sus != null) {
+                            if (apa_sus.water_quality() > calitate_apa) {
+                                calitate_apa = apa_sus.water_quality();
+                                poz_x = pos_sus_i;
+                                poz_y = pos_sus_j;
+                            }
+                        }
+                        if (apa_jos != null && planta_jos != null) {
+                            if (apa_jos.water_quality() > calitate_apa) {
+                                calitate_apa = apa_jos.water_quality();
+                                poz_x = pos_jos_i;
+                                poz_y = pos_jos_j;
+                            }
+                        }
+                        if (apa_dreapta != null && planta_dreapta != null) {
+                            if (apa_dreapta.water_quality() > calitate_apa) {
+                                calitate_apa = apa_dreapta.water_quality();
+                                poz_x = pos_dreapta_i;
+                                poz_y = pos_dreapta_j;
+                            }
+                        }
+                        if (apa_stanga != null && planta_stanga != null) {
+                            if (apa_stanga.water_quality() > calitate_apa) {
+                                calitate_apa = apa_stanga.water_quality();
+                                poz_x = pos_stanga_i;
+                                poz_y = pos_stanga_j;
+                            }
+                        }
+                        if (poz_x == -1) {
+                            if (apa_sus != null || planta_sus != null) {
+                                if (planta_sus != null) {
+                                    poz_x = pos_sus_i;
+                                    poz_y = pos_sus_j;
+                                }
+                            } else if (apa_dreapta != null || planta_dreapta != null) {
+                                if (planta_dreapta != null) {
+                                    poz_x = pos_dreapta_i;
+                                    poz_y = pos_dreapta_j;
+                                }
+                            } else if (apa_jos != null || planta_jos != null) {
+                                if (planta_jos != null) {
+                                    poz_x = pos_jos_i;
+                                    poz_y = pos_jos_j;
+                                }
+                            } else if (apa_stanga != null || planta_stanga != null) {
+                                if (planta_stanga != null) {
+                                    poz_x = pos_stanga_i;
+                                    poz_y = pos_stanga_j;
+                                }
+                            }
+                        }
+                        if (poz_x == -1) {
+                            if (apa_sus != null || planta_sus != null) {
+                                if (apa_sus != null) {
+                                    if (apa_sus.water_quality() > calitate_apa) {
+                                        calitate_apa = apa_sus.water_quality();
+                                        poz_x = pos_sus_i;
+                                        poz_y = pos_sus_j;
+                                    }
+                                }
+                            }
+                            if (apa_dreapta != null || planta_dreapta != null) {
+                                if (apa_dreapta != null) {
+                                    if (apa_dreapta.water_quality() > calitate_apa) {
+                                        calitate_apa = apa_dreapta.water_quality();
+                                        poz_x = pos_dreapta_i;
+                                        poz_y = pos_dreapta_j;
+                                    }
+                                }
+                            }
+                            if (apa_jos != null || planta_jos != null) {
+                                if (apa_jos != null) {
+                                    if (apa_jos.water_quality() > calitate_apa) {
+                                        calitate_apa = apa_jos.water_quality();
+                                        poz_x = pos_jos_i;
+                                        poz_y = pos_jos_j;
+                                    }
+                                }
+                            }
+                            if (apa_stanga != null || planta_stanga != null) {
+                                if (apa_stanga != null) {
+                                    if (apa_stanga.water_quality() > calitate_apa) {
+                                        calitate_apa = apa_stanga.water_quality();
+                                        poz_x = pos_stanga_i;
+                                        poz_y = pos_stanga_j;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (poz_x == -1) {
+                        if (exista_sus == 1) {
+                            poz_x = pos_sus_i;
+                            poz_y = pos_sus_j;
+                        } else if (exista_dreapta == 1) {
+                            poz_x = pos_dreapta_i;
+                            poz_y = pos_dreapta_j;
+                        } else if (exista_jos == 1) {
+                            poz_x = pos_jos_i;
+                            poz_y = pos_jos_j;
+                        } else if (exista_stanga == 1) {
+                            poz_x = pos_stanga_i;
+                            poz_y = pos_stanga_j;
+                        }
+                    }
+                    if (animalul != null) {
+                        if (animalul.getState().equals("Carnivore") || animalul.getState().equals("Parasite")) {
+                            List<Entity> patratica = mat[poz_x][poz_y];
+                            Animal animal_patratica = return_animal(patratica);
+                            patratica.add(animalul);
+                            entities.remove(animalul);
+                            if (animal_patratica != null) {
+                                animalul.setMass(animalul.getMass() + animal_patratica.getMass());
+                                ok_inter_animal = 1;
+                                //interactiune animal-sol
+                                patratica.remove(animal_patratica);
+                            } else {
+                                Plant planta_curenta = return_plant(patratica);
+                                Water apa_curenta = return_water(patratica);
+                                if (planta_curenta != null) {
+                                    planta_curenta.setMaturity_level("dead");
+                                    animalul.setMass(animalul.getMass() + planta_curenta.getMass());
+                                    animalul.setState("well-fed");
+                                    ok_inter_animal = 1;
+                                    // interactiune animal_soil cu 0.5
+                                }
+                                if (apa_curenta != null) {
+                                    double water_to_drink = Math.min(animalul.getMass() * 0.08, apa_curenta.getMass());
+                                    apa_curenta.setMass(apa_curenta.getMass() - water_to_drink);
+                                    animalul.setMass(animalul.getMass() + water_to_drink);
+                                    // animalul.setState("well-fed");
+                                    ok_inter_animal = 1;
+                                    // interactiune animal_soil cu 0.5
+                                }
+                                // daca sunt !NULL amandoua atunci fac 0.8
+                            }
+                        } else {
+                            List<Entity> patratica = mat[poz_x][poz_y];
+                            patratica.add(animalul);
+                            entities.remove(animalul);
+                            Plant planta_curenta = return_plant(patratica);
+                            Water apa_curenta = return_water(patratica);
+                            if (planta_curenta != null) {
+                                planta_curenta.setMaturity_level("dead");
+                                animalul.setMass(animalul.getMass() + planta_curenta.getMass());
+                                ok_inter_animal = 1;
+                                // interactiune animal_soil cu 0.5
+                            }
+                            if (apa_curenta != null) {
+                                double water_to_drink = Math.min(animalul.getMass() * 0.08, apa_curenta.getMass());
+                                apa_curenta.setMass(apa_curenta.getMass() - water_to_drink);
+                                animalul.setMass(animalul.getMass() + water_to_drink);
+                                ok_inter_animal = 1;
+                                // interactiune animal_soil cu 0.5
+                            }
+                        }
+                    }
+                }
+            }
+            // node.put("baterie", robotel.getBattery());
             node.put("timestamp", command.getTimestamp());
             output.add(node);
         }
-
         File outputFile = new File(outputPath);
         outputFile.getParentFile().mkdirs();
         WRITER.writeValue(outputFile, output);
