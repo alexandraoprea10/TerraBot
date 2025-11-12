@@ -103,6 +103,7 @@ public class Main {
         waterNode.put("type", apita.getType());
         waterNode.put("name", apita.getName());
         waterNode.put("mass", apita.getMass());
+        // waterNode.put("scanat", apita.getisScanned());
         return waterNode;
     }
     public static ObjectNode print_air(Air airut) {
@@ -139,6 +140,118 @@ public class Main {
             airNode.put("windSpeed", ((Polar) airut).getWindSpeed());
         else if (airut.isDesert())
             airNode.put("desertStorm", ((DesertAir) airut).getDesertStorm());
+    }
+    public static boolean exist_plant(List <Entity> entities) {
+        for (int i = 0 ; i <  entities.size() ; i++) {
+            if (entities.get(i).isPlant())
+                return true;
+        }
+        return false;
+    }
+    public static boolean exist_animal(List <Entity> entities) {
+        for (int i = 0 ; i <  entities.size() ; i++) {
+            if (entities.get(i).isAnimal())
+                return true;
+        }
+        return false;
+    }
+    public static boolean exist_water(List <Entity> entities) {
+        for (int i = 0 ; i <  entities.size() ; i++) {
+            if (entities.get(i).isWater())
+                return true;
+        }
+        return false;
+    }
+    public static Plant return_plant(List <Entity> entities) {
+        for (int i = 0 ; i <   entities.size() ; i++) {
+            Entity entity = entities.get(i);
+            if (entity.isPlant())
+                return (Plant) entity;
+        }
+        return null;
+    }
+    public static Animal return_animal(List <Entity> entities) {
+        for (int i = 0 ; i <   entities.size() ; i++) {
+            Entity entity = entities.get(i);
+            if (entity.isAnimal())
+                return (Animal) entity;
+        }
+        return null;
+    }
+    public static Soil return_soil(List <Entity> entities) {
+        for (int i = 0 ; i <   entities.size() ; i++) {
+            Entity entity = entities.get(i);
+            if (entity.isSoil())
+                return (Soil) entity;
+        }
+        return null;
+    }
+    public static Water return_water(List <Entity> entities) {
+        for (int i = 0 ; i <   entities.size() ; i++) {
+            Entity entity = entities.get(i);
+            if (entity.isWater())
+                return (Water) entity;
+        }
+        return null;
+    }
+    public static Air return_air(List <Entity> entities) {
+        for (int i = 0 ; i <   entities.size() ; i++) {
+            Entity entity = entities.get(i);
+            if (entity.isAir())
+                return (Air) entity;
+        }
+        return null;
+    }
+    public static void interactiuni_every_iteration(List <Entity> entities) {
+        Plant planta =  return_plant(entities);
+        Animal animal =  return_animal(entities);
+        Soil soil =  return_soil(entities);
+        Water water =  return_water(entities);
+        Air air =  return_air(entities);
+        if (air != null && animal != null && air.toxicity().equals("toxic"))
+            animal.setState("sick");
+//        if (soil != null && planta != null)
+//            planta.setOxygen_curent(planta.getOxygen_curent() + 0.2);
+        if (soil != null && planta != null) {
+            planta.setNivel_crestere(planta.getNivel_crestere() + 0.2);
+        }
+        if (water != null && planta != null && water.getisScanned()) {
+            planta.setNivel_crestere(planta.getNivel_crestere() + 0.2);
+        }
+        if (planta != null && air != null && planta.getisScanned()) {
+            if (planta.getNivel_crestere() >= 1.0) {
+                if (planta.getMaturity_level().equals("young"))
+                    planta.setMaturity_level("mature");
+                else if (planta.getMaturity_level().equals("mature"))
+                    planta.setMaturity_level("old");
+                else if (planta.getMaturity_level().equals("old"))
+                    planta.setMaturity_level("dead");
+                planta.setNivel_crestere(0);
+            }
+            air.setOxygenLevel(Math.round((air.getOxygenLevel() + planta.oxigen_from_plant() + planta.maturity_oxigen_level()) * 100.0) / 100.0);
+            air.setAir_quality(Math.round(air.air_quality() * 100.0) / 100.0);
+        }
+//        if (animal != null && water!= null && animal.getisScanned()) {
+//            if (animal.getState().equals("well-fed"))
+//        }
+        if (animal != null && water != null && animal.getisScanned())
+            animal.setMass(animal.getMass() + water.getMass());
+    }
+    public static void interactiuni_every_two_iterations(List <Entity> entities) {
+        Plant planta = return_plant(entities);
+        Animal animal = return_animal(entities);
+        Soil soil = return_soil(entities);
+        Water water = return_water(entities);
+        Air air = return_air(entities);
+        if (water != null && air != null && water.getisScanned()) {
+            double result = Math.round((air.getHumidity() + 0.1) * 100.0) / 100.0;
+            air.setHumidity(result);
+            air.setAir_quality(Math.round(air.air_quality() * 100.0) / 100.0);
+        }
+        if (water != null && soil != null && water.getisScanned()) {
+            double result = Math.round((soil.getWaterRetention() + 0.1) * 100.0) / 100.0;
+            soil.setWaterRetention(result);
+        }
     }
     public static void action(final String inputPath,
                               final String outputPath) throws IOException {
@@ -295,6 +408,9 @@ public class Main {
         int iteratii = 0;
         int stamps = 0;
         int ok_schimbari_meteo = 0;
+        int ok_scanari = 0;
+        int s_a_scanat = 0;
+        int incepe_iteratie = 0;
         int previous_stamp = 0;
         List <CommandInput> commands = inputLoader.getCommands();
         int ok_simulation = 0;
@@ -307,31 +423,68 @@ public class Main {
                 stamps = 0;
                 previous_stamp = 0;
             }
+            if (ok_scanari == 1) {
+                if (s_a_scanat == 0) {
+                    s_a_scanat = 1;
+                    incepe_iteratie = iteratii;
+                }
+                iteratii++;
+            }
+            if (ok_scanari == 1) {
+                for (int a = 0; a < dimension; a++) {
+                    for (int b = 0 ; b < dimension; b++) {
+                        List<Entity> entities = mat[a][b];
+                        // node.put("adauga", return_plant(entities).getOxygen_curent());
+                        interactiuni_every_iteration(entities);
+                        if (iteratii > incepe_iteratie && (iteratii - incepe_iteratie) % 2 == 0) {
+//                            Water api =  return_water(entities);
+//                            node.put("message", "Am intrat");
+                            interactiuni_every_two_iterations(entities);
+                        }
+                    }
+                }
+            }
+            for (int a = 0; a < dimension; a++) {
+                for (int b = 0; b < dimension; b++) {
+                    List<Entity> entities = mat[b][a];
+                    double calcul_probabilitate = calculate_probabilitate(entities);
+                    int obiecte = calculate_objects(entities);
+                    double mean = -1, score = -1;
+                    if (obiecte == 0)
+                        mean = -1;
+                    else mean = Math.abs(calcul_probabilitate / obiecte);
+                    int result = (int) Math.round(mean);
+                    for (int p = 0; p < entities.size(); p++) {
+                        Entity entity = entities.get(p);
+                        entity.set_attack(result);
+                    }
+                }
+            }
             ObjectNode node = MAPPER.createObjectNode();
             node.put("command", command.getCommand());
             if (command.getCommand().equals("startSimulation")) {
                 node.put("message", "Simulation has started.");
                 ok_simulation = 1;
-                for (int a = 0; a < dimension; a++) {
-                    for (int b = 0; b < dimension; b++) {
-                        List<Entity> entities = mat[b][a];
-                        ObjectNode entityNode = MAPPER.createObjectNode();
-                        ArrayNode entitiesNode = MAPPER.createArrayNode();
-                        entitiesNode.add(b);
-                        entitiesNode.add(a);
-                        double calcul_probabilitate = calculate_probabilitate(entities);
-                        int obiecte = calculate_objects(entities);
-                        double mean = -1, score = -1;
-                        if (obiecte == 0)
-                            mean = -1;
-                        else mean = Math.abs(calcul_probabilitate / obiecte);
-                        int result = (int) Math.round(mean);
-                        for (int p = 0; p < entities.size(); p++) {
-                            Entity entity = entities.get(p);
-                            entity.set_attack(result);
-                        }
-                    }
-                }
+//                for (int a = 0; a < dimension; a++) {
+//                    for (int b = 0; b < dimension; b++) {
+//                        List<Entity> entities = mat[b][a];
+//                        ObjectNode entityNode = MAPPER.createObjectNode();
+//                        ArrayNode entitiesNode = MAPPER.createArrayNode();
+//                        entitiesNode.add(b);
+//                        entitiesNode.add(a);
+//                        double calcul_probabilitate = calculate_probabilitate(entities);
+//                        int obiecte = calculate_objects(entities);
+//                        double mean = -1, score = -1;
+//                        if (obiecte == 0)
+//                            mean = -1;
+//                        else mean = Math.abs(calcul_probabilitate / obiecte);
+//                        int result = (int) Math.round(mean);
+//                        for (int p = 0; p < entities.size(); p++) {
+//                            Entity entity = entities.get(p);
+//                            entity.set_attack(result);
+//                        }
+//                    }
+//                }
             }
             else if (command.getCommand().equals("printEnvConditions")) {
                 if (ok_simulation == 0) {
@@ -403,7 +556,7 @@ public class Main {
                             for (int p = 0; p < entities.size(); p++) {
                                 if (entities.get(p).isWater())
                                     contor++;
-                                if (entities.get(p).isWater())
+                                if (entities.get(p).isPlant())
                                     contor++;
                                 if (entities.get(p).isAnimal())
                                     contor++;
@@ -515,7 +668,29 @@ public class Main {
                     node.put("message", "The robot has successfully moved to position (" + robotel.getPoz_x() + ", " + robotel.getPoz_y() + ").");
                 }
             }
-            else if (command.getCommand().equals("scanObjects")) {
+            else if (command.getCommand().equals("scanObject")) {
+                ok_scanari = 1;
+                List <Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
+                String color = command.getColor();
+                String smell = command.getSmell();
+                String sound = command.getSound();
+                if (exist_water(entities) && (color.equals("none")) && (smell.equals("none") && (sound.equals("none")))) {
+                    Water apa = return_water(entities);
+                    apa.setIsScanned(true);
+                    // node.put("apa", apa.getisScanned());
+                    node.put("message", "The scanned object is water.");
+                }
+                else if (exist_plant(entities) && !(color.equals("none")) && !(smell.equals("none") && (sound.equals("none")))) {
+                    Plant planta =  return_plant(entities);
+                    planta.setIsScanned(true);
+                    node.put("message", "The scanned object is a plant.");
+                }
+                else if (exist_animal(entities) && !(color.equals("none")) && !(smell.equals("none") && !(sound.equals("none")))) {
+                    Animal animalul = return_animal(entities);
+                    animalul.setIsScanned(true);
+                    node.put("message", "The scanned object is an animal.");
+                }
+                robotel.setBattery(robotel.getBattery() - 7);
             }
             else if (command.getCommand().equals("learnFact")) {
             }
@@ -533,6 +708,7 @@ public class Main {
                     node.put("message", "TerraBot has " + robotel.getBattery() + " energy points left.");
                 }
             }
+
             else if (command.getCommand().equals("rechargeBattery")) {
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
@@ -605,54 +781,10 @@ public class Main {
                     node.put("message", "The weather has changed.");
                 }
             }
+//            node.put("baterie", robotel.getBattery());
+//            node.put("scor", mat[0][1].get(0).get_attack());
             node.put("timestamp", command.getTimestamp());
             output.add(node);
-
-            iteratii++;
-            for (int a = 0; a < dimension; a++) {
-                for (int b = 0; b < dimension; b++) {
-                    List<Entity> entities = mat[a][b];
-                    Air aerul = null;
-                    Soil solul = null;
-                    Plant planta = null;
-                    Animal animalul = null;
-                    Water apa = null;
-                    for (int k = 0; k < entities.size(); k++) {
-                        Entity entity = entities.get(k);
-                        if (entity.isAir()) {
-                            aerul = (Air) entity;
-                        } else if (entity.isSoil()) {
-                            solul = (Soil) entity;
-                        } else if (entity.isPlant()) {
-                            planta = (Plant) entity;
-                        } else if (entity.isAnimal()) {
-                            animalul = (Animal) entity;
-                        } else if (entity.isWater()) {
-                            apa = (Water) entity;
-                        }
-//                        // interactiune aer->animal
-//                        if (aerul != null && animalul != null && aerul.toxicity().equals("toxic")) {
-//                            animalul.setState("sick");
-//                        }
-//                        // interactiune sol->planta
-//                        if (solul != null && planta != null)
-//                            planta.setOxygen_curent(planta.oxigen_from_plant() + 0.2);
-//                        // interactiune apa->planta
-//                        if (water != null && planta != null)
-//                            planta.setOxygen_curent(planta.oxigen_from_plant() + 0.2);
-//                        // interactiune apa-?planta
-//                        if (water != null && planta != null)
-//                            aerul.setOxygenLevel(planta.oxigen_from_plant() + aerul.getOxygenLevel());
-//                        // interactiune animal->sol
-//                        if (animalul != null && solul != null)
-//                            if (animalul.getState().equals("well-fed")) {
-//                                solul.setOrganicMatter((solul.getOrganicMatter()) + 0.1);
-//                            }
-//                        //
-                    }
-                }
-            }
-            // node.put("robot", robotel.isCharging());
         }
 
         File outputFile = new File(outputPath);

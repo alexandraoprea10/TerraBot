@@ -8,6 +8,7 @@ public class Water extends Entity{
     private double turbidity;
     private double contaminantIndex;
     private boolean isFrozen;
+    private boolean isScanned;
     // constructori
     public Water(String name, double mass) {
         super(name, mass, 0);
@@ -50,6 +51,9 @@ public class Water extends Entity{
     public boolean isFrozen() {
         return isFrozen;
     }
+    public boolean getisScanned() {
+        return isScanned;
+    }
     // setteri
     public void setType(String type) {
         this.type = type;
@@ -71,6 +75,9 @@ public class Water extends Entity{
     }
     public void setIsFrozen(boolean isFrozen) {
         this.isFrozen = isFrozen;
+    }
+    public void setIsScanned(boolean isScanned) {
+        this.isScanned = isScanned;
     }
     public double water_quality() {
         double purity_score = purity / 100;

@@ -30,7 +30,8 @@ public class MountainAir extends Air{
     public double air_quality() {
         double oxygenFactor = getOxygenLevel() - (altitude / 1000 * 0.5);
         double score = oxygenFactor * 2 + getHumidity() * 0.6;
-        double result = Math.round(score * 100.0) / 100.0;
+        double normalize_score = Math.max(0, Math.min(100, score));
+        double result = Math.round(normalize_score * 100.0) / 100.0;
         return result;
     }
     @Override

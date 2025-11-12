@@ -29,7 +29,8 @@ public class DesertAir extends Air{
     @Override
     public double air_quality() {
         double score = ((getOxygenLevel() * 2) - (dustParticles * 0.2) - (getTemperature() * 0.3));
-        double result = Math.round(score * 100.0) / 100.0;
+        double normalize_score = Math.max(0, Math.min(100, score));
+        double result = Math.round(normalize_score * 100.0) / 100.0;
         return result;
     }
     @Override

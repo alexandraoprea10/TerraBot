@@ -29,7 +29,8 @@ public class TemperateAir extends Air{
     @Override
     public double air_quality() {
         double score = ((getOxygenLevel() * 2) + (getHumidity() * 0.7) - (pollenLevel * 0.1));
-        double result = Math.round(score * 100.0) / 100.0;
+        double normalize_score = Math.max(0, Math.min(100, score));
+        double result = Math.round(normalize_score * 100.0) / 100.0;
         return result;
     }
     @Override

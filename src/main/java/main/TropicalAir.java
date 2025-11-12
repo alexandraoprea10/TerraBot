@@ -29,14 +29,17 @@ public class TropicalAir extends Air{
     @Override
     public double air_quality() {
         double score = ((getOxygenLevel() * 2) + (getHumidity() * 0.5) - (co2Level * 0.01));
-        double result = Math.round(score * 100.0) / 100.0;
+        double normalize_score = Math.max(0, Math.min(100, score));
+        double result = Math.round(normalize_score * 100.0) / 100.0;
         return result;
     }
     @Override
     public double air_toxicity() {
         double toxicityAQ = 100 * (1 - air_quality() / 82.0);
         double result = Math.round(toxicityAQ * 100.0) / 100.0;
-        return result;
+        double normalize_score = Math.max(0, Math.min(100, result));
+        double res = Math.round(normalize_score * 100.0) / 100.0;
+        return res;
     }
     @Override
     public String toxicity() {
