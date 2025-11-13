@@ -1,91 +1,224 @@
 package main;
 
-abstract public class Air extends Entity {
+public abstract class Air extends Entity {
     private double humidity;
     private double temperature;
     private double oxygenLevel;
     private String event;
-    private double air_quality;
+    private double airQuality;
     // constructori
-    public Air(String name, double mass) {
+    public Air(final String name, final double mass) {
         super(name, mass, 0);
         this.humidity = 0.0;
         this.temperature = 0.0;
         this.oxygenLevel = 0.0;
     }
-    public Air(String name, double mass, double humidity, double temperature, double oxygenLevel) {
+    public Air(final String name, final double mass, final double humidity,
+               final double temperature, final double oxygenLevel) {
         super(name, mass, 0);
         this.humidity = humidity;
         this.temperature = temperature;
         this.oxygenLevel = oxygenLevel;
     }
     // getteri
+
+    /**
+     * Returneaza umiditatea.
+     * @return
+     */
     public double getHumidity() {
         return humidity;
     }
+
+    /**
+     * Returneaza temperatura.
+     * @return
+     */
     public double getTemperature() {
         return temperature;
     }
+
+    /**
+     * Returneaza nivelul de oxigen al plantei.
+     * @return
+     */
     public double getOxygenLevel() {
         return oxygenLevel;
     }
-    public  String getEvent() {
+
+    /**
+     * Returneaza evenimentul care se petrece.
+     * @return
+     */
+    public String getEvent() {
         return event;
     }
-    public double getAir_quality() {
-        return air_quality;
+    /**
+     * Returneaza calitatea aerului.
+     * @return
+     */
+    public double getAirQuality() {
+        return airQuality;
     }
     // setteri
-    public void setHumidity(double humidity) {
+
+    /**
+     * Seteaza umiditatea.
+     * @param humidity
+     */
+    public void setHumidity(final double humidity) {
         this.humidity = humidity;
     }
-    public void setTemperature(double temperature) {
+
+    /**
+     * Seteaza temperatura.
+     * @param temperature
+     */
+    public void setTemperature(final double temperature) {
         this.temperature = temperature;
     }
-    public void setOxygenLevel(double oxygenLevel) {
+
+    /**
+     * Seteaza oxigenul.
+     * @param oxygenLevel
+     */
+    public void setOxygenLevel(final double oxygenLevel) {
         this.oxygenLevel = oxygenLevel;
     }
-    public void setEvent(String event) {
+
+    /**
+     * Seteaza evenimentul.
+     * @param event
+     */
+    public void setEvent(final String event) {
         this.event = event;
     }
-    public void setAir_quality(double air_quality) {
-        this.air_quality = air_quality;
+
+    /**
+     * Seteaza calitatea aerului
+     * @param airQual
+     */
+    public void setAirQuality(final double airQual) {
+        this.airQuality = airQual;
     }
-    public abstract double air_quality();
-    public abstract double air_toxicity();
-    public String result_air(double quality) {
-        if (quality < 40)
+
+    /**
+     * Calculeaza calitatea aerului pentru fiecare tip de aer.
+     * @return
+     */
+    public abstract double airQuality();
+
+    /**
+     * Calculeaza toxicitatea aerului pentru fiecare tip de aer.
+     * @return
+     */
+    public abstract double airToxicity();
+
+    /**
+     * Returneaza ce tip de aer este.
+     * @param quality
+     * @return
+     */
+    public String resultAir(final double quality) {
+        if (quality < MagicNumbersInt.patruzero.getNumar()) {
             return "poor";
-        else if ((quality >= 40) && (quality <= 70))
+        } else if ((quality >= MagicNumbersInt.patruzero.getNumar())
+                && (quality <= MagicNumbersInt.saptezero.getNumar())) {
             return "moderate";
+        }
         return "good";
     }
-    public abstract String result_event();
-    public abstract double update_air_quality();
+
+    /**
+     * Returneaza ce tip de eveniment se intampla pentru fiecare tip de aer.
+     * @return
+     */
+    public abstract String resultEvent();
+
+    /**
+     * Updateaza calitatea aerului daca se fac modificari.
+     * @return
+     */
+    public abstract double updateAirQuality();
+
+    /**
+     * Returneaza ce tip de toxiicitate este in aer.
+     * @return
+     */
     public abstract String toxicity();
+
+    /**
+     * Returneaza false ca e aer.
+     * @return
+     */
     @Override
-    public boolean isPlant() {
+    public final boolean isPlant() {
         return false;
     }
+
+    /**
+     * Returneaza false ca e aer.
+     * @return
+     */
     @Override
-    public boolean isAnimal() {
+    public final boolean isAnimal() {
         return false;
     }
+
+    /**
+     * Returneaza false ca e aer.
+     * @return
+     */
     @Override
-    public boolean isWater() {
+    public final boolean isWater() {
         return false;
     }
+
+    /**
+     * Returneaza false ca e aer.
+     * @return
+     */
     @Override
-    public boolean isSoil() {
+    public final boolean isSoil() {
         return false;
     }
+
+    /**
+     * Returneaza true ca e aer.
+     * @return
+     */
     @Override
-    public boolean isAir() {
+    public final boolean isAir() {
         return true;
     }
+
+    /**
+     * Verifica daca aerul e tropical.
+     * @return
+     */
     public abstract boolean isTropical();
+
+    /**
+     * Verifica daca aerul e polar.
+     * @return
+     */
     public abstract boolean isPolar();
+
+    /**
+     * Verifica daca aerul e temperat.
+     * @return
+     */
     public abstract boolean isTemperate();
+
+    /**
+     * Verifica daca aerul e de desert.
+     * @return
+     */
     public abstract boolean isDesert();
+
+    /**
+     * Verifica daca aerul e montan.
+     * @return
+     */
     public abstract boolean isMountain();
 }

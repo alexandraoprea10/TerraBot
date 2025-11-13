@@ -1,13 +1,15 @@
 package main;
 
-public class Detritivores extends Animal {
+public final class Detritivores extends Animal {
     // constructor
-    public Detritivores(String name, double mass, String state) {
+    public Detritivores(final String name, final double mass, final String state) {
         super(name, mass, state);
     }
     @Override
-    public double probability_attack() {
-        double score = (100.0 - 90.0) / 10.0;
+    public double probabilityAttack() {
+        double score = (MagicNumbersDouble.normalize.getNumar()
+                - MagicNumbersDouble.atacDetr.getNumar())
+                / MagicNumbersDouble.zece.getNumar();
         return score;
     }
 }

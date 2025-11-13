@@ -6,13 +6,15 @@ public abstract class Soil extends Entity {
     private double soilPh;
     private double organicMatter;
     // constructori
-    public Soil(String name, double mass) {
+    public Soil(final String name, final double mass) {
         super(name, mass, 0);
         this.nitrogen = 0;
         this.waterRetention = 0;
         this.soilPh = 0;
     }
-    public Soil(String name, double mass, double nitrogen, double waterRetention, double soilPh, double organicMatter) {
+    public Soil(final String name, final double mass,
+                final double nitrogen, final double waterRetention,
+                final double soilPh, final double organicMatter) {
         super(name, mass, 0);
         this.nitrogen = nitrogen;
         this.waterRetention = waterRetention;
@@ -20,63 +22,171 @@ public abstract class Soil extends Entity {
         this.organicMatter = organicMatter;
     }
     // getteri
+
+    /**
+     * Returneaza nitrogenul pentru sol.
+     * @return
+     */
     public double getNitrogen() {
         return nitrogen;
     }
+
+    /**
+     * Returneaza waterretention
+     * @return
+     */
     public double getWaterRetention() {
         return waterRetention;
     }
+
+    /**
+     * Returneaza Ph-ul solului.
+     * @return
+     */
     public double getSoilPh() {
         return soilPh;
     }
+
+    /**
+     * Returneaza organic matter pentru sol.
+     * @return
+     */
     public double getOrganicMatter() {
         return organicMatter;
     }
     // setteri
-    public void setNitrogen(double nitrogen) {
-        this.nitrogen = nitrogen;
+
+    /**
+     * Seteaza nitrogenul pentru sol.
+     * @param nitro
+     */
+    public void setNitrogen(final double nitro) {
+        this.nitrogen = nitro;
     }
-    public void setWaterRetention(double waterRetention) {
-        this.waterRetention = waterRetention;
+
+    /**
+     * Seteaza waterRet pentru sol.
+     * @param waterRet
+     */
+    public void setWaterRetention(final double waterRet) {
+        this.waterRetention = waterRet;
     }
-    public void setSoilPh(double soilPh) {
-        this.soilPh = soilPh;
+
+    /**
+     * Seteaza soilPh pentru sol.
+     * @param soilPH
+     */
+    public void setSoilPh(final double soilPH) {
+        this.soilPh = soilPH;
     }
-    public void setOrganicMatter(double organicMatter) {
-        this.organicMatter = organicMatter;
+
+    /**
+     * Seteaza organic matter pentru sol.
+     * @param organicMat
+     */
+    public void setOrganicMatter(final double organicMat) {
+        this.organicMatter = organicMat;
     }
-    public abstract double soil_quality();
-    public abstract double probability_attack();
-    public String result_soil(double quality) {
-        if (quality < 40)
+
+    /**
+     * Calculeaza calitatea solului.
+     * @return
+     */
+    public abstract double soilQuality();
+
+    /**
+     * Calculeaza probabilitatea de atac
+     * @return
+     */
+    public abstract double probabilityAttack();
+
+    /**
+     * Retruneaza ce tip de calitate are solul.
+     * @param quality
+     * @return
+     */
+    public String resultSoil(final double quality) {
+        if (quality < MagicNumbersInt.patruzero.getNumar()) {
             return "poor";
-        else if ((quality >= 40) && (quality <= 70))
+        } else if ((quality >= MagicNumbersInt.patruzero.getNumar())
+                && (quality <= MagicNumbersInt.saptezero.getNumar())) {
             return "moderate";
+        }
         return "good";
     }
+
+    /**
+     * Returnez false ca e soil.
+     * @return
+     */
     @Override
-    public boolean isPlant() {
+    public final boolean isPlant() {
         return false;
     }
+
+    /**
+     * Returnez false ca e soil.
+     * @return
+     */
     @Override
-    public boolean isAnimal() {
+    public final boolean isAnimal() {
         return false;
     }
+
+    /**
+     * Returnez false ca e soil.
+     * @return
+     */
     @Override
-    public boolean isWater() {
+    public final boolean isWater() {
         return false;
     }
+
+    /**
+     * Returnez true ca entitatea e sol.
+     * @return
+     */
     @Override
-    public boolean isSoil() {
+    public final boolean isSoil() {
         return true;
     }
+
+    /**
+     * Returnez false ca e soil.
+     * @return
+     */
     @Override
-    public boolean isAir() {
+    public final boolean isAir() {
         return false;
     }
+
+    /**
+     * Verific daca e forest.
+     * @return
+     */
     public abstract boolean isForest();
+
+    /**
+     * Verific daca e swamp.
+     * @return
+     */
     public abstract boolean isSwamp();
+
+    /**
+     * Verific daca e desert.
+     * @return
+     */
     public abstract boolean isDesertSoil();
+
+    /**
+     * Verific daca e Grassland.
+     * @return
+     */
     public abstract boolean isGrassland();
+
+    /**
+     * Verific daca e tundra.
+     * @return
+     */
     public abstract boolean isTundra();
 }

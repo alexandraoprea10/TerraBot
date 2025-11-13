@@ -1,12 +1,14 @@
 package main;
 
-public class DesertSoil extends Soil {
+public final class DesertSoil extends Soil {
     private double salinity;
     // constructori
-    public DesertSoil(String name, double mass) {
+    public DesertSoil(final String name, final double mass) {
         super(name, mass);
     }
-    public DesertSoil(String name, double mass, double nitrogen, double waterRetention, double solidpH, double organicMatter, double salinity) {
+    public DesertSoil(final String name, final double mass, final double nitrogen,
+                      final double waterRetention, final double solidpH,
+                      final double organicMatter, final double salinity) {
         super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
         this.salinity = salinity;
     }
@@ -15,19 +17,27 @@ public class DesertSoil extends Soil {
         return salinity;
     }
     // setter
-    public void setSalinity(double salinity) {
+    public void setSalinity(final double salinity) {
         this.salinity = salinity;
     }
     @Override
-    public double soil_quality() {
-        double score = (getNitrogen() * 0.5) + (getWaterRetention() * 0.3) - (salinity * 2);
-        double normalizeScore = Math.max(0, Math.min(100.0, score));
-        double finalResult = Math.round(normalizeScore * 100.0) / 100.0;
+    public double soilQuality() {
+        double score = (getNitrogen() * MagicNumbersDouble.half.getNumar())
+                + (getWaterRetention() * MagicNumbersDouble.waterRetentionDesert.getNumar())
+                - (salinity * MagicNumbersInt.doi.getNumar());
+        double normalizeScore = Math.max(0,
+                Math.min(MagicNumbersDouble.normalize.getNumar(), score));
+        double finalResult = Math.round(normalizeScore
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return finalResult;
     }
     @Override
-    public double probability_attack() {
-        double score = (100 - getWaterRetention() + salinity) / 100 * 100;
+    public double probabilityAttack() {
+        double score = (MagicNumbersInt.suta.getNumar()
+                - getWaterRetention() + salinity)
+                / MagicNumbersInt.suta.getNumar()
+                * MagicNumbersInt.suta.getNumar();
         return score;
     }
     @Override

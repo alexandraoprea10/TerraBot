@@ -1,49 +1,50 @@
 package main;
 
-public class Robot {
+public final class Robot {
     private int battery;
-    private int poz_x;
-    private int poz_y;
+    private int pozX;
+    private int pozY;
     private boolean isCharging;
-    private int fosta_baterie;
+    private int fostaBaterie;
 
     // constructor
-    public Robot(int battery, int poz_x, int poz_y, boolean isCharging) {
+    public Robot(final int battery, final int pozX,
+                 final int pozY, final boolean isCharging) {
         this.battery = battery;
-        this.poz_x = poz_x;
-        this.poz_y = poz_y;
+        this.pozX = pozX;
+        this.pozY = pozY;
         this.isCharging = isCharging;
     }
     // getteri
     public int getBattery() {
         return battery;
     }
-    public int getPoz_x() {
-        return poz_x;
+    public int getPozX() {
+        return pozX;
     }
-    public int getPoz_y() {
-        return poz_y;
+    public int getPozY() {
+        return pozY;
     }
     public boolean isCharging() {
         return isCharging;
     }
-    public int getFosta_baterie() {
-        return fosta_baterie;
+    public int getFostaBaterie() {
+        return fostaBaterie;
     }
     // setteri
-    public void setBattery(int battery) {
+    public void setBattery(final int battery) {
         this.battery = battery;
     }
-    public void setPoz_x(int poz_x) {
-        this.poz_x = poz_x;
+    public void setPozX(final int pozX) {
+        this.pozX = pozX;
     }
-    public void setPoz_y(int poz_y) {
-        this.poz_y = poz_y;
+    public void setPozY(final int pozY) {
+        this.pozY = pozY;
     }
-    public void setIsCharging(boolean isCharging) {
+    public void setIsCharging(final boolean isCharging) {
         this.isCharging = isCharging;
     }
-    public void setFosta_baterie(int fosta_baterie) {
-        this.fosta_baterie = fosta_baterie;
+    public void setFostaBaterie(final int fostaBaterie) {
+        this.fostaBaterie = fostaBaterie;
     }
 }

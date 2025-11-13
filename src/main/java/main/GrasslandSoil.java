@@ -6,7 +6,9 @@ public final class GrasslandSoil extends Soil {
     public GrasslandSoil(final String name, final double mass) {
         super(name, mass);
     }
-    public GrasslandSoil(final String name, final double mass, final double nitrogen, final double waterRetention, final double solidpH, final double organicMatter, final double rootDensity) {
+    public GrasslandSoil(final String name, final double mass, final double nitrogen,
+                         final double waterRetention, final double solidpH,
+                         final double organicMatter, final double rootDensity) {
         super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
         this.rootDensity = rootDensity;
     }
@@ -19,15 +21,21 @@ public final class GrasslandSoil extends Soil {
         this.rootDensity = rootDensity;
     }
     @Override
-    public double soil_quality() {
-        double score = (getNitrogen() * 1.3) + (getOrganicMatter() * 1.5) + (rootDensity * 0.8);
-        double normalizeScore = Math.max(0, Math.min(100.0, score));
-        double finalResult = Math.round(normalizeScore * 100.0) / 100.0;
+    public double soilQuality() {
+        double score = (getNitrogen() * MagicNumbersDouble.nitrogen.getNumar())
+                + (getOrganicMatter() * MagicNumbersDouble.organicMatter.getNumar())
+                + (rootDensity * MagicNumbersDouble.rootDensity.getNumar());
+        double normalizeScore = Math.max(0,
+                Math.min(MagicNumbersDouble.normalize.getNumar(), score));
+        double finalResult = Math.round(normalizeScore * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return finalResult;
     }
     @Override
-    public double probability_attack() {
-        double score = ((50 - rootDensity) + getWaterRetention() * 0.5) / 75 * 100;
+    public double probabilityAttack() {
+        double score = ((MagicNumbersInt.jumatate.getNumar() - rootDensity)
+                + getWaterRetention() * MagicNumbersDouble.half.getNumar())
+                / MagicNumbersInt.trei_sferturi.getNumar() * MagicNumbersInt.suta.getNumar();
         return score;
     }
     @Override

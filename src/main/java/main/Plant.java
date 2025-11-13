@@ -1,76 +1,93 @@
 package main;
 
 public abstract class Plant extends Entity {
-    private String maturity_level;
-    private double nivel_crestere;
-    private double oxygen_curent;
-    private int moment_scanare;
+    private String maturityLevel;
+    private double nivelCrestere;
+    private double oxygenCurent;
+    private int momentScanare;
     // constructor
-    public Plant(String name, double mass, String maturity_level,  double oxygen_curent) {
+    public Plant(final String name, final double mass,
+                 final String maturityLevel, final double oxygenCurent) {
         super(name, mass, 0);
-        this.maturity_level = maturity_level;
-        this.oxygen_curent = oxygen_curent;
+        this.maturityLevel = maturityLevel;
+        this.oxygenCurent = oxygenCurent;
     }
     // getter
-    public String getMaturity_level() {
-        return maturity_level;
+    public final String getMaturityLevel() {
+        return maturityLevel;
     }
-    public double getOxygen_curent() {
-        return oxygen_curent;
+    public final double getOxygenCurent() {
+        return oxygenCurent;
     }
-    public double getNivel_crestere() {
-        return nivel_crestere;
+    public final double getNivelCrestere() {
+        return nivelCrestere;
     }
-    public int getMoment_scanare() {
-        return moment_scanare;
+    public final int getMomentScanare() {
+        return momentScanare;
     }
     // setter
-    public void setMaturity_level(String maturity_level) {
-        this.maturity_level = maturity_level;
+    public final void setMaturityLevel(final String maturityLevel) {
+        this.maturityLevel = maturityLevel;
     }
-    public void setOxygen_curent(double oxygen_curent) {
-        this.oxygen_curent = oxygen_curent;
+    public final void setOxygenCurent(final double oxygenCurent) {
+        this.oxygenCurent = oxygenCurent;
     }
-    public void setNivel_crestere(double nivel_crestere) {
-        this.nivel_crestere = nivel_crestere;
+    public final void setNivelCrestere(final double nivelCrestere) {
+        this.nivelCrestere = nivelCrestere;
     }
-    public void setMoment_scanare(int moment_scanare) {
-        this.moment_scanare = moment_scanare;
+    public final void setMomentScanare(final int momentScanare) {
+        this.momentScanare = momentScanare;
     }
-    // oxigenul din fiecare categorie
-    public double maturity_oxigen_level() {
+
+    /**
+     * Calculeaza oxigenul in functie de maturitate.
+     * @return
+     */
+    public double maturityOxigenLevel() {
         double result = 0.0;
-        if (maturity_level.equals("young")) {
-            result = 0.2;
+        if (maturityLevel.equals("young")) {
+            result = MagicNumbersDouble.zerodoi.getNumar();
+        } else if (maturityLevel.equals("mature")) {
+            result = MagicNumbersDouble.zerosapte.getNumar();
+        } else if (maturityLevel.equals("old")) {
+            result = MagicNumbersDouble.zeropatru.getNumar();
         }
-        else if (maturity_level.equals("mature")) {
-            result = 0.7;
-        }
-        else if (maturity_level.equals("old")) {
-            result = 0.4;
-        }
-        return Math.round(result * 100.0) / 100.0;
+        return Math.round(result * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
     }
-    public abstract double oxigen_from_plant();
-    public abstract double probability_attack();
+
+    /**
+     * Calculeaza oxigenul din planta.
+     * @return
+     */
+    public abstract double oxigenFromPlant();
+
+    /**
+     * Calculeaza probabilitatea de a se agata TerraBot pe planta.
+     * @return
+     */
+    public abstract double probabilityAttack();
+    /**
+     * Verifica ce fel de entitate este.
+     */
     @Override
-    public boolean isPlant() {
+    public final boolean isPlant() {
         return true;
     }
     @Override
-    public boolean isAnimal() {
+    public final boolean isAnimal() {
         return false;
     }
     @Override
-    public boolean isWater() {
+    public final boolean isWater() {
         return false;
     }
     @Override
-    public boolean isSoil() {
+    public final boolean isSoil() {
         return false;
     }
     @Override
-    public boolean isAir() {
+    public final boolean isAir() {
         return false;
     }
 }

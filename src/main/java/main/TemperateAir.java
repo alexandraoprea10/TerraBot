@@ -1,14 +1,16 @@
 package main;
 
-public class TemperateAir extends Air {
+public final class TemperateAir extends Air {
     private double pollenLevel;
     private String season;
     // constructori
-    public TemperateAir(String nume, double mass) {
+    public TemperateAir(final String nume, final double mass) {
         super(nume, mass);
         this.pollenLevel = 0.0;
     }
-    public TemperateAir(String name, double mass, double humidity, double temperature, double oxygenLevel, double pollenLevel) {
+    public TemperateAir(final String name, final double mass, final double humidity,
+                        final double temperature, final double oxygenLevel,
+                        final double pollenLevel) {
         super(name, mass,  humidity, temperature, oxygenLevel);
         this.pollenLevel = pollenLevel;
     }
@@ -20,44 +22,57 @@ public class TemperateAir extends Air {
         return season;
     }
     // setter
-    public void setPollenLevel(double pollenLevel) {
+    public void setPollenLevel(final double pollenLevel) {
         this.pollenLevel = pollenLevel;
     }
-    public void setSeason(String season) {
+    public void setSeason(final String season) {
         this.season = season;
     }
     @Override
-    public double air_quality() {
-        double score = ((getOxygenLevel() * 2) + (getHumidity() * 0.7) - (pollenLevel * 0.1));
-        double normalize_score = Math.max(0, Math.min(100, score));
-        double result = Math.round(normalize_score * 100.0) / 100.0;
+    public double airQuality() {
+        double score = ((getOxygenLevel() * MagicNumbersInt.oxygen.getNumar())
+                + (getHumidity() * MagicNumbersDouble.humidity.getNumar())
+                - (pollenLevel * MagicNumbersDouble.pollen.getNumar()));
+        double normalizeScore = Math.max(0,
+                Math.min(MagicNumbersInt.suta.getNumar(), score));
+        double result = Math.round(normalizeScore
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return result;
     }
     @Override
-    public double air_toxicity() {
-        double toxicityAQ = 100 * (1 - air_quality() / 84.0);
-        double result = Math.round(toxicityAQ * 100.0) / 100.0;
+    public double airToxicity() {
+        double toxicityAQ = MagicNumbersInt.suta.getNumar()
+                * (1 - airQuality() / MagicNumbersDouble.airTemperate.getNumar());
+        double result = Math.round(toxicityAQ * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return result;
     }
     @Override
     public String toxicity() {
-        double toxicityAQ = 100 * (1 - air_quality() / 84.0);
-        if (toxicityAQ > (0.8 * 84.0))
+        double toxicityAQ = MagicNumbersInt.suta.getNumar()
+                * (MagicNumbersInt.unu.getNumar() - airQuality()
+                / MagicNumbersDouble.airTemperate.getNumar());
+        if (toxicityAQ > (MagicNumbersDouble.toxic.getNumar()
+                * MagicNumbersDouble.airTemperate.getNumar())) {
             return "toxic";
-        else return "not toxic";
+        } else {
+            return "not toxic";
+        }
     }
     @Override
-    public String result_event() {
+    public String resultEvent() {
         return "newSeason";
     }
     @Override
-    public double update_air_quality() {
+    public double updateAirQuality() {
         double seasonPenalty = 0.0;
         if (season != null) {
-            if (season.equalsIgnoreCase("Spring"))
-                seasonPenalty = 15.0;
+            if (season.equalsIgnoreCase("Spring")) {
+                seasonPenalty = MagicNumbersDouble.penalty.getNumar();
+            }
         }
-        double result = getAir_quality() - seasonPenalty;
+        double result = getAirQuality() - seasonPenalty;
         return result;
     }
     @Override

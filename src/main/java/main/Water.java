@@ -8,9 +8,9 @@ public class Water extends Entity {
     private double turbidity;
     private double contaminantIndex;
     private boolean isFrozen;
-    private int moment_scanare;
+    private int momentScanare;
     // constructori
-    public Water(String name, double mass) {
+    public Water(final String name, final double mass) {
         super(name, mass, 0);
         this.salinity = 0.0;
         this.purity = 0.0;
@@ -19,7 +19,9 @@ public class Water extends Entity {
         this.pH = 0.0;
         this.isFrozen = false;
     }
-    public Water(String name, double mass, String type, double salinity, double pH, double purity, double turbidity, double contaminantIndex, boolean isFrozen) {
+    public Water(final String name, final double mass, final String type,
+                 final double salinity, final double pH, final double purity,
+                 final double turbidity, final double contaminantIndex, final boolean isFrozen) {
         super(name, mass, 0);
         this.type = type;
         this.salinity = salinity;
@@ -30,93 +32,199 @@ public class Water extends Entity {
         this.isFrozen = isFrozen;
     }
     // getteri
+
+    /**
+     * Returneaza tipul.
+     * @return
+     */
     public String getType() {
         return type;
     }
+
+    /**
+     * Returneaza salinitatea.
+     * @return
+     */
     public double getSalinity() {
         return salinity;
     }
+
+    /**
+     * Returneaza puritatea apei.
+     * @return
+     */
     public double getPurity() {
         return purity;
     }
+
+    /**
+     * Returneaza turbiditatea apei.
+     * @return
+     */
     public double getTurbidity() {
         return turbidity;
     }
+
+    /**
+     * Returneaza indexul de contaminare al apei.
+     * @return
+     */
     public double getContaminantIndex() {
         return contaminantIndex;
     }
+
+    /**
+     * Returneaza PH-ul apei.
+     * @return
+     */
     public double getPH() {
         return pH;
     }
+
+    /**
+     * Returneaza daca apa e inghetata sau nu.
+     * @return
+     */
     public boolean isFrozen() {
         return isFrozen;
     }
-    public int  getMoment_scanare() {
-        return moment_scanare;
+
+    /**
+     * Returneaza momentul in care a fost scanata apa.
+     * @return
+     */
+    public int getMomentScanare() {
+        return momentScanare;
     }
     // setteri
-    public void setType(String type) {
+
+    /**
+     * Seteaza tipul apei.
+     * @param type
+     */
+    public void setType(final String type) {
         this.type = type;
     }
-    public void setSalinity(double salinity) {
+
+    /**
+     * Seteaza salinitatea apei.
+     * @param salinity
+     */
+    public void setSalinity(final double salinity) {
         this.salinity = salinity;
     }
-    public void setPurity(double purity) {
+
+    /**
+     * Seteaza puritatea apei.
+     * @param purity
+     */
+    public void setPurity(final double purity) {
         this.purity = purity;
     }
-    public void setTurbidity(int turbidity) {
+
+    /**
+     * Seteaza turbiditatea apei.
+     * @param turbidity
+     */
+    public void setTurbidity(final int turbidity) {
         this.turbidity = turbidity;
     }
-    public void setContaminantIndex(double contaminantIndex) {
+
+    /**
+     * Seteaza indexul de contaminare.
+     * @param contaminantIndex
+     */
+    public void setContaminantIndex(final double contaminantIndex) {
         this.contaminantIndex = contaminantIndex;
     }
-    public void setPH(double pH) {
-        this.pH = pH;
+
+    /**
+     * Seteaza PH-ul apei.
+     * @param ph
+     */
+    public void setPh(final double ph) {
+        this.pH = ph;
     }
-    public void setIsFrozen(boolean isFrozen) {
+
+    /**
+     * Seteaza daca apa e inghetata sau nu.
+     * @param isFrozen
+     */
+    public void setIsFrozen(final boolean isFrozen) {
         this.isFrozen = isFrozen;
     }
-    public void setMoment_scanare(int moment_scanare) {
-        this.moment_scanare = moment_scanare;
+
+    /**
+     * Seteaza momentul in care a fost scanata apa.
+     * @param momentScanare
+     */
+    public void setMomentScanare(final int momentScanare) {
+        this.momentScanare = momentScanare;
     }
-    public double water_quality() {
-        double purity_score = purity / 100;
-        double pH_score = 1 - Math.abs(pH - 7.5) / 7.5;
-        double salinity_score = 1 - (salinity / 350);
-        double turbidity_score = 1 - (turbidity / 100.0);
-        double contaminant_score = 1 - (contaminantIndex / 100);
-        double frozen_score;
-        if (isFrozen)
-            frozen_score = 0.0;
-        else frozen_score = 1.0;
-        double water_q = (0.3 * purity_score + 0.2 * pH_score + 0.15 * salinity_score + 0.1 * turbidity_score + 0.15 * contaminant_score + 0.2 * frozen_score) * 100.0;
-        return water_q;
+
+    /**
+     * Calculez calitatea apei.
+     * @return
+     */
+    public double waterQuality() {
+        double purityScore = purity / MagicNumbersInt.suta.getNumar();
+        double pHScore = MagicNumbersInt.unu.getNumar() - Math.abs(pH
+                - MagicNumbersDouble.saptecinci.getNumar())
+                / MagicNumbersDouble.saptecinci.getNumar();
+        double salinityScore = MagicNumbersInt.unu.getNumar()
+                - (salinity / MagicNumbersInt.treicincizero.getNumar());
+        double turbidityScore = MagicNumbersInt.unu.getNumar()
+                - (turbidity / MagicNumbersDouble.normalize.getNumar());
+        double contaminantScore = MagicNumbersInt.unu.getNumar()
+                - (contaminantIndex / MagicNumbersInt.suta.getNumar());
+        double frozenScore;
+        if (isFrozen) {
+            frozenScore = 0.0;
+        } else {
+            frozenScore = MagicNumbersDouble.unu.getNumar();
+        }
+        double waterQ = (MagicNumbersDouble.temperatura.getNumar()
+                * purityScore + MagicNumbersDouble.zerodoi.getNumar()
+                * pHScore + MagicNumbersDouble.zerounucinci.getNumar()
+                * salinityScore + MagicNumbersDouble.zerounu.getNumar()
+                * turbidityScore + MagicNumbersDouble.zerounucinci.getNumar()
+                * contaminantScore + MagicNumbersDouble.zerodoi.getNumar()
+                * frozenScore) * MagicNumbersDouble.normalize.getNumar();
+        return waterQ;
     }
-    public String result_water(double quality) {
-        if (quality < 40)
+
+    /**
+     * Calculez ce calitate are apa.
+     * @param quality
+     * @return
+     */
+    public String resultWater(final double quality) {
+        if (quality < MagicNumbersInt.patruzero.getNumar()) {
             return "Poor";
-        else if ((quality >= 40) && (quality <= 70))
+        } else if ((quality >= MagicNumbersInt.patruzero.getNumar())
+                && (quality <= MagicNumbersInt.saptezero.getNumar())) {
             return "Moderate";
+        }
         return "Good";
     }
     @Override
-    public boolean isPlant() {
+    public final boolean isPlant() {
         return false;
     }
     @Override
-    public boolean isAnimal() {
+    public final boolean isAnimal() {
         return false;
     }
     @Override
-    public boolean isWater() {
+    public final boolean isWater() {
         return true;
     }
     @Override
-    public boolean isSoil() {
+    public final boolean isSoil() {
         return false;
     }
     @Override
-    public boolean isAir() {
+    public final boolean isAir() {
         return false;
     }
 }

@@ -1,16 +1,18 @@
 package main;
 
-public class TropicalAir extends Air {
+public final class TropicalAir extends Air {
     private double co2Level;
     private double rainfall;
     // constructori
-    public TropicalAir(String nume, double mass) {
+    public TropicalAir(final String nume, final double mass) {
         super(nume, mass);
         this.co2Level = 0.0;
     }
-    public TropicalAir(String nume, double mass, double humidity, double temperature, double oxygenLevel, double co2Level) {
+    public TropicalAir(final String nume, final double mass, final double humidity,
+                       final double temperature, final double oxygenLevel, final double co2Level) {
         super(nume, mass,  humidity, temperature, oxygenLevel);
         this.co2Level = co2Level;
+        this.rainfall = 0.0;
     }
     // getter
     public double getCo2Level() {
@@ -20,41 +22,58 @@ public class TropicalAir extends Air {
         return rainfall;
     }
     // setter
-    public void setCo2Level(double co2Level) {
+    public void setCo2Level(final double co2Level) {
         this.co2Level = co2Level;
     }
-    public void  setRainfall(double rainfall) {
+    public void setRainfall(final double rainfall) {
         this.rainfall = rainfall;
     }
     @Override
-    public double air_quality() {
-        double score = ((getOxygenLevel() * 2) + (getHumidity() * 0.5) - (co2Level * 0.01));
-        double normalize_score = Math.max(0, Math.min(100, score));
-        double result = Math.round(normalize_score * 100.0) / 100.0;
+    public double airQuality() {
+        double score = ((getOxygenLevel()
+                * MagicNumbersInt.doi.getNumar())
+                + (getHumidity() * MagicNumbersDouble.half.getNumar())
+                - (co2Level * MagicNumbersDouble.zerozerounu.getNumar()));
+        double normalizeScore = Math.max(0, Math.min(MagicNumbersInt.suta.getNumar(), score));
+        double result = Math.round(normalizeScore
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return result;
     }
     @Override
-    public double air_toxicity() {
-        double toxicityAQ = 100 * (1 - air_quality() / 82.0);
-        double result = Math.round(toxicityAQ * 100.0) / 100.0;
-        double normalize_score = Math.max(0, Math.min(100, result));
-        double res = Math.round(normalize_score * 100.0) / 100.0;
+    public double airToxicity() {
+        double toxicityAQ = MagicNumbersInt.suta.getNumar()
+                * (MagicNumbersInt.unu.getNumar() - airQuality()
+                / MagicNumbersDouble.optdoi.getNumar());
+        double result = Math.round(toxicityAQ
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
+        double normalizeScore = Math.max(0,
+                Math.min(MagicNumbersInt.suta.getNumar(), result));
+        double res = Math.round(normalizeScore * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return res;
     }
     @Override
     public String toxicity() {
-        double toxicityAQ = 100 * (1 - air_quality() / 82.0);
-        if (toxicityAQ > (0.8 * 82.0))
+        double toxicityAQ = MagicNumbersInt.suta.getNumar()
+                * (MagicNumbersInt.unu.getNumar() - airQuality()
+                / MagicNumbersDouble.optdoi.getNumar());
+        if (toxicityAQ > (MagicNumbersDouble.oxygenMoss.getNumar()
+                * MagicNumbersDouble.optdoi.getNumar())) {
             return "toxic";
-        else return "not toxic";
+        } else {
+            return "not toxic";
+        }
     }
     @Override
-    public String result_event() {
+    public String resultEvent() {
         return "rainfall";
     }
     @Override
-    public double update_air_quality() {
-        double result = getAir_quality() + (rainfall * 0.3);
+    public double updateAirQuality() {
+        double result = getAirQuality() + (rainfall
+                * MagicNumbersDouble.waterRetentionDesert.getNumar());
         return result;
     }
     @Override

@@ -1,18 +1,30 @@
 package main;
 
-public class Ferns extends Plant {
+public final class Ferns extends Plant {
     // constructor
-    public Ferns(String name, double mass, double oxygen, String maturity_level) {
-        super(name, mass, maturity_level, oxygen);
+    public Ferns(final String name, final double mass,
+                 final double oxygen, final String maturityLevel) {
+        super(name, mass, maturityLevel, oxygen);
     }
     // aflu oxigenul din fiecare categorie
+
+    /**
+     * Returnez oxigenul din planta
+     * @return
+     */
     @Override
-    public double oxigen_from_plant() {
+    public double oxigenFromPlant() {
         return 0.0;
     }
+
+    /**
+     * Calculeaza probabilitatea de atac.
+     * @return
+     */
     @Override
-    public double probability_attack() {
-        double score = 30.0 / 100.0;
+    public double probabilityAttack() {
+        double score = MagicNumbersDouble.treizeci.getNumar()
+                / MagicNumbersDouble.normalize.getNumar();
         return score;
     }
 }

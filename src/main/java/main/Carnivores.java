@@ -1,13 +1,15 @@
 package main;
 
-public class Carnivores extends Animal {
+public final class Carnivores extends Animal {
     // constructor
-    public Carnivores(String name, double mass, String state) {
+    public Carnivores(final String name, final double mass, final String state) {
         super(name, mass, state);
     }
     @Override
-    public double probability_attack() {
-        double score = (100.0 - 30.0) / 10.0;
+    public double probabilityAttack() {
+        double score = (MagicNumbersDouble.normalize.getNumar()
+                - MagicNumbersDouble.treizeci.getNumar())
+                / MagicNumbersDouble.zece.getNumar();
         return score;
     }
 }

@@ -1,12 +1,14 @@
 package main;
 
-public class ForestSoil extends Soil {
+public final class ForestSoil extends Soil {
     private double leafLitter;
     // constructori
-    public ForestSoil(String name, double mass) {
+    public ForestSoil(final String name, final double mass) {
         super(name, mass);
     }
-    public ForestSoil(String name, double mass, double nitrogen, double waterRetention, double solidpH, double organicMatter, double leafLitter) {
+    public ForestSoil(final String name, final double mass, final double nitrogen,
+                      final double waterRetention, final double solidpH,
+                      final double organicMatter, final double leafLitter) {
         super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
         this.leafLitter = leafLitter;
     }
@@ -15,19 +17,28 @@ public class ForestSoil extends Soil {
         return leafLitter;
     }
     // setter
-    public void setLeafLitter(double leafLitter) {
+    public void setLeafLitter(final double leafLitter) {
         this.leafLitter = leafLitter;
     }
     @Override
-    public double soil_quality() {
-        double score = (getNitrogen() * 1.2) + (getOrganicMatter() * 2) + (getWaterRetention() * 1.5) + (leafLitter * 0.3);
-        double normalizeScore = Math.max(0, Math.min(100.0, score));
-        double finalResult = Math.round(normalizeScore * 100.0) / 100.0;
+    public double soilQuality() {
+        double score = (getNitrogen() * MagicNumbersDouble.nitrogenForest.getNumar())
+                + (getOrganicMatter() * MagicNumbersInt.doi.getNumar())
+                + (getWaterRetention() * MagicNumbersDouble.waterRetForest.getNumar())
+                + (leafLitter * MagicNumbersDouble.leafliterSoil.getNumar());
+        double normalizeScore = Math.max(0,
+                Math.min(MagicNumbersDouble.normalize.getNumar(), score));
+        double finalResult = Math.round(normalizeScore
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return finalResult;
     }
     @Override
-    public double probability_attack() {
-        double score = (getWaterRetention() * 0.6 + leafLitter * 0.4) / 80 * 100;
+    public double probabilityAttack() {
+        double score = (getWaterRetention() * MagicNumbersDouble.waterRetFor2.getNumar()
+                + leafLitter * MagicNumbersDouble.leafLiter2.getNumar())
+                / MagicNumbersInt.optzeci.getNumar()
+                * MagicNumbersInt.suta.getNumar();
         return score;
     }
     @Override

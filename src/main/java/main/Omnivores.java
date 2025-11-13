@@ -1,14 +1,16 @@
 package main;
 
-public class Omnivores extends Animal {
-    private static final double posibility = (100.0 - 60.0) / 10.0;
+public final class Omnivores extends Animal {
     // constructor
-    public Omnivores(String name, double mass, String state) {
+    public Omnivores(final String name, final double mass,
+                     final String state) {
         super(name, mass, state);
     }
     @Override
-    public double probability_attack() {
-        double score = (100.0 - 60.0) / 10.0;
+    public double probabilityAttack() {
+        double score = (MagicNumbersDouble.normalize.getNumar()
+                - MagicNumbersDouble.saizeci.getNumar())
+                / MagicNumbersDouble.zece.getNumar();
         return score;
     }
 }

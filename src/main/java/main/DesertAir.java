@@ -1,14 +1,16 @@
 package main;
 
-public class DesertAir extends Air {
+public final class DesertAir extends Air {
     private double dustParticles;
     private boolean desertStorm;
     // constructori
-    public DesertAir(String nume, double mass) {
+    public DesertAir(final String nume, final double mass) {
         super(nume, mass);
         this.dustParticles = 0.0;
     }
-    public DesertAir(String nume, double mass, double humidity, double temperature, double oxygenLevel, double dustParticles) {
+    public DesertAir(final String nume, final double mass,
+                     final double humidity, final double temperature,
+                     final double oxygenLevel, final double dustParticles) {
         super(nume, mass, humidity, temperature, oxygenLevel);
         this.dustParticles = dustParticles;
     }
@@ -20,43 +22,57 @@ public class DesertAir extends Air {
         return desertStorm;
     }
     // setter
-    public void setDustParticles(double dustParticles) {
+    public void setDustParticles(final double dustParticles) {
         this.dustParticles = dustParticles;
     }
-    public void setDesertStorm(boolean desertStorm) {
+    public void setDesertStorm(final boolean desertStorm) {
         this.desertStorm = desertStorm;
     }
     @Override
-    public double air_quality() {
-        double score = ((getOxygenLevel() * 2) - (dustParticles * 0.2) - (getTemperature() * 0.3));
-        double normalize_score = Math.max(0, Math.min(100, score));
-        double result = Math.round(normalize_score * 100.0) / 100.0;
+    public double airQuality() {
+        double score = ((getOxygenLevel() * MagicNumbersInt.doi.getNumar())
+                - (dustParticles * MagicNumbersDouble.dustParticles.getNumar())
+                - (getTemperature() * MagicNumbersDouble.temperatura.getNumar()));
+        double normalizeScore = Math.max(0, Math.min(MagicNumbersInt.suta.getNumar(), score));
+        double result = Math.round(normalizeScore
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return result;
     }
     @Override
-    public double air_toxicity() {
-        double toxicityAQ = 100 * (1 - air_quality() / 65.0);
-        double result = Math.round(toxicityAQ * 100.0) / 100.0;
+    public double airToxicity() {
+        double toxicityAQ = MagicNumbersInt.suta.getNumar()
+                * (MagicNumbersInt.unu.getNumar() - airQuality()
+                / MagicNumbersDouble.airDesert.getNumar());
+        double result = Math.round(toxicityAQ
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return result;
     }
     @Override
     public String toxicity() {
-        double toxicityAQ = 100 * (1 - air_quality() / 65.0);
-        if (toxicityAQ > (0.8 * 65.0))
+        double toxicityAQ = MagicNumbersInt.suta.getNumar()
+                * (MagicNumbersInt.unu.getNumar() - airQuality()
+                / MagicNumbersDouble.airDesert.getNumar());
+        if (toxicityAQ > (MagicNumbersDouble.toxic.getNumar()
+                * MagicNumbersDouble.airDesert.getNumar())) {
             return "toxic";
-        else return "not toxic";
+        }
+        return "not toxic";
     }
     @Override
-    public String result_event() {
+    public String resultEvent() {
         return "desertStorm";
     }
     @Override
-    public double update_air_quality() {
+    public double updateAirQuality() {
         double r;
-        if (desertStorm)
-            r = 30.0;
-        else r = 0.0;
-        double result = getAir_quality() - r;
+        if (desertStorm) {
+            r = MagicNumbersDouble.treizeci.getNumar();
+        } else {
+            r = 0.0;
+        }
+        double result = getAirQuality() - r;
         return result;
     }
     @Override

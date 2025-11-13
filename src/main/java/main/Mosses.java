@@ -1,18 +1,20 @@
 package main;
 
-public class Mosses extends Plant {
+public final class Mosses extends Plant {
     // constructor
-    public Mosses(String name, double mass, double oxygen, String maturity_level) {
+    public Mosses(final String name, final double mass,
+                  final double oxygen, final String maturityLevel) {
         super(name, mass, "young", 0);
     }
     // aflu oxigenul din fiecare categorie
     @Override
-    public double oxigen_from_plant() {
-        return 0.8;
+    public double oxigenFromPlant() {
+        return MagicNumbersDouble.oxygenMoss.getNumar();
     }
     @Override
-    public double probability_attack() {
-        double score = 40.0 / 100.0;
+    public double probabilityAttack() {
+        double score = MagicNumbersDouble.patruzeci.getNumar()
+                / MagicNumbersDouble.normalize.getNumar();
         return score;
     }
 }

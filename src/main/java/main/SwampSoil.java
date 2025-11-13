@@ -1,12 +1,14 @@
 package main;
 
-public class SwampSoil extends Soil {
+public final class SwampSoil extends Soil {
     private double waterLogging;
     // constructor
-    public SwampSoil(String name, double mass) {
+    public SwampSoil(final String name, final double mass) {
         super(name, mass);
     }
-    public SwampSoil(String name, double mass, double nitrogen, double waterRetention, double solidpH, double organicMatter, double waterLogging) {
+    public SwampSoil(final String name, final double mass, final double nitrogen,
+                     final double waterRetention, final double solidpH, final double organicMatter,
+                     final double waterLogging) {
         super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
         this.waterLogging = waterLogging;
     }
@@ -15,19 +17,24 @@ public class SwampSoil extends Soil {
         return waterLogging;
     }
     // setter
-    public void setWaterLogging(double waterLogging) {
+    public void setWaterLogging(final double waterLogging) {
         this.waterLogging = waterLogging;
     }
     @Override
-    public double soil_quality() {
-        double score = (getNitrogen() * 1.1) + (getOrganicMatter() * 2.2) - (waterLogging * 5);
-        double normalizeScore = Math.max(0, Math.min(100.0, score));
-        double finalResult = Math.round(normalizeScore * 100.0) / 100.0;
+    public double soilQuality() {
+        double score = (getNitrogen() * MagicNumbersDouble.ununu.getNumar()) + (getOrganicMatter()
+                * MagicNumbersDouble.doidoi.getNumar())
+                - (waterLogging * MagicNumbersInt.cinci.getNumar());
+        double normalizeScore = Math.max(0,
+                Math.min(MagicNumbersDouble.normalize.getNumar(), score));
+        double finalResult = Math.round(normalizeScore
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return finalResult;
     }
     @Override
-    public double probability_attack() {
-        double score = waterLogging * 10;
+    public double probabilityAttack() {
+        double score = waterLogging * MagicNumbersInt.zece.getNumar();
         return score;
     }
     @Override

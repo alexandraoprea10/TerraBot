@@ -1,13 +1,17 @@
 package main;
 
-public class TundraSoil extends Soil {
+public final class TundraSoil extends Soil {
     private double permafrostDepth;
     // constructori
-    public TundraSoil(String name, double mass) {
+    public TundraSoil(final String name, final double mass) {
         super(name, mass);
     }
-    public TundraSoil(String name, double mass, double nitrogen, double waterRetention, double solidpH, double organicMatter, double permafrostDepth) {
-        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
+    public TundraSoil(final String name, final double mass,
+                      final double nitrogen, final double waterRetention,
+                      final double solidpH, final double organicMatter,
+                      final double permafrostDepth) {
+        super(name, mass, nitrogen,
+                waterRetention, solidpH, organicMatter);
         this.permafrostDepth = permafrostDepth;
     }
     // getter
@@ -15,19 +19,26 @@ public class TundraSoil extends Soil {
         return permafrostDepth;
     }
     // setter
-    public void setPermafrostDepth(double permafrostDepth) {
+    public void setPermafrostDepth(final double permafrostDepth) {
         this.permafrostDepth = permafrostDepth;
     }
     @Override
-    public double soil_quality() {
-        double score = (getNitrogen() * 0.7) + (getOrganicMatter() * 0.5) - (permafrostDepth * 1.5);
-        double normalizeScore = Math.max(0, Math.min(100.0, score));
-        double finalResult = Math.round(normalizeScore * 100.0) / 100.0;
+    public double soilQuality() {
+        double score = (getNitrogen() * MagicNumbersDouble.zerosapte.getNumar())
+                + (getOrganicMatter() * MagicNumbersDouble.half.getNumar())
+                - (permafrostDepth * MagicNumbersDouble.unucinci.getNumar());
+        double normalizeScore = Math.max(0,
+                Math.min(MagicNumbersDouble.normalize.getNumar(), score));
+        double finalResult = Math.round(normalizeScore
+                * MagicNumbersDouble.normalize.getNumar())
+                / MagicNumbersDouble.normalize.getNumar();
         return finalResult;
     }
     @Override
-    public double probability_attack() {
-        double score =  (50 - permafrostDepth) / 50 * 100;
+    public double probabilityAttack() {
+        double score =  (MagicNumbersInt.jumatate.getNumar() - permafrostDepth)
+                / MagicNumbersInt.jumatate.getNumar()
+                * MagicNumbersInt.suta.getNumar();
         return score;
     }
     @Override

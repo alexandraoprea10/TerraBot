@@ -1,13 +1,15 @@
 package main;
 
-public class Parasites extends Animal {
+public final class Parasites extends Animal {
     // constructor
-    public Parasites(String name, double mass, String state) {
+    public Parasites(final String name, final double mass, final String state) {
         super(name, mass, state);
     }
     @Override
-    public double probability_attack() {
-        double score = (100.0 - 10.0) / 10.0;
+    public double probabilityAttack() {
+        double score = (MagicNumbersDouble.normalize.getNumar()
+                - MagicNumbersDouble.zece.getNumar())
+                / MagicNumbersDouble.zece.getNumar();
         return score;
     }
 }
