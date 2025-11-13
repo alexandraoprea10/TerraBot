@@ -335,6 +335,52 @@ public class Main {
         }
         robotel.setBattery(robotel.getBattery() - scor_minim);
     }
+    public static int updateaza_oxigenul(List <Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            if (entity.isAir()) {
+                Air aer = (Air) entity;
+                aer.setOxygenLevel(aer.getOxygenLevel() + 0.3);
+                aer.setAir_quality(aer.air_quality());
+                return 1;
+            }
+        }
+        return 0;
+    }
+    public static int updateaza_fertilizarea(List <Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            if (entity.isSoil()) {
+                Soil sol = (Soil) entity;
+                sol.setOrganicMatter(sol.getOrganicMatter() + 0.3);
+                return 1;
+            }
+        }
+        return 0;
+    }
+    public static int updateaza_umiditatea(List <Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            if (entity.isAir()) {
+                Air aer = (Air) entity;
+                aer.setHumidity(aer.getHumidity() + 0.2);
+                aer.setOxygenLevel(aer.air_quality());
+                return 1;
+            }
+        }
+        return 0;
+    }
+    public static int updateaza_waterret(List <Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            if (entity.isSoil()) {
+                Soil sol = (Soil) entity;
+                sol.setWaterRetention(sol.getWaterRetention() + 0.2);
+                return 1;
+            }
+        }
+        return 0;
+    }
     public static void action(final String inputPath,
                               final String outputPath) throws IOException {
 
@@ -723,6 +769,7 @@ public class Main {
                 } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
                 } else {
+                    int e_bun = 0;
                     String fact = command.getComponents();
                     String subj = command.getSubject();
                     for (int a = 0; a < dimension; a++) {
@@ -730,43 +777,22 @@ public class Main {
                             List<Entity> entities = mat[a][b];
                             for (int p = 0; p < entities.size(); p++) {
                                 Entity entity = entities.get(p);
-                                if (entity.isAir()) {
-                                    Air aer =  (Air) entity;
-                                    if (aer.getName().equals(fact)) {
-                                        aer.set_subject(subj);
-                                    }
-                                }
-                                else if (entity.isSoil()) {
-                                    Soil sol = (Soil) entity;
-                                    if (sol.getName().equals(fact)) {
-                                        sol.set_subject(subj);
-                                    }
-                                }
-                                else if (entity.isWater()) {
-                                    Water apa = (Water) entity;
-                                    if (apa.getName().equals(fact)) {
-                                        apa.set_subject(subj);
-                                    }
-                                }
-                                else if (entity.isPlant()) {
-                                    Plant planta =  (Plant) entity;
-                                    if (planta.getName().equals(fact)) {
-                                        planta.set_subject(subj);
-                                    }
-                                }
-                                else if (entity.isAnimal()) {
-                                    Animal anim =  (Animal) entity;
-                                    if (anim.getName().equals(fact)) {
-                                        anim.set_subject(subj);
-                                    }
+                                if (entity.getisScanned() && entity.getName().equals(fact)) {
+                                    e_bun = 1;
+                                    entity.set_subject(subj);
                                 }
                             }
                         }
                     }
-                    node.put("message", "The fact has been successfully saved in the database.");
-                    robotel.setBattery(robotel.getBattery() - 2);
+                    if (e_bun == 1) {
+                        robotel.setBattery(robotel.getBattery() - 2);
+                        node.put("message", "The fact has been successfully saved in the database.");
+                    }
+                    else
+                        node.put("message", "ERROR: Subject not yet saved. Cannot perform action");
                 }
-            } else if (command.getCommand().equals("printKnowledgeBase")) {
+            }
+            else if (command.getCommand().equals("printKnowledgeBase")) {
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
                 } else {
@@ -806,53 +832,67 @@ public class Main {
                 node.set("output",  subiecte);
                 }
             }
-            else if (command.getCommand().equals("improveEnvConditions")) {
+            else if (command.getCommand().equals("improveEnvironment")) {
                 if (ok_simulation == 0) {
                     node.put("message", "ERROR: Simulation not started. Cannot perform action");
                 } else if (robotel.isCharging() == true) {
                     node.put("message", "ERROR: Robot still charging. Cannot perform action");
                 } else {
-                    List<Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
+//                    List<Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
+//                    for (int p = 0 ; p <  entities.size(); p++) {
+//                        Entity entity = entities.get(p);
+//                        if (entity.isAir())
+//                            node.put("ba", entity.getisScanned());
+//                    }
                     String improvment = command.getImprovementType();
-                    for (int p = 0; p < entities.size(); p++) {
-                        Entity entity = entities.get(p);
-                        if (entity.getisScanned() && entity.get_subject() != null && !entity.get_subject().isEmpty()) {
-                            for (int k = 0; k < entity.get_subject().size(); k++) {
-                                String subject = entity.get_subject().get(k);
-                                String[] imparte = subject.split(" ");
-                                String ce_modific = imparte[imparte.length - 1];
-                                if (improvment.equals("plantVegetation")) {
-                                    Air aer =  (Air) entity;
-                                    if (aer != null) {
-                                        aer.setOxygenLevel(aer.getOxygenLevel() + 0.3);
-                                        node.put("message", "The " + ce_modific + "was planted successfully");
-                                    }
-                                }
-                                else if (improvment.equals("fertilizeSoil")) {
-                                    Soil sol =  (Soil) entity;
-                                    if (sol != null) {
-                                        sol.setOrganicMatter(sol.getOrganicMatter() + 0.3);
-                                        node.put("message", "The soil was successfully fertilized using " + ce_modific);
-                                    }
-                                }
-                                else if (improvment.equals("increaseHumidity")) {
-                                    Air aer =  (Air) entity;
-                                    if (aer != null) {
-                                        aer.setHumidity(aer.getHumidity() + 0.2);
-                                        node.put("message", "The air humidity was successfully increased using " + ce_modific);
-                                    }
-                                }
-                                else if (improvment.equals("increaseMoisture")) {
-                                    Soil sol =   (Soil) entity;
-                                    if (sol != null) {
-                                        sol.setWaterRetention(sol.getWaterRetention() + 0.2);
-                                        node.put("message", "The soil moisture was successfully increased using " + ce_modific);
+                    int merge = 0;
+                    for (int a = 0 ; a < dimension; a++) {
+                        for (int b = 0; b < dimension; b++) {
+                            List<Entity> entities = mat[a][b];
+                            for (int p = 0; p < entities.size(); p++) {
+                                Entity entity = entities.get(p);
+                                if (entity.getisScanned() && entity.get_subject().size() != 0 && !entity.get_subject().isEmpty()) {
+                                    for (int k = 0; k < entity.get_subject().size(); k++) {
+                                        String subject = entity.get_subject().get(k);
+                                        String[] comanda = subject.split(" ");
+                                        String ce_modific = comanda[comanda.length - 1];
+                                        // node.put("campul", ce_modific);
+                                        if (improvment.equals("plantVegetation") && entity.isPlant() && entity.getisScanned()) {
+                                            int ok = updateaza_oxigenul(mat[robotel.getPoz_x()][robotel.getPoz_y()]);
+                                            if (ok == 1) {
+                                                merge = 1;
+                                                node.put("message", "The " + ce_modific + " was planted successfully.");
+                                            }
+                                        } else if (improvment.equals("fertilizeSoil") && entity.isSoil() && entity.getisScanned()) {
+                                            int ok = updateaza_fertilizarea(mat[robotel.getPoz_x()][robotel.getPoz_y()]);
+                                            if (ok == 1) {
+                                                merge = 1;
+                                                node.put("message", "The soil was successfully fertilized using " + ce_modific + ".");
+                                            }
+                                        } else if (improvment.equals("increaseHumidity") && entity.isAir() && entity.getisScanned()) {
+                                            int ok = updateaza_umiditatea(mat[robotel.getPoz_x()][robotel.getPoz_y()]);
+                                            if (ok == 1) {
+                                                merge = 1;
+                                                node.put("message", "The air humidity was successfully increased using " + ce_modific + ".");
+                                            }
+                                        } else if (improvment.equals("increaseMoisture") && entity.isWater() && entity.getisScanned()) {
+                                            int ok = updateaza_waterret(mat[robotel.getPoz_x()][robotel.getPoz_y()]);
+                                            if (ok == 1) {
+                                                merge = 1;
+                                                node.put("message", "The soil moisture was successfully increased using " + ce_modific + ".");
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    robotel.setBattery(robotel.getBattery() - 10);
+                    if (merge == 0) {
+                        node.put("message", "ERROR: Subject not yet saved. Cannot perform action");
+                    }
+                    else {
+                        robotel.setBattery(robotel.getBattery() - 10);
+                    }
                 }
             } else if (command.getCommand().equals("getEnergyStatus")) {
                 if (ok_simulation == 0) {
