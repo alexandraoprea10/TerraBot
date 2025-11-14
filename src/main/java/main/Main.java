@@ -113,6 +113,7 @@ public final class Main {
         plantNode.put("type", plantuta.getClass().getSimpleName());
         plantNode.put("name", plantuta.getName());
         plantNode.put("mass", plantuta.getMass());
+        // plantNode.put("state", plantuta.getMaturityLevel());
         return plantNode;
     }
 
@@ -341,7 +342,7 @@ public final class Main {
                     + MagicNumbersDouble.zerodoi.getNumar());
         }
         if (planta != null && air != null && planta.getisScanned()) {
-            if (planta.getNivelCrestere() >= 1.0) {
+            if (planta.getNivelCrestere() >= 1) {
                 if (planta.getMaturityLevel().equals("young")) {
                     planta.setMaturityLevel("mature");
                 } else if (planta.getMaturityLevel().equals("mature")) {
@@ -359,6 +360,9 @@ public final class Main {
             air.setAirQuality(Math.round(air.airQuality()
                     * MagicNumbersDouble.normalize.getNumar())
                     / MagicNumbersDouble.normalize.getNumar());
+            if (planta.getMaturityLevel().equals("dead")) {
+                    air.setOxygenLevel(air.getOxygenLevel() - planta.oxigenFromPlant());
+            }
         }
         if (okInterAnimal == 1) {
             if (planta != null && water != null) {
@@ -568,6 +572,21 @@ public final class Main {
     }
 
     /**
+     * Elimin de pe patratica planta care e moarta.
+     * @param entities
+     */
+    public static void verificaMoarteaPlantuta(final List<Entity> entities) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            if (entity.isPlant()) {
+                Plant plantuta = (Plant) entity;
+                if (plantuta.getMaturityLevel().equals("dead")) {
+                    entities.remove(i);
+                }
+            }
+        }
+    }
+    /**
      * MAIN
      * @param inputPath
      * @param outputPath
@@ -752,6 +771,7 @@ public final class Main {
             }
         }
         int iteratii = 0;
+        int fostaIteratie = 0;
         int stamps = 0;
         int okSchimbariMeteo = 0;
         int okScanari = 0;
@@ -763,9 +783,11 @@ public final class Main {
         List<CommandInput> commands = inputLoader.getCommands();
         int okSimulation = 0;
         for (int i = 0; i < commands.size(); i++) {
-            // double soilQuality = 0.0;
             double airQuality = 0.0;
+            List<Entity> entit = mat[robotel.getPozX()][robotel.getPozY()];
+            verificaMoarteaPlantuta(entit);
             CommandInput command = commands.get(i);
+            iteratii = command.getTimestamp();
             if ((command.getTimestamp() - previousStamp >= stamps)
                     && (robotel.isCharging())) {
                 robotel.setIsCharging(false);
@@ -778,17 +800,29 @@ public final class Main {
                     incepeIteratie = iteratii;
                 }
             }
-            iteratii++;
+            // iteratii++;
             if (okScanari == 1) {
                 for (int a = 0; a < dimension; a++) {
                     for (int b = 0; b < dimension; b++) {
                         List<Entity> entities = mat[a][b];
                         // node.put("adauga", return_plant(entities).getOxygen_curent());
-                        interactiuniEveryIteration(entities, okInterAnimal);
-                        if (iteratii > incepeIteratie && (iteratii - incepeIteratie) % 2 == 0) {
+                        if (iteratii - fostaIteratie > 1) {
+                            for (int p = fostaIteratie; p <= iteratii; p++) {
+                                List<Entity> enti = mat[robotel.getPozX()][robotel.getPozY()];
+                                verificaMoarteaPlantuta(enti);
+                                interactiuniEveryIteration(entities, okInterAnimal);
+                                if (iteratii > incepeIteratie
+                                        && (iteratii - incepeIteratie) % 2 == 0) {
+                                    interactiuniEveryTwoIterations(entities);
+                                }
+                            }
+                        } else {
+                            interactiuniEveryIteration(entities, okInterAnimal);
+                            if (iteratii > incepeIteratie && (iteratii - incepeIteratie) % 2 == 0) {
 //                            Water api =  return_water(entities);
 //                            node.put("message", "Am intrat");
-                            interactiuniEveryTwoIterations(entities);
+                                interactiuniEveryTwoIterations(entities);
+                                }
                         }
                     }
                 }
@@ -1011,6 +1045,9 @@ public final class Main {
                 } else if (robotel.isCharging()) {
                     node.put("message",
                             "ERROR: Robot still charging. Cannot perform action");
+                } else if (robotel.getBattery() < MagicNumbersInt.doi.getNumar()) {
+                    node.put("message",
+                            "ERROR: Not enough battery left. Cannot perform action");
                 } else {
                     int eBun = 0;
                     String fact = command.getComponents();
@@ -1086,21 +1123,19 @@ public final class Main {
                 } else if (robotel.isCharging()) {
                     node.put("message",
                             "ERROR: Robot still charging. Cannot perform action");
+                } else if (robotel.getBattery() < MagicNumbersDouble.zece.getNumar()) {
+                    node.put("message",
+                            "ERROR: Not enough battery left. Cannot perform action");
                 } else {
-//                    List<Entity> entities = mat[robotel.getPoz_x()][robotel.getPoz_y()];
-//                    for (int p = 0 ; p <  entities.size(); p++) {
-//                        Entity entity = entities.get(p);
-//                        if (entity.isAir())
-//                            node.put("ba", entity.getisScanned());
-//                    }
                     String improvment = command.getImprovementType();
+                    String name = command.getName();
                     int merge = 0;
                     for (int a = 0; a < dimension; a++) {
                         for (int b = 0; b < dimension; b++) {
                             List<Entity> entities = mat[a][b];
                             for (int p = 0; p < entities.size(); p++) {
                                 Entity entity = entities.get(p);
-                                if (entity.getisScanned()
+                                if (entity.getisScanned() && entity.getName().equals(name)
                                         && entity.getSubject().size() != 0
                                         && !entity.getSubject().isEmpty()) {
                                     for (int k = 0; k < entity.getSubject().size(); k++) {
@@ -1138,7 +1173,7 @@ public final class Main {
                                                 node.put("message",
                                                         "The air humidity was "
                                                                 + "successfully increased using "
-                                                                + ceModific + ".");
+                                                                + command.getName() + ".");
                                             }
                                         } else if (improvment.equals("increaseMoisture")
                                                 && entity.isWater() && entity.getisScanned()) {
@@ -1147,9 +1182,9 @@ public final class Main {
                                             if (ok == 1) {
                                                 merge = 1;
                                                 node.put("message",
-                                                        "The soil moisture was "
+                                                        "The moisture was "
                                                                 + "successfully increased using "
-                                                                + ceModific + ".");
+                                                                + command.getName());
                                             }
                                         }
                                     }
@@ -1495,6 +1530,7 @@ public final class Main {
                     }
                 }
             }
+            fostaIteratie = iteratii;
             // node.put("baterie", robotel.getBattery());
             node.put("timestamp", command.getTimestamp());
             output.add(node);
