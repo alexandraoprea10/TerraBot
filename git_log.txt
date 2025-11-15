@@ -1,3 +1,9 @@
+commit fb1aba8ef8a3de1f8de27f7a0fae8884352e9480
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Fri Nov 14 22:50:12 2025 +0200
+
+    Am facut RAEDME si am mai asezat putin codul.
+
 commit 3fc02bd3f6696c6fcbbef796933f01eb52a44d88
 Author: Alexandra Oprea <adrianaalex07@gmail.com>
 Date:   Fri Nov 14 21:27:43 2025 +0200

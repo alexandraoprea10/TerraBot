@@ -18,6 +18,7 @@ public class Water extends Entity {
         this.contaminantIndex = 0.0;
         this.pH = 0.0;
         this.isFrozen = false;
+        this.momentScanare = -1;
     }
     public Water(final String name, final double mass, final String type,
                  final double salinity, final double pH, final double purity,

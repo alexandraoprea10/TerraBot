@@ -11,6 +11,7 @@ public abstract class Plant extends Entity {
         super(name, mass, 0);
         this.maturityLevel = maturityLevel;
         this.oxygenCurent = oxygenCurent;
+        this.momentScanare = -1;
     }
     // getter
     public final String getMaturityLevel() {
