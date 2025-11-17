@@ -3,8 +3,8 @@ package main;
 public final class Omnivores extends Animal {
     // constructor
     public Omnivores(final String name, final double mass,
-                     final String state) {
-        super(name, mass, state);
+                     final String state, final String type) {
+        super(name, mass, state, type);
     }
     @Override
     public double probabilityAttack() {

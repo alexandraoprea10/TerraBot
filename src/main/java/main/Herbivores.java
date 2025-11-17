@@ -2,8 +2,8 @@ package main;
 
 public final class Herbivores extends Animal {
     // constructor
-    public Herbivores(final String name, final double mass, final String state) {
-        super(name, mass, state);
+    public Herbivores(final String name, final double mass, final String state, final String type) {
+        super(name, mass, state, type);
     }
     @Override
     public double probabilityAttack() {

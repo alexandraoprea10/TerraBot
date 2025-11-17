@@ -15,7 +15,6 @@ public abstract class Entity {
         this.name = name;
         this.mass = mass;
         this.attack = 0;
-        this.isScanned = false;
         this.subject = new ArrayList<>();
     }
     // getteri

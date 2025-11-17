@@ -44,7 +44,9 @@ public final class Main {
                 }
             } else if (entity.isAnimal()) {
                 Animal animalut = (Animal) entity;
-                calculProbabilitate = calculProbabilitate + animalut.probabilityAttack();
+                if (!animalut.getType().equals("out")) {
+                    calculProbabilitate = calculProbabilitate + animalut.probabilityAttack();
+                }
             }
         }
         return calculProbabilitate;
@@ -72,7 +74,9 @@ public final class Main {
                 }
             } else if (entity.isAnimal()) {
                 Animal animalut = (Animal) entity;
-                objects++;
+                if (!animalut.getType().equals("out")) {
+                    objects++;
+                }
             }
         }
         return objects;
@@ -340,11 +344,11 @@ public final class Main {
                 && air.toxicity().equals("toxic")) {
             animal.setState("sick");
         }
-        if (soil != null && planta != null) {
+        if (soil != null && planta != null && planta.getisScanned()) {
             planta.setNivelCrestere(planta.getNivelCrestere()
                     + MagicNumbersDouble.zerodoi.getNumar());
         }
-        if (water != null && planta != null && water.getisScanned()) {
+        if (water != null && planta != null && planta.getisScanned()) {
             planta.setNivelCrestere(planta.getNivelCrestere()
                     + MagicNumbersDouble.zerodoi.getNumar());
         }
@@ -624,29 +628,34 @@ public final class Main {
                         pozY = posStangaJ;
                     }
                 }
+                System.out.println("animalul se muta pe" + pozX + pozY);
                 if (animalul != null) {
-                    if (animalul.getState().equals("Carnivore")
-                            || animalul.getState().equals("Parasite")) {
+                    if (animalul.getType().equals("Carnivores")
+                            || animalul.getType().equals("Parasites")) {
                         List<Entity> patratica = mat[pozX][pozY];
                         Animal animalPatratica = returnAnimal(patratica);
                         patratica.add(animalul);
-                        // entities.remove(animalul);
+                        // animalul.setType("adaugat");
+                        entities.remove(animalul);
                         if (animalPatratica != null) {
                             animalul.setMass(animalul.getMass() + animalPatratica.getMass());
                             okInterAnimal = 1;
                             //interactiune animal-sol
-                            patratica.remove(animalPatratica);
+                            animalPatratica.setType("out");
+                             // patratica.remove(animalPatratica);
+                            // animalPatratica.setType("");
                         } else {
                             Plant plantaCurenta = returnPlant(patratica);
                             Water apaCurenta = returnWater(patratica);
-                            if (plantaCurenta != null) {
+                            if (plantaCurenta != null && plantaCurenta.getisScanned()) {
                                 plantaCurenta.setMaturityLevel("dead");
                                 // entities.remove(plantaCurenta);
                                 animalul.setMass(animalul.getMass() + plantaCurenta.getMass());
+                                // System.out.println("a mancat planta");
                                 animalul.setState("well-fed");
                                 okInterAnimal = 1;
                             }
-                            if (apaCurenta != null) {
+                            if (apaCurenta != null && apaCurenta.getisScanned()) {
                                 double waterToDrink = Math.min(animalul.getMass()
                                                 * MagicNumbersDouble.zerozeroopt.getNumar(),
                                         apaCurenta.getMass());
@@ -901,6 +910,7 @@ public final class Main {
         int okSimulation = 0;
         List<SimulationInput> simulations = inputLoader.getSimulations();
         int contorComenzi = 0;
+        // int inceputIteratieAnimal = 0;
         for (int o = 0; o < simulations.size(); o++) {
             SimulationInput simInput = simulations.get(o);
             String dimensionString = simInput.getTerritoryDim();
@@ -987,19 +997,19 @@ public final class Main {
                     Animal animalut = null;
                     if (animalul.getType().equals("Herbivores")) {
                         animalut = new Herbivores(animalul.getName(),
-                                animalul.getMass(), "hungry");
+                                animalul.getMass(), "hungry", "Herbivores");
                     } else if (animalul.getType().equals("Carnivores")) {
                         animalut = new Carnivores(animalul.getName(),
-                                animalul.getMass(), "hungry");
+                                animalul.getMass(), "hungry", "Carnivores");
                     } else if (animalul.getType().equals("Omnivores")) {
                         animalut = new Omnivores(animalul.getName(),
-                                animalul.getMass(), "hungry");
+                                animalul.getMass(), "hungry", "Omnivores");
                     } else if (animalul.getType().equals("Detritivores")) {
                         animalut = new Detritivores(animalul.getName(),
-                                animalul.getMass(), "hungry");
+                                animalul.getMass(), "hungry", "Detritivores");
                     } else if (animalul.getType().equals("Parasites")) {
                         animalut = new Parasites(animalul.getName(),
-                                animalul.getMass(), "hungry");
+                                animalul.getMass(), "hungry",  "Parasites");
                     }
                     mat[loc.getX()][loc.getY()].add(animalut);
                 }
@@ -1059,6 +1069,7 @@ public final class Main {
             int previousStamp = 0;
             int okInterAnimal = 0;
             int inceputIteratieAnimal = 0;
+            int mergeSubj = 0;
             List<CommandInput> commands = inputLoader.getCommands();
             int nextSimulare = 0;
             int opresteSimulare = 0;
@@ -1108,6 +1119,7 @@ public final class Main {
                         }
                     }
                 }
+                // System.out.println("La comanda cu timestamp " + command.getTimestamp() + " este:");
                 for (int a = 0; a < dimension; a++) {
                     for (int b = 0; b < dimension; b++) {
                         List<Entity> entities = mat[b][a];
@@ -1125,6 +1137,7 @@ public final class Main {
                             Entity entity = entities.get(p);
                             entity.setAttack(result);
                         }
+                        // System.out.println("scor patratica(" + a + "," + b + "): " + result);
                     }
                 }
                 ObjectNode node = MAPPER.createObjectNode();
@@ -1193,7 +1206,7 @@ public final class Main {
                     if (okSimulation == 0) {
                         node.put("message",
                                 "ERROR: Simulation not started. Cannot perform action");
-                    } else if (robotel.getBattery() <= 0) {
+                    } else if (robotel.getBattery() < 0) {
                         node.put("message",
                                 "ERROR: Not enough battery left. Cannot perform action");
                     } else if (robotel.isCharging()) {
@@ -1215,9 +1228,19 @@ public final class Main {
                                         contor++;
                                     }
                                     if (entities.get(p).isPlant()) {
-                                        contor++;
+                                        Plant pl =  (Plant) entities.get(p);
+//                                        entityNode.put("planta", pl.getName());
+//                                        entityNode.put("stareplanta", pl.getMaturityLevel());
+//                                        entityNode.put("crestere", pl.getNivelCrestere());
+//                                        entityNode.put("scanata", pl.getisScanned());
+                                         if (!pl.getMaturityLevel().equals("dead")) {
+                                            contor++;
+                                        }
                                     }
                                     if (entities.get(p).isAnimal()) {
+                                        Animal anim =  (Animal) entities.get(p);
+                                        // entityNode.put("animal", anim.getType());
+                                        if (!anim.getType().equals("out"))
                                         contor++;
                                     }
                                 }
@@ -1345,7 +1368,7 @@ public final class Main {
                         node.put("message",
                                 "ERROR: Not enough battery left. Cannot perform action");
                     } else {
-                        int eBun = 0;
+                        mergeSubj = 0;
                         String fact = command.getComponents();
                         String subj = command.getSubject();
                         for (int a = 0; a < dimension; a++) {
@@ -1355,13 +1378,13 @@ public final class Main {
                                     Entity entity = entities.get(p);
                                     if (entity.getisScanned()
                                             && entity.getName().equals(fact)) {
-                                        eBun = 1;
+                                        mergeSubj = 1;
                                         entity.setSubject(subj);
                                     }
                                 }
                             }
                         }
-                        if (eBun == 1) {
+                        if (mergeSubj == 1) {
                             robotel.setBattery(robotel.getBattery() - 2);
                             node.put("message",
                                     "The fact has been successfully saved in the database.");
@@ -1492,6 +1515,10 @@ public final class Main {
                                 }
                             }
                         }
+                        if (mergeSubj == 0) {
+                            node.put("message",
+                                    "ERROR: Fact not yet saved. Cannot perform action");
+                        }
                         if (merge == 0) {
                             node.put("message",
                                     "ERROR: Subject not yet saved. Cannot perform action");
@@ -1537,6 +1564,7 @@ public final class Main {
                             Entity entity = entities.get(k);
                             if (entity.isAir()) {
                                 Air aer = (Air) entity;
+                                Air fostAer = (Air) entity;
                                 if (aer.isTropical()) {
                                     TropicalAir trop = (TropicalAir) aer;
                                     String eveniment = command.getImprovementType();
@@ -1578,14 +1606,16 @@ public final class Main {
                                     mountain.setAirQuality(mountain.updateAirQuality());
                                     merge = 1;
                                 }
+                                if (fostAer.airQuality() == aer.getAirQuality())
+                                    merge = 2;
                             }
                         }
                         if (merge == 1) {
                             node.put("message", "The weather has changed.");
                         } else {
-                            node.put("message", "The weather change does not " +
+                            node.put("message", "ERROR: The weather change does not " +
                                             "affect the environment."
-                                            + "Cannot perform action");
+                                            + " Cannot perform action");
                         }
                     }
                 }
@@ -1600,7 +1630,7 @@ public final class Main {
                                 okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
                                         inceputIteratieAnimal, robotel, dimension, entities);
                             }
-                            verificaMoarteaPlantuta(entit);
+                            verificaMoarteaPlantuta(entities);
                         }
                     }
                 }
@@ -1609,6 +1639,32 @@ public final class Main {
                 }
 //            node.put("scor01", mat[0][1].get(0).getAttack());
 //            node.put("baterie", robotel.getBattery());
+//                node.put("scor00", mat[0][0].get(0).getAttack());
+//                List <Entity> ent = mat[2][0];
+//                for (int p = 0 ; p < ent.size(); p++) {
+//                    Entity caca = ent.get(p);
+//                    if (caca.isAir()) {
+//                        Air aer =  (Air) caca;
+//                        node.put("scoraer", aer.airToxicity());
+//                    }
+//                    else if (caca.isPlant()) {
+//                        Plant pl = (Plant) caca;
+//                        node.put("scorpl", pl.probabilityAttack());
+//                    }
+//                    else if (caca.isAnimal()) {
+//                        Animal an = (Animal) caca;
+//                        node.put("scoranimal", an.probabilityAttack());
+//                    }
+//                    else if (caca.isWater()) {
+//                        Water apa = (Water) caca;
+//                        node.put("scorapa", apa.waterQuality());
+//                    }
+//                    else if (caca.isSoil()) {
+//                        Soil sol = (Soil) caca;
+//                        node.put("scorsol", sol.probabilityAttack());
+//                    }
+//                }
+//                node.put("scor11", mat[1][1].get(0).getAttack());
                 node.put("timestamp", command.getTimestamp());
                 output.add(node);
                 if (nextSimulare == 1) {

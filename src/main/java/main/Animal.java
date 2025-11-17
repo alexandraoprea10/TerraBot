@@ -2,14 +2,16 @@ package main;
 
 public abstract class Animal extends Entity {
     private String state;
+    private String type;
     // constructori
     public Animal(final String name, final double mass) {
         super(name, mass, 0);
         this.state = "hungry";
     }
-    public Animal(final String name, final double mass, final String state) {
+    public Animal(final String name, final double mass, final String state, final String type) {
         super(name, mass, 0);
         this.state = state;
+        this.type = type;
     }
     // getter
 
@@ -19,6 +21,14 @@ public abstract class Animal extends Entity {
      */
     public String getState() {
         return state;
+    }
+
+    /**
+     * REturnez tipul de animal, imi trebuie pentru t16.
+     * @return
+     */
+    public String getType() {
+        return type;
     }
     // setter
 
@@ -30,6 +40,13 @@ public abstract class Animal extends Entity {
         this.state = stat;
     }
 
+    /**
+     * Setez type.
+     * @param type
+     */
+    public void setType(final String type) {
+        this.type = type;
+    }
     /**
      * Calculez probabilitatea de atac
      * @return
