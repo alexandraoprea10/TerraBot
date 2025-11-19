@@ -3,15 +3,18 @@ package main;
 public abstract class Animal extends Entity {
     private String state;
     private String type;
+    boolean mutat;
     // constructori
     public Animal(final String name, final double mass) {
         super(name, mass, 0);
         this.state = "hungry";
+        this.mutat = false;
     }
     public Animal(final String name, final double mass, final String state, final String type) {
         super(name, mass, 0);
         this.state = state;
         this.type = type;
+        this.mutat = false;
     }
     // getter
 
@@ -21,6 +24,9 @@ public abstract class Animal extends Entity {
      */
     public String getState() {
         return state;
+    }
+    public boolean  isMutat() {
+        return mutat;
     }
 
     /**
@@ -46,6 +52,9 @@ public abstract class Animal extends Entity {
      */
     public void setType(final String type) {
         this.type = type;
+    }
+    public void  setMutat(final boolean mutat) {
+        this.mutat = mutat;
     }
     /**
      * Calculez probabilitatea de atac

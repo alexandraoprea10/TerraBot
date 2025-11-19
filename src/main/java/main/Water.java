@@ -175,11 +175,11 @@ public class Water extends Entity {
         double salinityScore = MagicNumbersInt.unu.getNumar()
                 - (salinity / MagicNumbersInt.treicincizero.getNumar());
         double turbidityScore = MagicNumbersInt.unu.getNumar()
-                - (turbidity / MagicNumbersDouble.normalize.getNumar());
+                - (turbidity / MagicNumbersInt.suta.getNumar());
         double contaminantScore = MagicNumbersInt.unu.getNumar()
                 - (contaminantIndex / MagicNumbersInt.suta.getNumar());
         double frozenScore;
-        if (isFrozen) {
+        if (!isFrozen) {
             frozenScore = 0.0;
         } else {
             frozenScore = MagicNumbersDouble.unu.getNumar();

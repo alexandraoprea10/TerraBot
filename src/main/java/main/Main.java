@@ -276,6 +276,8 @@ public final class Main {
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.isAnimal()) {
+                Animal animal =  (Animal) entity;
+                if (!animal.getType().equals("out"))
                 return (Animal) entity;
             }
         }
@@ -433,7 +435,7 @@ public final class Main {
     public static int ceFaceAnimalul(final List<Entity>[][] mat, final Animal animalul,
                                      final int iteratii, final int inceputIteratieAnimal,
                                      final Robot robotel, final int dimension,
-                                     final List<Entity> entities) {
+                                     final List<Entity> entities, final int a, final int b) {
         int okInterAnimal = 0;
         if (animalul != null && animalul.getisScanned()) {
             if (inceputIteratieAnimal < iteratii
@@ -444,23 +446,23 @@ public final class Main {
                 int existaDreapta = 1;
                 int existaSus = 1;
                 int existaJos = 1;
-                int posStangaI = robotel.getPozX();
-                int posStangaJ = robotel.getPozY() - 1;
+                int posStangaI = a;
+                int posStangaJ = b - 1;
                 if (posStangaJ < 0 || posStangaJ >= dimension) {
                     existaStanga = 0;
                 }
-                int posSusI = robotel.getPozX() - 1;
-                int posSusJ = robotel.getPozY();
+                int posSusI = a - 1;
+                int posSusJ = b;
                 if (posSusI < 0 || posSusI >= dimension) {
                     existaSus = 0;
                 }
-                int posDreaptaI = robotel.getPozX();
-                int posDreaptaJ = robotel.getPozY() + 1;
+                int posDreaptaI = a;
+                int posDreaptaJ = b + 1;
                 if (posDreaptaJ < 0 || posDreaptaJ >= dimension) {
                     existaDreapta = 0;
                 }
-                int posJosI = robotel.getPozX() + 1;
-                int posJosJ = robotel.getPozY();
+                int posJosI = a + 1;
+                int posJosJ = b;
                 if (posJosI < 0 || posJosI >= dimension) {
                     existaJos = 0;
                 }
@@ -472,50 +474,59 @@ public final class Main {
                 Water apaJos = null;
                 Plant plantaSus = null;
                 Water apaSus = null;
+                Animal animalJos = null;
+                Animal animalStanga = null;
+                Animal animalDreapta = null;
+                Animal animalSus = null;
                 if (existaStanga != 0) {
                     List<Entity> entitiesStanga = mat[posStangaI][posStangaJ];
                     apaStanga = returnWater(entitiesStanga);
                     plantaStanga = returnPlant(entitiesStanga);
+                    animalStanga = returnAnimal(entitiesStanga);
                 }
                 if (existaDreapta != 0) {
                     List<Entity> entitiesDreapta = mat[posDreaptaI][posDreaptaJ];
                     apaDreapta = returnWater(entitiesDreapta);
                     plantaDreapta = returnPlant(entitiesDreapta);
+                    animalDreapta = returnAnimal(entitiesDreapta);
                 }
                 if (existaJos != 0) {
                     List<Entity> entitiesJos = mat[posJosI][posJosJ];
                     apaJos = returnWater(entitiesJos);
                     plantaJos = returnPlant(entitiesJos);
+                    animalJos = returnAnimal(entitiesJos);
                 }
                 if (existaSus != 0) {
                     List<Entity> entitiesSus = mat[posSusI][posSusJ];
                     apaSus = returnWater(entitiesSus);
                     plantaSus = returnPlant(entitiesSus);
+                    animalSus = returnAnimal(entitiesSus);
                 }
+                // System.out.println("in stanga exista animal?", apaStanga);
                 double calitateApa = 0.0;
                 int pozX = -1, pozY = -1;
-                if (apaSus != null && plantaSus != null) {
-                    if (apaSus.waterQuality() > calitateApa) {
-                        calitateApa = apaSus.waterQuality();
-                        pozX = posSusI;
-                        pozY = posSusJ;
-                    }
-                }
-                if (apaJos != null && plantaJos != null) {
+                if (apaJos != null && plantaJos != null && !plantaJos.getMaturityLevel().equals("dead") && plantaJos.getisScanned()) {
                     if (apaJos.waterQuality() > calitateApa) {
                         calitateApa = apaJos.waterQuality();
                         pozX = posJosI;
                         pozY = posJosJ;
                     }
                 }
-                if (apaDreapta != null && plantaDreapta != null) {
+                if (apaDreapta != null && plantaDreapta != null && !plantaDreapta.getMaturityLevel().equals("dead") && plantaDreapta.getisScanned()) {
                     if (apaDreapta.waterQuality() > calitateApa) {
                         calitateApa = apaDreapta.waterQuality();
                         pozX = posDreaptaI;
                         pozY = posDreaptaJ;
                     }
                 }
-                if (apaStanga != null && plantaStanga != null) {
+                if (apaSus != null && plantaSus != null && !plantaSus.getMaturityLevel().equals("dead") &&  plantaSus.getisScanned()) {
+                    if (apaSus.waterQuality() > calitateApa) {
+                        calitateApa = apaSus.waterQuality();
+                        pozX = posSusI;
+                        pozY = posSusJ;
+                    }
+                }
+                if (apaStanga != null && plantaStanga != null && !plantaStanga.getMaturityLevel().equals("dead") &&  plantaStanga.getisScanned()) {
                     if (apaStanga.waterQuality() > calitateApa) {
                         calitateApa = apaStanga.waterQuality();
                         pozX = posStangaI;
@@ -523,28 +534,28 @@ public final class Main {
                     }
                 }
                 if (pozX == -1) {
-                    if (apaSus != null && plantaSus != null) {
-                        if (apaSus.waterQuality() > calitateApa) {
-                            calitateApa = apaSus.waterQuality();
-                            pozX = posSusI;
-                            pozY = posSusJ;
-                        }
-                    }
-                    if (apaJos != null && plantaJos != null) {
+                    if (apaJos != null && plantaJos != null && !plantaJos.getMaturityLevel().equals("dead") &&  plantaJos.getisScanned()) {
                         if (apaJos.waterQuality() > calitateApa) {
                             calitateApa = apaJos.waterQuality();
                             pozX = posJosI;
                             pozY = posJosJ;
                         }
                     }
-                    if (apaDreapta != null && plantaDreapta != null) {
+                    if (apaDreapta != null && plantaDreapta != null && !plantaDreapta.getMaturityLevel().equals("dead") && plantaDreapta.getisScanned()) {
                         if (apaDreapta.waterQuality() > calitateApa) {
                             calitateApa = apaDreapta.waterQuality();
                             pozX = posDreaptaI;
                             pozY = posDreaptaJ;
                         }
                     }
-                    if (apaStanga != null && plantaStanga != null) {
+                    if (apaSus != null && plantaSus != null && !plantaSus.getMaturityLevel().equals("dead") && plantaSus.getisScanned()) {
+                        if (apaSus.waterQuality() > calitateApa) {
+                            calitateApa = apaSus.waterQuality();
+                            pozX = posSusI;
+                            pozY = posSusJ;
+                        }
+                    }
+                    if (apaStanga != null && plantaStanga != null && !plantaStanga.getMaturityLevel().equals("dead") &&  plantaStanga.getisScanned()) {
                         if (apaStanga.waterQuality() > calitateApa) {
                             calitateApa = apaStanga.waterQuality();
                             pozX = posStangaI;
@@ -552,22 +563,23 @@ public final class Main {
                         }
                     }
                     if (pozX == -1) {
-                        if (apaSus != null || plantaSus != null) {
-                            if (plantaSus != null) {
-                                pozX = posSusI;
-                                pozY = posSusJ;
-                            }
-                        } else if (apaDreapta != null || plantaDreapta != null) {
-                            if (plantaDreapta != null) {
-                                pozX = posDreaptaI;
-                                pozY = posDreaptaJ;
-                            }
-                        } else if (apaJos != null || plantaJos != null) {
+                        if (apaJos != null || (plantaJos != null && !plantaJos.getMaturityLevel().equals("dead") && plantaJos.getisScanned())) {
                             if (plantaJos != null) {
                                 pozX = posJosI;
                                 pozY = posJosJ;
                             }
-                        } else if (apaStanga != null || plantaStanga != null) {
+                        } else if (apaDreapta != null || (plantaDreapta != null &&  !plantaDreapta.getMaturityLevel().equals("dead") &&  plantaDreapta.getisScanned())) {
+                            if (plantaDreapta != null) {
+                                pozX = posDreaptaI;
+                                pozY = posDreaptaJ;
+                            }
+                        } else if (apaSus != null || (plantaSus != null && !plantaSus.getMaturityLevel().equals("dead") &&  plantaSus.getisScanned())) {
+                            if (plantaSus != null) {
+                                pozX = posSusI;
+                                pozY = posSusJ;
+                            }
+                        }
+                        else if (apaStanga != null || (plantaStanga != null && !plantaStanga.getMaturityLevel().equals("dead") && plantaStanga.getisScanned())) {
                             if (plantaStanga != null) {
                                 pozX = posStangaI;
                                 pozY = posStangaJ;
@@ -584,7 +596,7 @@ public final class Main {
                                 }
                             }
                         }
-                        if (apaDreapta != null || plantaDreapta != null) {
+                        else if (apaDreapta != null || plantaDreapta != null) {
                             if (apaDreapta != null) {
                                 if (apaDreapta.waterQuality() > calitateApa) {
                                     calitateApa = apaDreapta.waterQuality();
@@ -593,7 +605,7 @@ public final class Main {
                                 }
                             }
                         }
-                        if (apaJos != null || plantaJos != null) {
+                        else if (apaJos != null || plantaJos != null) {
                             if (apaJos != null) {
                                 if (apaJos.waterQuality() > calitateApa) {
                                     calitateApa = apaJos.waterQuality();
@@ -602,7 +614,7 @@ public final class Main {
                                 }
                             }
                         }
-                        if (apaStanga != null || plantaStanga != null) {
+                        else if (apaStanga != null || plantaStanga != null) {
                             if (apaStanga != null) {
                                 if (apaStanga.waterQuality() > calitateApa) {
                                     calitateApa = apaStanga.waterQuality();
@@ -613,6 +625,7 @@ public final class Main {
                         }
                     }
                 }
+                System.out.println("animalul se muta pe " + pozX + pozY);
                 if (pozX == -1) {
                     if (existaSus == 1) {
                         pozX = posSusI;
@@ -628,7 +641,70 @@ public final class Main {
                         pozY = posStangaJ;
                     }
                 }
-                System.out.println("animalul se muta pe" + pozX + pozY);
+                System.out.println(
+                        "=== DEBUG ANIMAL @ T=" + iteratii + " ===\n" +
+                                "Animal Type: " + animalul.getType() + "\n" +
+                                "Pozitie initiala: (" + a + ", " + b + ")\n" +
+                                "Vecini disponibili:\n" +
+
+                                // STANGA
+                                "   Stanga:  (" + posStangaI + ", " + posStangaJ + ") | " +
+                                "apa=" + (apaStanga == null ? "-" : apaStanga.waterQuality()) + " | " +
+                                "planta=" + (plantaStanga == null ? "-" : plantaStanga.getMaturityLevel()) + " | " +
+                                "plant_scanned=" + (plantaStanga == null ? "-" : plantaStanga.getisScanned()) + " | " +
+                                "animal=" +
+                                (animalStanga == null ? "-" :
+                                        ("type=" + animalStanga.getType() +
+                                                ", mass=" + animalStanga.getMass() +
+                                                ", scanned=" + animalStanga.getisScanned() +
+                                                ", mutat=" + animalStanga.isMutat())
+                                ) + "\n" +
+
+                                // DREAPTA
+                                "   Dreapta: (" + posDreaptaI + ", " + posDreaptaJ + ") | " +
+                                "apa=" + (apaDreapta == null ? "-" : apaDreapta.waterQuality()) + " | " +
+                                "planta=" + (plantaDreapta == null ? "-" : plantaDreapta.getMaturityLevel()) + " | " +
+                                "plant_scanned=" + (plantaDreapta == null ? "-" : plantaDreapta.getisScanned()) + " | " +
+                                "animal=" +
+                                (animalDreapta == null ? "-" :
+                                        ("type=" + animalDreapta.getType() +
+                                                ", mass=" + animalDreapta.getMass() +
+                                                ", scanned=" + animalDreapta.getisScanned() +
+                                                ", mutat=" + animalDreapta.isMutat())
+                                ) + "\n" +
+
+                                // SUS
+                                "   Sus:     (" + posSusI + ", " + posSusJ + ") | " +
+                                "apa=" + (apaSus == null ? "-" : apaSus.waterQuality()) + " | " +
+                                "planta=" + (plantaSus == null ? "-" : plantaSus.getMaturityLevel()) + " | " +
+                                "plant_scanned=" + (plantaSus == null ? "-" : plantaSus.getisScanned()) + " | " +
+                                "animal=" +
+                                (animalSus == null ? "-" :
+                                        ("type=" + animalSus.getType() +
+                                                ", mass=" + animalSus.getMass() +
+                                                ", scanned=" + animalSus.getisScanned() +
+                                                ", mutat=" + animalSus.isMutat())
+                                ) + "\n" +
+
+                                // JOS
+                                "   Jos:     (" + posJosI + ", " + posJosJ + ") | " +
+                                "apa=" + (apaJos == null ? "-" : apaJos.waterQuality()) + " | " +
+                                "planta=" + (plantaJos == null ? "-" : plantaJos.getMaturityLevel()) + " | " +
+                                "plant_scanned=" + (plantaJos == null ? "-" : plantaJos.getisScanned()) + " | " +
+                                "animal=" +
+                                (animalJos == null ? "-" :
+                                        ("type=" + animalJos.getType() +
+                                                ", mass=" + animalJos.getMass() +
+                                                ", scanned=" + animalJos.getisScanned() +
+                                                ", mutat=" + animalJos.isMutat())
+                                ) + "\n" +
+
+                                "Pozitie aleasa FINAL: (" + pozX + ", " + pozY + ")\n" +
+                                "============================================"
+                );
+
+
+
                 if (animalul != null) {
                     if (animalul.getType().equals("Carnivores")
                             || animalul.getType().equals("Parasites")) {
@@ -655,7 +731,7 @@ public final class Main {
                                 animalul.setState("well-fed");
                                 okInterAnimal = 1;
                             }
-                            if (apaCurenta != null && apaCurenta.getisScanned()) {
+                            if (apaCurenta != null) {
                                 double waterToDrink = Math.min(animalul.getMass()
                                                 * MagicNumbersDouble.zerozeroopt.getNumar(),
                                         apaCurenta.getMass());
@@ -1074,10 +1150,12 @@ public final class Main {
             int nextSimulare = 0;
             int opresteSimulare = 0;
             for (int i = contorComenzi; i < commands.size(); i++) {
+                int okPlanta = 0;
                 double airQuality = 0.0;
                 List<Entity> entit = mat[robotel.getPozX()][robotel.getPozY()];
                 verificaMoarteaPlantuta(entit);
                 CommandInput command = commands.get(i);
+                System.out.println("la pasul " + command.getTimestamp() + ": ");
                 iteratii = command.getTimestamp();
                 if ((command.getTimestamp() - previousStamp >= stamps)
                         && (robotel.isCharging())) {
@@ -1116,6 +1194,25 @@ public final class Main {
                                     interactiuniEveryTwoIterations(entities);
                                 }
                             }
+                        }
+                    }
+                }
+                for (int a = 0; a < dimension; a++) {
+                    for (int b = 0; b < dimension; b++) {
+                        List<Entity> entities = mat[a][b];
+                        for (int p = 0; p < entities.size(); p++) {
+                            Entity entity = entities.get(p);
+                            if (entity.isAnimal() && inceputIteratieAnimal != -1) {
+                                Animal an =  (Animal) entity;
+                                if (!an.isMutat()) {
+                                    // System.out.println("in celula " + a + "si " + b);
+                                    // System.out.println("animalul e" + an.getName());
+                                    okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
+                                            inceputIteratieAnimal, robotel, dimension, entities, a, b);
+                                    an.setMutat(true);
+                                }
+                            }
+                            verificaMoarteaPlantuta(entities);
                         }
                     }
                 }
@@ -1335,7 +1432,8 @@ public final class Main {
                                 && (sound.equals("none")))) {
                             sePoate = 1;
                             Plant planta = returnPlant(entities);
-                            planta.setIsScanned(true);
+                            okPlanta = 1;
+                            // planta.setIsScanned(true);
                             planta.setMomentScanare(iteratii);
                             node.put("message", "The scanned object is a plant.");
                         } else if (existanimal(entities)
@@ -1619,16 +1717,112 @@ public final class Main {
                         }
                     }
                 }
+                for (int k = 0; k < dimension; k++) {
+                    for (int j = 0; j < dimension; j++) {
+
+                        List<Entity> entities = mat[k][j];
+
+                        System.out.println("=== CELULA (" + k + ", " + j + ") ===");
+
+                        if (entities.isEmpty()) {
+                            System.out.println("Celula este goală.");
+                        } else {
+
+                            for (Entity entity : entities) {
+
+                                // ░░░ ANIMAL ░░░
+                                if (entity.isAnimal()) {
+                                    Animal an = (Animal) entity;
+                                    System.out.println(
+                                            "[ANIMAL] Type=" + an.getType() +
+                                                    " | Mass=" + an.getMass() +
+                                                    " | State=" + an.getState() +
+                                                    " | Scanned=" + an.getisScanned() +
+                                                    " | Mutat=" + an.isMutat()
+                                    );
+                                }
+
+                                // ░░░ PLANT ░░░
+                                else if (entity instanceof Plant) {
+                                    Plant p = (Plant) entity;
+                                    System.out.println(
+                                            "[PLANT] Maturity=" + p.getMaturityLevel() +
+                                                    " | Scanned=" + p.getisScanned() +
+                                                    " | Mass=" + p.getMass()
+                                    );
+                                }
+
+                                // ░░░ WATER (cu scanned) ░░░
+                                else if (entity instanceof Water) {
+                                    Water w = (Water) entity;
+                                    System.out.println(
+                                            "[WATER] Quality=" + w.waterQuality() +
+                                                    " | Mass=" + w.getMass() +
+                                                    " | Scanned=" + w.getisScanned()
+                                    );
+                                }
+
+                                // ░░░ AIR (cu calitate aer) ░░░
+                                else if (entity instanceof Air) {
+                                    Air air1 = (Air) entity;
+                                    System.out.println(
+                                            "[AIR] Quality=" + air1.airQuality()
+                                    );
+                                }
+
+                                // ░░░ SOIL ░░░
+                                else if (entity instanceof Soil) {
+                                    Soil soill = (Soil) entity;
+                                    System.out.println(
+                                            "[SOIL] Quality=" + soill.soilQuality()
+                                    );
+                                }
+
+                                // ░░░ NECUNOSCUT ░░░
+                                else {
+                                    System.out.println("[UNKNOWN ENTITY] " + entity.getClass().getSimpleName());
+                                }
+                            }
+                        }
+
+                        System.out.println("==================================\n");
+                    }
+                }
+
+
+
+
 //            node.put("baterie", robotel.getBattery());
 //            node.put("scor", mat[0][1].get(0).get_attack());
+//                for (int a = 0; a < dimension; a++) {
+//                    for (int b = 0; b < dimension; b++) {
+//                        List<Entity> entities = mat[a][b];
+//                        for (int p = 0; p < entities.size(); p++) {
+//                            Entity entity = entities.get(p);
+//                            if (entity.isAnimal() && inceputIteratieAnimal != -1) {
+//                                Animal an =  (Animal) entity;
+//                                if (!an.isMutat()) {
+//                                    // System.out.println("in celula " + a + "si " + b);
+//                                    // System.out.println("animalul e" + an.getName());
+//                                    okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
+//                                            inceputIteratieAnimal, robotel, dimension, entities, a, b);
+//                                    an.setMutat(true);
+//                                }
+//                            }
+//                            verificaMoarteaPlantuta(entities);
+//                        }
+//                    }
+//                }
                 for (int a = 0; a < dimension; a++) {
                     for (int b = 0; b < dimension; b++) {
                         List<Entity> entities = mat[a][b];
                         for (int p = 0; p < entities.size(); p++) {
                             Entity entity = entities.get(p);
                             if (entity.isAnimal() && inceputIteratieAnimal != -1) {
-                                okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
-                                        inceputIteratieAnimal, robotel, dimension, entities);
+                                Animal an =  (Animal) entity;
+                                if (an.isMutat()) {
+                                    an.setMutat(false);
+                                }
                             }
                             verificaMoarteaPlantuta(entities);
                         }
@@ -1636,6 +1830,12 @@ public final class Main {
                 }
                 if (okSimulation == 1) {
                     fostaIteratie = iteratii;
+                }
+                if (okPlanta == 1) {
+                    Plant pl = returnPlant(entit);
+                    if (pl != null) {
+                        pl.setIsScanned(true);
+                    }
                 }
 //            node.put("scor01", mat[0][1].get(0).getAttack());
 //            node.put("baterie", robotel.getBattery());
