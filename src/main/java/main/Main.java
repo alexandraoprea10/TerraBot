@@ -7,9 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+import java.util.Iterator;
 
 /**
  * The entry point to this homework. It runs the checker that tests your implementation.
@@ -198,13 +202,16 @@ public final class Main {
      */
     public static void printAirWithEvent(final Air airut, final ObjectNode airNode) {
         if (airut.isMountain()) {
-            airNode.put("numberOfHikers", ((MountainAir) airut).getNumberOfHikers());
+            airNode.put("altitude", ((MountainAir) airut).getAltitude());
         } else if (airut.isTemperate()) {
             airNode.put("pollenLevel", ((TemperateAir) airut).getPollenLevel());
         } else if (airut.isTropical()) {
-            airNode.put("rainfall", ((TropicalAir) airut).getRainfall());
+            double result = Math.round(((TropicalAir) airut).getCo2Level()
+                    * MagicNumbersDouble.normalize.getNumar())
+                    / MagicNumbersDouble.normalize.getNumar();
+            airNode.put("co2Level", result);
         } else if (airut.isPolar()) {
-            airNode.put("windSpeed", ((Polar) airut).getWindSpeed());
+            airNode.put("iceCrystalConcentration", ((Polar) airut).getIceCrystalConcentration());
         } else if (airut.isDesert()) {
             airNode.put("desertStorm", ((DesertAir) airut).getDesertStorm());
         }
@@ -261,6 +268,8 @@ public final class Main {
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.isPlant()) {
+                Plant pl = (Plant) entity;
+                if (!pl.getMaturityLevel().equals("dead"))
                 return (Plant) entity;
             }
         }
@@ -277,8 +286,9 @@ public final class Main {
             Entity entity = entities.get(i);
             if (entity.isAnimal()) {
                 Animal animal =  (Animal) entity;
-                if (!animal.getType().equals("out"))
-                return (Animal) entity;
+                if (!animal.getType().equals("out")) {
+                    return (Animal) entity;
+                }
             }
         }
         return null;
@@ -373,15 +383,15 @@ public final class Main {
             air.setAirQuality(Math.round(air.airQuality()
                     * MagicNumbersDouble.normalize.getNumar())
                     / MagicNumbersDouble.normalize.getNumar());
-            if (planta.getMaturityLevel().equals("dead")) {
+            if (planta.getMaturityLevel().equals("dead") || planta.getMaturityLevel().equals("out")) {
                 air.setOxygenLevel(air.getOxygenLevel() - planta.oxigenFromPlant());
             }
         }
         if (okInterAnimal == 1) {
-            if (planta != null && water != null) {
+            if (planta != null && water != null && !planta.getMaturityLevel().equals("out")) {
                 soil.setOrganicMatter(soil.getOrganicMatter()
                         + MagicNumbersDouble.oxygenMoss.getNumar());
-            } else if (planta != null || water != null) {
+            } else if (planta != null || water != null && !planta.getMaturityLevel().equals("out")) {
                 soil.setOrganicMatter(soil.getOrganicMatter()
                         + MagicNumbersDouble.half.getNumar());
             }
@@ -505,28 +515,36 @@ public final class Main {
                 // System.out.println("in stanga exista animal?", apaStanga);
                 double calitateApa = 0.0;
                 int pozX = -1, pozY = -1;
-                if (apaJos != null && plantaJos != null && !plantaJos.getMaturityLevel().equals("dead") && plantaJos.getisScanned()) {
+                if (apaJos != null && plantaJos != null
+                        && !plantaJos.getMaturityLevel().equals("dead")
+                        && plantaJos.getisScanned()) {
                     if (apaJos.waterQuality() > calitateApa) {
                         calitateApa = apaJos.waterQuality();
                         pozX = posJosI;
                         pozY = posJosJ;
                     }
                 }
-                if (apaDreapta != null && plantaDreapta != null && !plantaDreapta.getMaturityLevel().equals("dead") && plantaDreapta.getisScanned()) {
+                if (apaDreapta != null && plantaDreapta != null
+                        && !plantaDreapta.getMaturityLevel().equals("dead")
+                        && plantaDreapta.getisScanned()) {
                     if (apaDreapta.waterQuality() > calitateApa) {
                         calitateApa = apaDreapta.waterQuality();
                         pozX = posDreaptaI;
                         pozY = posDreaptaJ;
                     }
                 }
-                if (apaSus != null && plantaSus != null && !plantaSus.getMaturityLevel().equals("dead") &&  plantaSus.getisScanned()) {
+                if (apaSus != null && plantaSus != null
+                        && !plantaSus.getMaturityLevel().equals("dead")
+                        &&  plantaSus.getisScanned()) {
                     if (apaSus.waterQuality() > calitateApa) {
                         calitateApa = apaSus.waterQuality();
                         pozX = posSusI;
                         pozY = posSusJ;
                     }
                 }
-                if (apaStanga != null && plantaStanga != null && !plantaStanga.getMaturityLevel().equals("dead") &&  plantaStanga.getisScanned()) {
+                if (apaStanga != null && plantaStanga != null
+                        && !plantaStanga.getMaturityLevel().equals("dead")
+                        &&  plantaStanga.getisScanned()) {
                     if (apaStanga.waterQuality() > calitateApa) {
                         calitateApa = apaStanga.waterQuality();
                         pozX = posStangaI;
@@ -534,28 +552,36 @@ public final class Main {
                     }
                 }
                 if (pozX == -1) {
-                    if (apaJos != null && plantaJos != null && !plantaJos.getMaturityLevel().equals("dead") &&  plantaJos.getisScanned()) {
+                    if (apaJos != null && plantaJos != null
+                            && !plantaJos.getMaturityLevel().equals("dead")
+                            && plantaJos.getisScanned()) {
                         if (apaJos.waterQuality() > calitateApa) {
                             calitateApa = apaJos.waterQuality();
                             pozX = posJosI;
                             pozY = posJosJ;
                         }
                     }
-                    if (apaDreapta != null && plantaDreapta != null && !plantaDreapta.getMaturityLevel().equals("dead") && plantaDreapta.getisScanned()) {
+                    if (apaDreapta != null && plantaDreapta != null
+                            && !plantaDreapta.getMaturityLevel().equals("dead")
+                            && plantaDreapta.getisScanned()) {
                         if (apaDreapta.waterQuality() > calitateApa) {
                             calitateApa = apaDreapta.waterQuality();
                             pozX = posDreaptaI;
                             pozY = posDreaptaJ;
                         }
                     }
-                    if (apaSus != null && plantaSus != null && !plantaSus.getMaturityLevel().equals("dead") && plantaSus.getisScanned()) {
+                    if (apaSus != null && plantaSus != null
+                            && !plantaSus.getMaturityLevel().equals("dead")
+                            && plantaSus.getisScanned()) {
                         if (apaSus.waterQuality() > calitateApa) {
                             calitateApa = apaSus.waterQuality();
                             pozX = posSusI;
                             pozY = posSusJ;
                         }
                     }
-                    if (apaStanga != null && plantaStanga != null && !plantaStanga.getMaturityLevel().equals("dead") &&  plantaStanga.getisScanned()) {
+                    if (apaStanga != null && plantaStanga != null
+                            && !plantaStanga.getMaturityLevel().equals("dead")
+                            && plantaStanga.getisScanned()) {
                         if (apaStanga.waterQuality() > calitateApa) {
                             calitateApa = apaStanga.waterQuality();
                             pozX = posStangaI;
@@ -563,23 +589,33 @@ public final class Main {
                         }
                     }
                     if (pozX == -1) {
-                        if (apaJos != null || (plantaJos != null && !plantaJos.getMaturityLevel().equals("dead") && plantaJos.getisScanned())) {
+                        if (apaJos != null || (plantaJos != null
+                                && !plantaJos.getMaturityLevel().equals("dead")
+                                && plantaJos.getisScanned())) {
                             if (plantaJos != null) {
                                 pozX = posJosI;
                                 pozY = posJosJ;
                             }
-                        } else if (apaDreapta != null || (plantaDreapta != null &&  !plantaDreapta.getMaturityLevel().equals("dead") &&  plantaDreapta.getisScanned())) {
+                        } else if (apaDreapta != null
+                                || (plantaDreapta != null
+                                        && !plantaDreapta.getMaturityLevel().equals("dead")
+                                        && plantaDreapta.getisScanned())) {
                             if (plantaDreapta != null) {
                                 pozX = posDreaptaI;
                                 pozY = posDreaptaJ;
                             }
-                        } else if (apaSus != null || (plantaSus != null && !plantaSus.getMaturityLevel().equals("dead") &&  plantaSus.getisScanned())) {
+                        } else if (apaSus != null
+                                || (plantaSus != null
+                                        && !plantaSus.getMaturityLevel().equals("dead")
+                                        && plantaSus.getisScanned())) {
                             if (plantaSus != null) {
                                 pozX = posSusI;
                                 pozY = posSusJ;
                             }
-                        }
-                        else if (apaStanga != null || (plantaStanga != null && !plantaStanga.getMaturityLevel().equals("dead") && plantaStanga.getisScanned())) {
+                        } else if (apaStanga != null
+                                || (plantaStanga != null
+                                        && !plantaStanga.getMaturityLevel().equals("dead")
+                                        && plantaStanga.getisScanned())) {
                             if (plantaStanga != null) {
                                 pozX = posStangaI;
                                 pozY = posStangaJ;
@@ -595,8 +631,7 @@ public final class Main {
                                     pozY = posSusJ;
                                 }
                             }
-                        }
-                        else if (apaDreapta != null || plantaDreapta != null) {
+                        } else if (apaDreapta != null || plantaDreapta != null) {
                             if (apaDreapta != null) {
                                 if (apaDreapta.waterQuality() > calitateApa) {
                                     calitateApa = apaDreapta.waterQuality();
@@ -604,8 +639,7 @@ public final class Main {
                                     pozY = posDreaptaJ;
                                 }
                             }
-                        }
-                        else if (apaJos != null || plantaJos != null) {
+                        } else if (apaJos != null || plantaJos != null) {
                             if (apaJos != null) {
                                 if (apaJos.waterQuality() > calitateApa) {
                                     calitateApa = apaJos.waterQuality();
@@ -613,8 +647,7 @@ public final class Main {
                                     pozY = posJosJ;
                                 }
                             }
-                        }
-                        else if (apaStanga != null || plantaStanga != null) {
+                        } else if (apaStanga != null || plantaStanga != null) {
                             if (apaStanga != null) {
                                 if (apaStanga.waterQuality() > calitateApa) {
                                     calitateApa = apaStanga.waterQuality();
@@ -625,7 +658,6 @@ public final class Main {
                         }
                     }
                 }
-                System.out.println("animalul se muta pe " + pozX + pozY);
                 if (pozX == -1) {
                     if (existaSus == 1) {
                         pozX = posSusI;
@@ -641,69 +673,67 @@ public final class Main {
                         pozY = posStangaJ;
                     }
                 }
-                System.out.println(
-                        "=== DEBUG ANIMAL @ T=" + iteratii + " ===\n" +
-                                "Animal Type: " + animalul.getType() + "\n" +
-                                "Pozitie initiala: (" + a + ", " + b + ")\n" +
-                                "Vecini disponibili:\n" +
-
-                                // STANGA
-                                "   Stanga:  (" + posStangaI + ", " + posStangaJ + ") | " +
-                                "apa=" + (apaStanga == null ? "-" : apaStanga.waterQuality()) + " | " +
-                                "planta=" + (plantaStanga == null ? "-" : plantaStanga.getMaturityLevel()) + " | " +
-                                "plant_scanned=" + (plantaStanga == null ? "-" : plantaStanga.getisScanned()) + " | " +
-                                "animal=" +
-                                (animalStanga == null ? "-" :
-                                        ("type=" + animalStanga.getType() +
-                                                ", mass=" + animalStanga.getMass() +
-                                                ", scanned=" + animalStanga.getisScanned() +
-                                                ", mutat=" + animalStanga.isMutat())
-                                ) + "\n" +
-
-                                // DREAPTA
-                                "   Dreapta: (" + posDreaptaI + ", " + posDreaptaJ + ") | " +
-                                "apa=" + (apaDreapta == null ? "-" : apaDreapta.waterQuality()) + " | " +
-                                "planta=" + (plantaDreapta == null ? "-" : plantaDreapta.getMaturityLevel()) + " | " +
-                                "plant_scanned=" + (plantaDreapta == null ? "-" : plantaDreapta.getisScanned()) + " | " +
-                                "animal=" +
-                                (animalDreapta == null ? "-" :
-                                        ("type=" + animalDreapta.getType() +
-                                                ", mass=" + animalDreapta.getMass() +
-                                                ", scanned=" + animalDreapta.getisScanned() +
-                                                ", mutat=" + animalDreapta.isMutat())
-                                ) + "\n" +
-
-                                // SUS
-                                "   Sus:     (" + posSusI + ", " + posSusJ + ") | " +
-                                "apa=" + (apaSus == null ? "-" : apaSus.waterQuality()) + " | " +
-                                "planta=" + (plantaSus == null ? "-" : plantaSus.getMaturityLevel()) + " | " +
-                                "plant_scanned=" + (plantaSus == null ? "-" : plantaSus.getisScanned()) + " | " +
-                                "animal=" +
-                                (animalSus == null ? "-" :
-                                        ("type=" + animalSus.getType() +
-                                                ", mass=" + animalSus.getMass() +
-                                                ", scanned=" + animalSus.getisScanned() +
-                                                ", mutat=" + animalSus.isMutat())
-                                ) + "\n" +
-
-                                // JOS
-                                "   Jos:     (" + posJosI + ", " + posJosJ + ") | " +
-                                "apa=" + (apaJos == null ? "-" : apaJos.waterQuality()) + " | " +
-                                "planta=" + (plantaJos == null ? "-" : plantaJos.getMaturityLevel()) + " | " +
-                                "plant_scanned=" + (plantaJos == null ? "-" : plantaJos.getisScanned()) + " | " +
-                                "animal=" +
-                                (animalJos == null ? "-" :
-                                        ("type=" + animalJos.getType() +
-                                                ", mass=" + animalJos.getMass() +
-                                                ", scanned=" + animalJos.getisScanned() +
-                                                ", mutat=" + animalJos.isMutat())
-                                ) + "\n" +
-
-                                "Pozitie aleasa FINAL: (" + pozX + ", " + pozY + ")\n" +
-                                "============================================"
-                );
-
-
+//                System.out.println(
+//                        "=== DEBUG ANIMAL @ T=" + iteratii + " ===\n" +
+//                                "Animal Type: " + animalul.getType() + "\n" +
+//                                "Pozitie initiala: (" + a + ", " + b + ")\n" +
+//                                "Vecini disponibili:\n" +
+//
+//                                // STANGA
+//                                "   Stanga:  (" + posStangaI + ", " + posStangaJ + ") | " +
+//                                "apa=" + (apaStanga == null ? "-" : apaStanga.waterQuality()) + " | " +
+//                                "planta=" + (plantaStanga == null ? "-" : plantaStanga.getMaturityLevel()) + " | " +
+//                                "plant_scanned=" + (plantaStanga == null ? "-" : plantaStanga.getisScanned()) + " | " +
+//                                "animal=" +
+//                                (animalStanga == null ? "-" :
+//                                        ("type=" + animalStanga.getType() +
+//                                                ", mass=" + animalStanga.getMass() +
+//                                                ", scanned=" + animalStanga.getisScanned() +
+//                                                ", mutat=" + animalStanga.isMutat())
+//                                ) + "\n" +
+//
+//                                // DREAPTA
+//                                "   Dreapta: (" + posDreaptaI + ", " + posDreaptaJ + ") | " +
+//                                "apa=" + (apaDreapta == null ? "-" : apaDreapta.waterQuality()) + " | " +
+//                                "planta=" + (plantaDreapta == null ? "-" : plantaDreapta.getMaturityLevel()) + " | " +
+//                                "plant_scanned=" + (plantaDreapta == null ? "-" : plantaDreapta.getisScanned()) + " | " +
+//                                "animal=" +
+//                                (animalDreapta == null ? "-" :
+//                                        ("type=" + animalDreapta.getType() +
+//                                                ", mass=" + animalDreapta.getMass() +
+//                                                ", scanned=" + animalDreapta.getisScanned() +
+//                                                ", mutat=" + animalDreapta.isMutat())
+//                                ) + "\n" +
+//
+//                                // SUS
+//                                "   Sus:     (" + posSusI + ", " + posSusJ + ") | " +
+//                                "apa=" + (apaSus == null ? "-" : apaSus.waterQuality()) + " | " +
+//                                "planta=" + (plantaSus == null ? "-" : plantaSus.getMaturityLevel()) + " | " +
+//                                "plant_scanned=" + (plantaSus == null ? "-" : plantaSus.getisScanned()) + " | " +
+//                                "animal=" +
+//                                (animalSus == null ? "-" :
+//                                        ("type=" + animalSus.getType() +
+//                                                ", mass=" + animalSus.getMass() +
+//                                                ", scanned=" + animalSus.getisScanned() +
+//                                                ", mutat=" + animalSus.isMutat())
+//                                ) + "\n" +
+//
+//                                // JOS
+//                                "   Jos:     (" + posJosI + ", " + posJosJ + ") | " +
+//                                "apa=" + (apaJos == null ? "-" : apaJos.waterQuality()) + " | " +
+//                                "planta=" + (plantaJos == null ? "-" : plantaJos.getMaturityLevel()) + " | " +
+//                                "plant_scanned=" + (plantaJos == null ? "-" : plantaJos.getisScanned()) + " | " +
+//                                "animal=" +
+//                                (animalJos == null ? "-" :
+//                                        ("type=" + animalJos.getType() +
+//                                                ", mass=" + animalJos.getMass() +
+//                                                ", scanned=" + animalJos.getisScanned() +
+//                                                ", mutat=" + animalJos.isMutat())
+//                                ) + "\n" +
+//
+//                                "Pozitie aleasa FINAL: (" + pozX + ", " + pozY + ")\n" +
+//                                "============================================"
+//                );
 
                 if (animalul != null) {
                     if (animalul.getType().equals("Carnivores")
@@ -907,7 +937,7 @@ public final class Main {
                 Air aer = (Air) entity;
                 aer.setHumidity(aer.getHumidity()
                         + MagicNumbersDouble.zerodoi.getNumar());
-                aer.setOxygenLevel(aer.airQuality());
+                aer.setAirQuality(aer.airQuality());
                 return 1;
             }
         }
@@ -942,7 +972,8 @@ public final class Main {
             if (entity.isPlant()) {
                 Plant plantuta = (Plant) entity;
                 if (plantuta.getMaturityLevel().equals("dead")) {
-                    entities.remove(i);
+                    //entities.remove(i);
+                    plantuta.setMaturityLevel("out");
                 }
             }
         }
@@ -986,6 +1017,7 @@ public final class Main {
         int okSimulation = 0;
         List<SimulationInput> simulations = inputLoader.getSimulations();
         int contorComenzi = 0;
+        LinkedHashMap<String, List<String>> factsAndSubjects = new LinkedHashMap<>();
         // int inceputIteratieAnimal = 0;
         for (int o = 0; o < simulations.size(); o++) {
             SimulationInput simInput = simulations.get(o);
@@ -1016,27 +1048,27 @@ public final class Main {
                         solul = new ForestSoil(sol.getName(), sol.getMass(),
                                 sol.getNitrogen(), sol.getWaterRetention(),
                                 sol.getSoilpH(), sol.getOrganicMatter(),
-                                sol.getLeafLitter());
+                                sol.getLeafLitter(), sol.getType());
                     } else if (sol.getType().equals("SwampSoil")) {
                         solul = new SwampSoil(sol.getName(), sol.getMass(),
                                 sol.getNitrogen(), sol.getWaterRetention(),
                                 sol.getSoilpH(), sol.getOrganicMatter(),
-                                sol.getWaterLogging());
+                                sol.getWaterLogging(), sol.getType());
                     } else if (sol.getType().equals("DesertSoil")) {
                         solul = new DesertSoil(sol.getName(), sol.getMass(),
                                 sol.getNitrogen(), sol.getWaterRetention(),
                                 sol.getSoilpH(), sol.getOrganicMatter(),
-                                sol.getSalinity());
+                                sol.getSalinity(), sol.getType());
                     } else if (sol.getType().equals("GrasslandSoil")) {
                         solul = new GrasslandSoil(sol.getName(), sol.getMass(),
                                 sol.getNitrogen(), sol.getWaterRetention(),
                                 sol.getSoilpH(), sol.getOrganicMatter(),
-                                sol.getRootDensity());
+                                sol.getRootDensity(), sol.getType());
                     } else if (sol.getType().equals("TundraSoil")) {
                         solul = new TundraSoil(sol.getName(), sol.getMass(),
                                 sol.getNitrogen(), sol.getWaterRetention(),
                                 sol.getSoilpH(), sol.getOrganicMatter(),
-                                sol.getPermafrostDepth());
+                                sol.getPermafrostDepth(), sol.getType());
                     }
                     mat[loc.getX()][loc.getY()].add(solul);
                 }
@@ -1048,19 +1080,19 @@ public final class Main {
                     Plant plantuta = null;
                     if (planta.getType().equals("FloweringPlants")) {
                         plantuta = new FloweringPlants(planta.getName(),
-                                planta.getMass(), 0, "young");
+                                planta.getMass(), 0, "young", planta.getType());
                     } else if (planta.getType().equals("GymnospermsPlants")) {
                         plantuta = new GymnospermsPlants(planta.getName(),
-                                planta.getMass(), 0, "young");
+                                planta.getMass(), 0, "young", planta.getType());
                     } else if (planta.getType().equals("Ferns")) {
                         plantuta = new Ferns(planta.getName(),
-                                planta.getMass(), 0, "young");
+                                planta.getMass(), 0, "young", planta.getType());
                     } else if (planta.getType().equals("Mosses")) {
                         plantuta = new Mosses(planta.getName(),
-                                planta.getMass(), 0, "young");
+                                planta.getMass(), 0, "young", planta.getType());
                     } else if (planta.getType().equals("Algae")) {
                         plantuta = new Algae(planta.getName(),
-                                planta.getMass(), 0, "young");
+                                planta.getMass(), 0, "young", planta.getType());
                     }
                     mat[loc.getX()][loc.getY()].add(plantuta);
                 }
@@ -1097,7 +1129,7 @@ public final class Main {
                     Water apita = new Water(apa.getName(), apa.getMass(),
                             apa.getType(), apa.getSalinity(), apa.getPH(),
                             apa.getPurity(), apa.getTurbidity(),
-                            apa.getContaminantIndex(), apa.isFrozen());
+                            apa.getContaminantIndex(), apa.isFrozen(), apa.getType());
                     mat[loc.getX()][loc.getY()].add(apita);
                 }
             }
@@ -1110,26 +1142,26 @@ public final class Main {
                         aerut = new TropicalAir(aer.getName(),
                                 aer.getMass(), aer.getHumidity(),
                                 aer.getTemperature(), aer.getOxygenLevel(),
-                                aer.getCo2Level());
+                                aer.getCo2Level(), aer.getType());
                     } else if (aer.getType().equals("PolarAir")) {
                         aerut = new Polar(aer.getName(), aer.getMass(),
                                 aer.getHumidity(), aer.getTemperature(),
                                 aer.getOxygenLevel(),
-                                aer.getIceCrystalConcentration());
+                                aer.getIceCrystalConcentration(), aer.getType());
                     } else if (aer.getType().equals("TemperateAir")) {
                         aerut = new TemperateAir(aer.getName(), aer.getMass(),
                                 aer.getHumidity(), aer.getTemperature(),
-                                aer.getOxygenLevel(), aer.getPollenLevel());
+                                aer.getOxygenLevel(), aer.getPollenLevel(), aer.getType());
                     } else if (aer.getType().equals("DesertAir")) {
                         aerut = new DesertAir(aer.getName(),
                                 aer.getMass(), aer.getHumidity(),
                                 aer.getTemperature(), aer.getOxygenLevel(),
-                                aer.getDustParticles());
+                                aer.getDustParticles(), aer.getType());
                     } else if (aer.getType().equals("MountainAir")) {
                         aerut = new MountainAir(aer.getName(),
                                 aer.getMass(), aer.getHumidity(),
                                 aer.getTemperature(), aer.getOxygenLevel(),
-                                aer.getAltitude());
+                                aer.getAltitude(), aer.getType());
                     }
                     aerut.setAirQuality(aerut.airQuality());
                     mat[loc.getX()][loc.getY()].add(aerut);
@@ -1146,6 +1178,9 @@ public final class Main {
             int okInterAnimal = 0;
             int inceputIteratieAnimal = 0;
             int mergeSubj = 0;
+            int timestampWeather = 0;
+            int retineX = 0;
+            int retineY = 0;
             List<CommandInput> commands = inputLoader.getCommands();
             int nextSimulare = 0;
             int opresteSimulare = 0;
@@ -1155,7 +1190,6 @@ public final class Main {
                 List<Entity> entit = mat[robotel.getPozX()][robotel.getPozY()];
                 verificaMoarteaPlantuta(entit);
                 CommandInput command = commands.get(i);
-                System.out.println("la pasul " + command.getTimestamp() + ": ");
                 iteratii = command.getTimestamp();
                 if ((command.getTimestamp() - previousStamp >= stamps)
                         && (robotel.isCharging())) {
@@ -1208,7 +1242,8 @@ public final class Main {
                                     // System.out.println("in celula " + a + "si " + b);
                                     // System.out.println("animalul e" + an.getName());
                                     okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
-                                            inceputIteratieAnimal, robotel, dimension, entities, a, b);
+                                            inceputIteratieAnimal, robotel, dimension,
+                                            entities, a, b);
                                     an.setMutat(true);
                                 }
                             }
@@ -1216,7 +1251,6 @@ public final class Main {
                         }
                     }
                 }
-                // System.out.println("La comanda cu timestamp " + command.getTimestamp() + " este:");
                 for (int a = 0; a < dimension; a++) {
                     for (int b = 0; b < dimension; b++) {
                         List<Entity> entities = mat[b][a];
@@ -1272,8 +1306,10 @@ public final class Main {
                                 env.set("soil", soilNode);
                             } else if (entity.isPlant()) {
                                 Plant plantuta = (Plant) entity;
-                                ObjectNode plantNode = printPlant(plantuta);
-                                env.set("plants", plantNode);
+                                if (!plantuta.getMaturityLevel().equals("out")) {
+                                    ObjectNode plantNode = printPlant(plantuta);
+                                    env.set("plants", plantNode);
+                                }
                             } else if (entity.isAnimal()) {
                                 Animal animalut = (Animal) entity;
                                 ObjectNode animalNode = printAnimal(animalut);
@@ -1330,15 +1366,16 @@ public final class Main {
 //                                        entityNode.put("stareplanta", pl.getMaturityLevel());
 //                                        entityNode.put("crestere", pl.getNivelCrestere());
 //                                        entityNode.put("scanata", pl.getisScanned());
-                                         if (!pl.getMaturityLevel().equals("dead")) {
+                                         if (!pl.getMaturityLevel().equals("out")) {
                                             contor++;
                                         }
                                     }
                                     if (entities.get(p).isAnimal()) {
                                         Animal anim =  (Animal) entities.get(p);
                                         // entityNode.put("animal", anim.getType());
-                                        if (!anim.getType().equals("out"))
-                                        contor++;
+                                        if (!anim.getType().equals("out")) {
+                                            contor++;
+                                        }
                                     }
                                 }
                                 entityNode.put("totalNrOfObjects", contor);
@@ -1478,11 +1515,16 @@ public final class Main {
                                             && entity.getName().equals(fact)) {
                                         mergeSubj = 1;
                                         entity.setSubject(subj);
+                                        // entity.setTopic();
                                     }
                                 }
                             }
                         }
                         if (mergeSubj == 1) {
+                            if (!factsAndSubjects.containsKey(fact)) {
+                                factsAndSubjects.put(fact, new ArrayList<>());
+                            }
+                            factsAndSubjects.get(fact).add(subj);
                             robotel.setBattery(robotel.getBattery() - 2);
                             node.put("message",
                                     "The fact has been successfully saved in the database.");
@@ -1497,39 +1539,20 @@ public final class Main {
                                 "ERROR: Simulation not started. Cannot perform action");
                     } else {
                         ArrayNode subiecte = MAPPER.createArrayNode();
-                        for (int a = 0; a < dimension; a++) {
-                            for (int b = 0; b < dimension; b++) {
-                                List<Entity> entities = mat[a][b];
-                                for (int k = 0; k < entities.size(); k++) {
-                                    Entity entity = entities.get(k);
-                                    if (entity.getisScanned()
-                                            && entity.getSubject() != null
-                                            && !entity.getSubject().isEmpty()) {
-                                        ObjectNode adaugaComp = MAPPER.createObjectNode();
-                                        String component = entity.getName();
-                                        adaugaComp.put("topic", component);
-                                        ArrayNode adaugaSubj = MAPPER.createArrayNode();
-                                        List<String> subjects = entity.getSubject();
-                                        for (int p = 0; p < subjects.size(); p++) {
-                                            String subiect = subjects.get(p);
-                                            adaugaSubj.add(subiect);
-                                        }
-                                        adaugaComp.put("facts", adaugaSubj);
-                                        subiecte.add(adaugaComp);
-                                    }
-                                }
+                        Set<Map.Entry<String, List <String>>> subjs = factsAndSubjects.entrySet();
+                        Iterator<Map.Entry<String, List<String>>> iterator = subjs.iterator();
+                        while (iterator.hasNext()) {
+                            Map.Entry<String, List<String>> subj = iterator.next();
+                            String fact = subj.getKey();
+                            List<String> subiect = subj.getValue();
+                            ObjectNode adaugaS = MAPPER.createObjectNode();
+                            adaugaS.put("topic", fact);
+                            ArrayNode vectorSub = MAPPER.createArrayNode();
+                            for (int j = 0; j< subiect.size(); j++) {
+                                vectorSub.add(subiect.get(j));
                             }
-                        }
-                        for (int m = 0; m < subiecte.size() - 1; m++) {
-                            for (int n = m + 1; n < subiecte.size(); n++) {
-                                String primulFact = subiecte.get(m).get("topic").asText();
-                                String alDoilea = subiecte.get(n).get("facts").asText();
-                                if (primulFact.compareTo(alDoilea) > 0) {
-                                    ObjectNode tmp = (ObjectNode) subiecte.get(m);
-                                    subiecte.set(m, subiecte.get(n));
-                                    subiecte.set(n, tmp);
-                                }
-                            }
+                            adaugaS.put("facts", vectorSub);
+                            subiecte.add(adaugaS);
                         }
                         node.set("output", subiecte);
                     }
@@ -1546,83 +1569,88 @@ public final class Main {
                     } else {
                         String improvment = command.getImprovementType();
                         String name = command.getName();
+                        String type = command.getType();
                         int merge = 0;
-                        for (int a = 0; a < dimension; a++) {
-                            for (int b = 0; b < dimension; b++) {
-                                List<Entity> entities = mat[a][b];
-                                for (int p = 0; p < entities.size(); p++) {
-                                    Entity entity = entities.get(p);
-                                    if (entity.getisScanned() && entity.getName().equals(name)
-                                            && entity.getSubject().size() != 0
-                                            && !entity.getSubject().isEmpty()) {
-                                        for (int k = 0; k < entity.getSubject().size(); k++) {
-                                            String subject = entity.getSubject().get(k);
-                                            String[] comanda = subject.split(" ");
-                                            String ceModific = comanda[comanda.length - 1];
-                                            // node.put("campul", ceModific);
-                                            if (improvment.equals("plantVegetation")
-                                                    && entity.isPlant() && entity.getisScanned()) {
-                                                int ok = updateazaOxigenul(mat[robotel.getPozX()]
-                                                        [robotel.getPozY()]);
-                                                if (ok == 1) {
-                                                    merge = 1;
-                                                    node.put("message",
-                                                            "The " + ceModific
-                                                                    + " was planted successfully.");
-                                                }
-                                            } else if (improvment.equals("fertilizeSoil")
-                                                    && entity.isSoil() && entity.getisScanned()) {
-                                                int ok = updateazaFertilizarea(
-                                                        mat[robotel.getPozX()]
-                                                        [robotel.getPozY()]);
-                                                if (ok == 1) {
-                                                    merge = 1;
-                                                    node.put("message",
-                                                            "The soil was "
-                                                                    + "successfully fertilized "
-                                                                    + " using "
-                                                                    + ceModific + ".");
-                                                }
-                                            } else if (improvment.equals("increaseHumidity")
-                                                    && entity.isAir() && entity.getisScanned()) {
-                                                int ok = updateazaUmiditatea(mat[robotel.getPozX()]
-                                                        [robotel.getPozY()]);
-                                                if (ok == 1) {
-                                                    merge = 1;
-                                                    node.put("message",
-                                                            "The air humidity was "
-                                                                    + "successfully increased "
-                                                                    + "using "
-                                                                    + command.getName() + ".");
-                                                }
-                                            } else if (improvment.equals("increaseMoisture")
-                                                    && entity.isWater() && entity.getisScanned()) {
-                                                int ok = updateazaWaterret(mat[robotel.getPozX()]
-                                                        [robotel.getPozY()]);
-                                                if (ok == 1) {
-                                                    merge = 1;
-                                                    node.put("message",
-                                                            "The moisture was "
-                                                                    + "successfully increased "
-                                                                    + "using "
-                                                                    + command.getName());
+                        mergeSubj = 0;
+                        if (factsAndSubjects.containsKey(name)) {
+                            mergeSubj = 1;
+                        }
+//                        System.out.println(name);
+//                        System.out.println(type);
+//                        System.out.println(mergeSubj);
+                        if (mergeSubj == 1) {
+                            for (int a = 0; a < dimension; a++) {
+                                for (int b = 0; b < dimension; b++) {
+                                    List<Entity> entities = mat[a][b];
+                                    for (int p = 0; p < entities.size(); p++) {
+                                        Entity entity = entities.get(p);
+                                        if (entity.getisScanned() && entity.getName().equals(name)
+                                                && entity.getSubject().size() != 0
+                                                && !entity.getSubject().isEmpty()) {
+                                            for (int k = 0; k < entity.getSubject().size(); k++) {
+                                                String subject = entity.getSubject().get(k);
+                                                String[] comanda = subject.split(" ");
+                                                String ceModific = comanda[comanda.length - 1];
+                                                // node.put("campul", ceModific);
+                                                if (improvment.equals("plantVegetation")
+                                                        && entity.isPlant() && entity.getisScanned()) {
+                                                    int ok = updateazaOxigenul(mat[robotel.getPozX()]
+                                                            [robotel.getPozY()]);
+                                                    if (ok == 1) {
+                                                        merge = 1;
+                                                        node.put("message",
+                                                                "The " + ceModific
+                                                                        + " was planted successfully.");
+                                                    }
+                                                } else if (improvment.equals("fertilizeSoil")) {
+                                                    int ok = updateazaFertilizarea(
+                                                            mat[robotel.getPozX()]
+                                                                    [robotel.getPozY()]);
+                                                    if (ok == 1) {
+                                                        merge = 1;
+                                                        node.put("message",
+                                                                "The soil was "
+                                                                        + "successfully fertilized "
+                                                                        + "using "
+                                                                        + ceModific);
+                                                    }
+                                                } else if (improvment.equals("increaseHumidity")) {
+                                                    int ok = updateazaUmiditatea(mat[robotel.getPozX()]
+                                                            [robotel.getPozY()]);
+                                                    if (ok == 1) {
+                                                        merge = 1;
+                                                        node.put("message",
+                                                                "The humidity was "
+                                                                        + "successfully increased "
+                                                                        + "using "
+                                                                        + command.getName());
+                                                    }
+                                                } else if (improvment.equals("increaseMoisture")
+                                                        && entity.isWater() && entity.getisScanned()) {
+                                                    int ok = updateazaWaterret(mat[robotel.getPozX()]
+                                                            [robotel.getPozY()]);
+                                                    if (ok == 1) {
+                                                        merge = 1;
+                                                        node.put("message",
+                                                                "The moisture was "
+                                                                        + "successfully increased "
+                                                                        + "using "
+                                                                        + command.getName());
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        if (mergeSubj == 0) {
-                            node.put("message",
-                                    "ERROR: Fact not yet saved. Cannot perform action");
-                        }
-                        if (merge == 0) {
-                            node.put("message",
-                                    "ERROR: Subject not yet saved. Cannot perform action");
-                        } else {
                             robotel.setBattery(robotel.getBattery()
                                     - MagicNumbersInt.zece.getNumar());
+                        } else if (mergeSubj == 0) {
+                            node.put("message",
+                                    "ERROR: Subject not yet saved. Cannot perform action");
+                        }else if (merge == 0) {
+                            node.put("message",
+                                    "ERROR: Fact not yet saved. Cannot perform action");
                         }
                     }
                 } else if (command.getCommand().equals("getEnergyStatus")) {
@@ -1657,159 +1685,139 @@ public final class Main {
                         node.put("message", "ERROR: Robot still charging. Cannot perform action");
                     } else {
                         okSchimbariMeteo = 1;
+                        timestampWeather = command.getTimestamp();
+                        retineX = robotel.getPozX();
+                        retineY = robotel.getPozY();
                         List<Entity> entities = mat[robotel.getPozX()][robotel.getPozY()];
                         for (int k = 0; k < entities.size(); k++) {
                             Entity entity = entities.get(k);
                             if (entity.isAir()) {
                                 Air aer = (Air) entity;
-                                Air fostAer = (Air) entity;
+                                // Air fostAer = (Air) entity;
+                                double fostAer = aer.getOxygenLevel();
                                 if (aer.isTropical()) {
                                     TropicalAir trop = (TropicalAir) aer;
-                                    String eveniment = command.getImprovementType();
+                                    String eveniment = command.getType();
                                     double rainfall = command.getRainfall();
                                     trop.setEvent(eveniment);
                                     trop.setRainfall(rainfall);
-                                    trop.setAirQuality(trop.updateAirQuality());
-                                    merge = 1;
+                                    // trop.setAirQuality(trop.updateAirQuality());
+                                    // System.out.println(eveniment);
+                                    if (eveniment != null && eveniment.equals("rainfall")) {
+                                        merge = 1;
+                                    }
                                 } else if (aer.isPolar()) {
                                     Polar polar = (Polar) aer;
-                                    String eveniment = command.getImprovementType();
+                                    String eveniment = command.getType();
                                     double wind = command.getWindSpeed();
                                     polar.setEvent(eveniment);
                                     polar.setWindSpeed(wind);
                                     polar.setAirQuality(polar.updateAirQuality());
-                                    merge = 1;
+                                    if (eveniment != null && eveniment.equals("polarStorm")) {
+                                        merge = 1;
+                                    }
                                 } else if (aer.isTemperate()) {
                                     TemperateAir temperate = (TemperateAir) aer;
-                                    String eveniment = command.getImprovementType();
+                                    String eveniment = command.getType();
                                     String seas = command.getSeason();
                                     temperate.setEvent(eveniment);
                                     temperate.setSeason(seas);
                                     temperate.setAirQuality(temperate.updateAirQuality());
-                                    merge = 1;
+                                    if (eveniment != null && eveniment.equals("newSeason")) {
+                                        merge = 1;
+                                    }
                                 } else if (aer.isDesert()) {
                                     DesertAir desert = (DesertAir) aer;
-                                    String eveniment = command.getImprovementType();
+                                    String eveniment = command.getType();
                                     boolean deser = command.isDesertStorm();
                                     desert.setEvent(eveniment);
                                     desert.setDesertStorm(deser);
                                     desert.setAirQuality(desert.updateAirQuality());
-                                    merge = 1;
+                                    if (eveniment != null && eveniment.equals("desertStorm")) {
+                                        merge = 1;
+                                    }
                                 } else if (aer.isMountain()) {
                                     MountainAir mountain = (MountainAir) aer;
-                                    String eveniment = command.getImprovementType();
+                                    String eveniment = command.getType();
                                     int number = command.getNumberOfHikers();
                                     mountain.setEvent(eveniment);
                                     mountain.setNumberOfHikers(number);
                                     mountain.setAirQuality(mountain.updateAirQuality());
-                                    merge = 1;
+                                    if (eveniment != null && eveniment.equals("peopleHiking")) {
+                                        merge = 1;
+                                    }
                                 }
-                                if (fostAer.airQuality() == aer.getAirQuality())
-                                    merge = 2;
                             }
                         }
                         if (merge == 1) {
                             node.put("message", "The weather has changed.");
                         } else {
-                            node.put("message", "ERROR: The weather change does not " +
-                                            "affect the environment."
-                                            + " Cannot perform action");
+                            node.put("message", "ERROR: The weather change does not "
+                                    + "affect the environment."
+                                    + " Cannot perform action");
                         }
                     }
                 }
-                for (int k = 0; k < dimension; k++) {
-                    for (int j = 0; j < dimension; j++) {
-
-                        List<Entity> entities = mat[k][j];
-
-                        System.out.println("=== CELULA (" + k + ", " + j + ") ===");
-
-                        if (entities.isEmpty()) {
-                            System.out.println("Celula este goală.");
-                        } else {
-
-                            for (Entity entity : entities) {
-
-                                // ░░░ ANIMAL ░░░
-                                if (entity.isAnimal()) {
-                                    Animal an = (Animal) entity;
-                                    System.out.println(
-                                            "[ANIMAL] Type=" + an.getType() +
-                                                    " | Mass=" + an.getMass() +
-                                                    " | State=" + an.getState() +
-                                                    " | Scanned=" + an.getisScanned() +
-                                                    " | Mutat=" + an.isMutat()
-                                    );
-                                }
-
-                                // ░░░ PLANT ░░░
-                                else if (entity instanceof Plant) {
-                                    Plant p = (Plant) entity;
-                                    System.out.println(
-                                            "[PLANT] Maturity=" + p.getMaturityLevel() +
-                                                    " | Scanned=" + p.getisScanned() +
-                                                    " | Mass=" + p.getMass()
-                                    );
-                                }
-
-                                // ░░░ WATER (cu scanned) ░░░
-                                else if (entity instanceof Water) {
-                                    Water w = (Water) entity;
-                                    System.out.println(
-                                            "[WATER] Quality=" + w.waterQuality() +
-                                                    " | Mass=" + w.getMass() +
-                                                    " | Scanned=" + w.getisScanned()
-                                    );
-                                }
-
-                                // ░░░ AIR (cu calitate aer) ░░░
-                                else if (entity instanceof Air) {
-                                    Air air1 = (Air) entity;
-                                    System.out.println(
-                                            "[AIR] Quality=" + air1.airQuality()
-                                    );
-                                }
-
-                                // ░░░ SOIL ░░░
-                                else if (entity instanceof Soil) {
-                                    Soil soill = (Soil) entity;
-                                    System.out.println(
-                                            "[SOIL] Quality=" + soill.soilQuality()
-                                    );
-                                }
-
-                                // ░░░ NECUNOSCUT ░░░
-                                else {
-                                    System.out.println("[UNKNOWN ENTITY] " + entity.getClass().getSimpleName());
-                                }
-                            }
-                        }
-
-                        System.out.println("==================================\n");
-                    }
-                }
-
-
-
-
-//            node.put("baterie", robotel.getBattery());
-//            node.put("scor", mat[0][1].get(0).get_attack());
-//                for (int a = 0; a < dimension; a++) {
-//                    for (int b = 0; b < dimension; b++) {
-//                        List<Entity> entities = mat[a][b];
-//                        for (int p = 0; p < entities.size(); p++) {
-//                            Entity entity = entities.get(p);
-//                            if (entity.isAnimal() && inceputIteratieAnimal != -1) {
-//                                Animal an =  (Animal) entity;
-//                                if (!an.isMutat()) {
-//                                    // System.out.println("in celula " + a + "si " + b);
-//                                    // System.out.println("animalul e" + an.getName());
-//                                    okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
-//                                            inceputIteratieAnimal, robotel, dimension, entities, a, b);
-//                                    an.setMutat(true);
+               // System.out.println("====== COMANDA CU NUMARUL: " + command.getTimestamp());
+//                for (int k = 0; k < dimension; k++) {
+//                    for (int j = 0; j < dimension; j++) {
+//                        List<Entity> entities = mat[k][j];
+//                        System.out.println("=== CELULA (" + k + ", " + j + ") ===");
+//                        if (entities.isEmpty()) {
+//                            System.out.println("Celula este goală.");
+//                        } else {
+//                            for (Entity entity : entities) {
+//                                if (entity.isAnimal()) {
+//                                    Animal an = (Animal) entity;
+//                                    System.out.println(
+//                                            "[ANIMAL] Type=" + an.getType()
+//                                                    + " | Mass=" + an.getMass()
+//                                                    + " | State=" + an.getState()
+//                                                    + " | Scanned=" + an.getisScanned()
+//                                                    + " | Mutat=" + an.isMutat()
+//                                    );
+//                                } else if (entity instanceof Plant) {
+//                                    Plant p = (Plant) entity;
+//                                    System.out.println(
+//                                            "[PLANT] Maturity=" + p.getMaturityLevel()
+//                                                    + " | Scanned=" + p.getisScanned()
+//                                                    + " | Mass=" + p.getMass()
+//                                    );
+//                                } else if (entity instanceof Water) {
+//                                    Water w = (Water) entity;
+//                                    System.out.println(
+//                                            "[WATER] Quality=" + w.waterQuality()
+//                                                    + " | Mass=" + w.getMass()
+//                                                    + " | Scanned=" + w.getisScanned()
+//                                    );
+//                                } else if (entity instanceof Air) {
+//                                    Air air1 = (Air) entity;
+//                                    System.out.println(
+//                                            "[AIR] Quality=" + air1.airQuality()
+//                                                    + " Oxygen= " + air1.getOxygenLevel()
+//                                    );
+//                                } else if (entity instanceof Soil) {
+//                                    Soil soill = (Soil) entity;
+//                                    System.out.println(
+//                                            "[SOIL] Quality=" + soill.soilQuality()
+//                                    );
+//                                } else {
+//                                    System.out.println("[UNKNOWN ENTITY] "
+//                                            + entity.getClass().getSimpleName());
 //                                }
 //                            }
-//                            verificaMoarteaPlantuta(entities);
+//                        }
+//
+//                        System.out.println("==================================\n");
+//                    }
+//                }
+//                if (command.getTimestamp() - timestampWeather == 2) {
+//                    List<Entity> entities = mat[retineX][retineY];
+//                    for (int a = 0 ; a < entities.size(); a++) {
+//                        Entity entity =  entities.get(a);
+//                        if (entity.isAir()) {
+//                            Air aer =  (Air) entity;
+//                            aer.setOxygenLevel(aer.getOxygenLevel());
 //                        }
 //                    }
 //                }
@@ -1865,6 +1873,7 @@ public final class Main {
 //                    }
 //                }
 //                node.put("scor11", mat[1][1].get(0).getAttack());
+                // node.put("baterie", robotel.getBattery());
                 node.put("timestamp", command.getTimestamp());
                 output.add(node);
                 if (nextSimulare == 1) {

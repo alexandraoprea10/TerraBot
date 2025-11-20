@@ -9,9 +9,9 @@ public final class TundraSoil extends Soil {
     public TundraSoil(final String name, final double mass,
                       final double nitrogen, final double waterRetention,
                       final double solidpH, final double organicMatter,
-                      final double permafrostDepth) {
+                      final double permafrostDepth, final String typ) {
         super(name, mass, nitrogen,
-                waterRetention, solidpH, organicMatter);
+                waterRetention, solidpH, organicMatter, typ);
         this.permafrostDepth = permafrostDepth;
     }
     // getter

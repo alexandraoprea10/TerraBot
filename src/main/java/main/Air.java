@@ -8,14 +8,14 @@ public abstract class Air extends Entity {
     private double airQuality;
     // constructori
     public Air(final String name, final double mass) {
-        super(name, mass, 0);
+        super(name, mass, 0, " ");
         this.humidity = 0.0;
         this.temperature = 0.0;
         this.oxygenLevel = 0.0;
     }
     public Air(final String name, final double mass, final double humidity,
-               final double temperature, final double oxygenLevel) {
-        super(name, mass, 0);
+               final double temperature, final double oxygenLevel, final String typ) {
+        super(name, mass, 0, typ);
         this.humidity = humidity;
         this.temperature = temperature;
         this.oxygenLevel = oxygenLevel;

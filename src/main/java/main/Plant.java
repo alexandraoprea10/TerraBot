@@ -7,8 +7,8 @@ public abstract class Plant extends Entity {
     private int momentScanare;
     // constructor
     public Plant(final String name, final double mass,
-                 final String maturityLevel, final double oxygenCurent) {
-        super(name, mass, 0);
+                 final String maturityLevel, final double oxygenCurent, final String typ) {
+        super(name, mass, 0, typ);
         this.maturityLevel = maturityLevel;
         this.oxygenCurent = oxygenCurent;
         this.nivelCrestere = 0;

@@ -8,8 +8,8 @@ public final class ForestSoil extends Soil {
     }
     public ForestSoil(final String name, final double mass, final double nitrogen,
                       final double waterRetention, final double solidpH,
-                      final double organicMatter, final double leafLitter) {
-        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
+                      final double organicMatter, final double leafLitter, final String typ) {
+        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter, typ);
         this.leafLitter = leafLitter;
     }
     // getter

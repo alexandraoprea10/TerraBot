@@ -11,7 +11,7 @@ public class Water extends Entity {
     private int momentScanare;
     // constructori
     public Water(final String name, final double mass) {
-        super(name, mass, 0);
+        super(name, mass, 0, " ");
         this.salinity = 0.0;
         this.purity = 0.0;
         this.turbidity = 0.0;
@@ -22,8 +22,8 @@ public class Water extends Entity {
     }
     public Water(final String name, final double mass, final String type,
                  final double salinity, final double pH, final double purity,
-                 final double turbidity, final double contaminantIndex, final boolean isFrozen) {
-        super(name, mass, 0);
+                 final double turbidity, final double contaminantIndex, final boolean isFrozen, final String typ) {
+        super(name, mass, 0, typ);
         this.type = type;
         this.salinity = salinity;
         this.purity = purity;

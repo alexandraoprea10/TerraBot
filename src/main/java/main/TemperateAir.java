@@ -10,8 +10,8 @@ public final class TemperateAir extends Air {
     }
     public TemperateAir(final String name, final double mass, final double humidity,
                         final double temperature, final double oxygenLevel,
-                        final double pollenLevel) {
-        super(name, mass,  humidity, temperature, oxygenLevel);
+                        final double pollenLevel, final String typ) {
+        super(name, mass,  humidity, temperature, oxygenLevel, typ);
         this.pollenLevel = pollenLevel;
     }
     // getter

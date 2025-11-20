@@ -8,8 +8,8 @@ public final class SwampSoil extends Soil {
     }
     public SwampSoil(final String name, final double mass, final double nitrogen,
                      final double waterRetention, final double solidpH, final double organicMatter,
-                     final double waterLogging) {
-        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
+                     final double waterLogging, final String typ) {
+        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter, typ);
         this.waterLogging = waterLogging;
     }
     // getter

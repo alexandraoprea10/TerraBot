@@ -10,8 +10,8 @@ public final class Polar extends Air {
     }
     public Polar(final String nume, final double mass, final double humidity,
                  final double temperature, final double oxygenLevel,
-                 final double iceCrystalConcentration) {
-        super(nume, mass,  humidity, temperature, oxygenLevel);
+                 final double iceCrystalConcentration, final String typ) {
+        super(nume, mass,  humidity, temperature, oxygenLevel, typ);
         this.iceCrystalConcentration = iceCrystalConcentration;
     }
     // getter

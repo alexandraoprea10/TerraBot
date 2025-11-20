@@ -9,13 +9,16 @@ public abstract class Entity {
     private int attack;
     private boolean isScanned;
     private List<String> subject = new ArrayList<>();
+    private String type;
 
     // constructor
-    public Entity(final String name, final double mass, final int probabilityAttack) {
+    public Entity(final String name, final double mass,
+                  final int probabilityAttack, final String type) {
         this.name = name;
         this.mass = mass;
         this.attack = 0;
         this.subject = new ArrayList<>();
+        this.type = type;
     }
     // getteri
 
@@ -57,6 +60,9 @@ public abstract class Entity {
      */
     public List<String> getSubject() {
         return subject;
+    }
+    public String getType() {
+        return type;
     }
     // setteri
 
@@ -106,6 +112,9 @@ public abstract class Entity {
      */
     public void setSubject(final String subj) {
         this.subject.add(subj);
+    }
+    public void setType(final String type) {
+        this.type = type;
     }
     // acum pentru fiecare tip de entitate
 

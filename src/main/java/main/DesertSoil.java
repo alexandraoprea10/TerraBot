@@ -8,8 +8,8 @@ public final class DesertSoil extends Soil {
     }
     public DesertSoil(final String name, final double mass, final double nitrogen,
                       final double waterRetention, final double solidpH,
-                      final double organicMatter, final double salinity) {
-        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
+                      final double organicMatter, final double salinity, final String typ) {
+        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter, typ);
         this.salinity = salinity;
     }
     // getter

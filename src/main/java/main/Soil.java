@@ -7,15 +7,15 @@ public abstract class Soil extends Entity {
     private double organicMatter;
     // constructori
     public Soil(final String name, final double mass) {
-        super(name, mass, 0);
+        super(name, mass, 0, " ");
         this.nitrogen = 0;
         this.waterRetention = 0;
         this.soilPh = 0;
     }
     public Soil(final String name, final double mass,
                 final double nitrogen, final double waterRetention,
-                final double soilPh, final double organicMatter) {
-        super(name, mass, 0);
+                final double soilPh, final double organicMatter, final String typ) {
+        super(name, mass, 0, typ);
         this.nitrogen = nitrogen;
         this.waterRetention = waterRetention;
         this.soilPh = soilPh;

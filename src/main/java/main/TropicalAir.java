@@ -9,8 +9,9 @@ public final class TropicalAir extends Air {
         this.co2Level = 0.0;
     }
     public TropicalAir(final String nume, final double mass, final double humidity,
-                       final double temperature, final double oxygenLevel, final double co2Level) {
-        super(nume, mass,  humidity, temperature, oxygenLevel);
+                       final double temperature, final double oxygenLevel,
+                       final double co2Level, final String typ) {
+        super(nume, mass,  humidity, temperature, oxygenLevel, typ);
         this.co2Level = co2Level;
         this.rainfall = 0.0;
     }

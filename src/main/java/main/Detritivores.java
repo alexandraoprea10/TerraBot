@@ -2,7 +2,8 @@ package main;
 
 public final class Detritivores extends Animal {
     // constructor
-    public Detritivores(final String name, final double mass, final String state, final String type) {
+    public Detritivores(final String name, final double mass,
+                        final String state, final String type) {
         super(name, mass, state, type);
     }
     @Override

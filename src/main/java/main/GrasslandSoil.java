@@ -8,8 +8,8 @@ public final class GrasslandSoil extends Soil {
     }
     public GrasslandSoil(final String name, final double mass, final double nitrogen,
                          final double waterRetention, final double solidpH,
-                         final double organicMatter, final double rootDensity) {
-        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter);
+                         final double organicMatter, final double rootDensity, final String typ) {
+        super(name, mass, nitrogen, waterRetention, solidpH, organicMatter, typ);
         this.rootDensity = rootDensity;
     }
     // getter
