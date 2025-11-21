@@ -1581,6 +1581,9 @@ public final class Main {
                         if (factsAndSubjects.containsKey(name)) {
                             mergeSubj = 1;
                         }
+                        if (mergeSubj == 1) {
+                            node.put("message", "ERROR: Fact not yet saved. Cannot perform action");
+                        }
                         // System.out.println(mergeSubj);
 //                        System.out.println(name);
 //                        System.out.println(type);
