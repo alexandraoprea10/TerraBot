@@ -225,7 +225,10 @@ public final class Main {
     public static boolean existPlant(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).isPlant()) {
-                return true;
+                Plant pl = (Plant) entities.get(i);
+                if (!pl.getMaturityLevel().equals("out")) {
+                    return true;
+                }
             }
         }
         return false;
@@ -1470,6 +1473,7 @@ public final class Main {
                             sePoate = 1;
                             Plant planta = returnPlant(entities);
                             okPlanta = 1;
+                            factsAndSubjects.put(planta.getName(), new ArrayList<>());
                             // planta.setIsScanned(true);
                             planta.setMomentScanare(iteratii);
                             node.put("message", "The scanned object is a plant.");
@@ -1545,14 +1549,16 @@ public final class Main {
                             Map.Entry<String, List<String>> subj = iterator.next();
                             String fact = subj.getKey();
                             List<String> subiect = subj.getValue();
-                            ObjectNode adaugaS = MAPPER.createObjectNode();
-                            adaugaS.put("topic", fact);
-                            ArrayNode vectorSub = MAPPER.createArrayNode();
-                            for (int j = 0; j< subiect.size(); j++) {
-                                vectorSub.add(subiect.get(j));
+                            if (subiect != null && !subiect.isEmpty()) {
+                                ObjectNode adaugaS = MAPPER.createObjectNode();
+                                adaugaS.put("topic", fact);
+                                ArrayNode vectorSub = MAPPER.createArrayNode();
+                                for (int j = 0; j < subiect.size(); j++) {
+                                    vectorSub.add(subiect.get(j));
+                                }
+                                adaugaS.put("facts", vectorSub);
+                                subiecte.add(adaugaS);
                             }
-                            adaugaS.put("facts", vectorSub);
-                            subiecte.add(adaugaS);
                         }
                         node.set("output", subiecte);
                     }
@@ -1575,6 +1581,7 @@ public final class Main {
                         if (factsAndSubjects.containsKey(name)) {
                             mergeSubj = 1;
                         }
+                        // System.out.println(mergeSubj);
 //                        System.out.println(name);
 //                        System.out.println(type);
 //                        System.out.println(mergeSubj);
@@ -1758,7 +1765,8 @@ public final class Main {
                         }
                     }
                 }
-               // System.out.println("====== COMANDA CU NUMARUL: " + command.getTimestamp());
+//                System.out.println("====== COMANDA CU NUMARUL: " + command.getTimestamp());
+//                System.out.println("ROBOTUL SE AFLA PE PATRATICA: " + robotel.getPozX() + robotel.getPozY());
 //                for (int k = 0; k < dimension; k++) {
 //                    for (int j = 0; j < dimension; j++) {
 //                        List<Entity> entities = mat[k][j];
