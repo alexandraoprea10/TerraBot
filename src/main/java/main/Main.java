@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.*;
 
+// import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,11 +26,10 @@ public final class Main {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     public static final ObjectWriter WRITER = MAPPER.writer().withDefaultPrettyPrinter();
-
     /**
      * Calculeaza probabilitatea
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return probabilitatea gasita
      */
     public static double calculateProbabilitate(final List<Entity> entities) {
         double calculProbabilitate = 0.0;
@@ -58,18 +58,16 @@ public final class Main {
 
     /**
      * Calculeaza numarul de obiecte
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return numarul de obiecte
      */
     public static int calculateObjects(final List<Entity> entities) {
         int objects = 0;
         for (int k = 0; k < entities.size(); k++) {
             Entity entity = entities.get(k);
             if (entity.isAir()) {
-                Air aer = (Air) entity;
                 objects++;
             } else if (entity.isSoil()) {
-                Soil sol = (Soil) entity;
                 objects++;
             } else if (entity.isPlant()) {
                 Plant plantuta = (Plant) entity;
@@ -87,9 +85,36 @@ public final class Main {
     }
 
     /**
+     * Calculeaza numarul de obiecte + niste conditii.
+     * @param entities lista de entitati
+     * @return numarul de obiecte
+     */
+    public static int calculazaObiecte(final List<Entity> entities) {
+        int contor = 0;
+        for (int p = 0; p < entities.size(); p++) {
+            if (entities.get(p).isWater()) {
+                contor++;
+            }
+            if (entities.get(p).isPlant()) {
+                Plant pl =  (Plant) entities.get(p);
+                if (!pl.getMaturityLevel().equals("out")) {
+                    contor++;
+                }
+            }
+            if (entities.get(p).isAnimal()) {
+                Animal anim =  (Animal) entities.get(p);
+                // entityNode.put("animal", anim.getType());
+                if (!anim.getType().equals("out")) {
+                    contor++;
+                }
+            }
+        }
+        return contor;
+    }
+    /**
      * Printeaza sol.
-     * @param solulet
-     * @return
+     * @param solulet solul de pe patratica
+     * @return caracteristicile solului
      */
     public static ObjectNode printSoil(final Soil solulet) {
         ObjectNode soilNode = MAPPER.createObjectNode();
@@ -117,8 +142,8 @@ public final class Main {
 
     /**
      * Printeaza planta.
-     * @param plantuta
-     * @return
+     * @param plantuta planta de pe patratica
+     * @return caracteristicile plantei
      */
     public static ObjectNode printPlant(final Plant plantuta) {
         ObjectNode plantNode = MAPPER.createObjectNode();
@@ -131,8 +156,8 @@ public final class Main {
 
     /**
      * Printeaza animalul.
-     * @param animalut
-     * @return
+     * @param animalut animalul de pe patratica
+     * @return caracteristicile animalului
      */
     public static ObjectNode printAnimal(final Animal animalut) {
         ObjectNode animalNode = MAPPER.createObjectNode();
@@ -144,8 +169,8 @@ public final class Main {
 
     /**
      * Printeaza apa.
-     * @param apita
-     * @return
+     * @param apita apa de pe patratica
+     * @return caracteristicile apei
      */
     public static ObjectNode printWater(final Water apita) {
         ObjectNode waterNode = MAPPER.createObjectNode();
@@ -158,8 +183,8 @@ public final class Main {
 
     /**
      * Printeaza aer
-     * @param airut
-     * @return
+     * @param airut aerul de pe patratica
+     * @return caracteristicile aerului
      */
     public static ObjectNode printAir(final Air airut) {
         ObjectNode airNode = MAPPER.createObjectNode();
@@ -175,8 +200,8 @@ public final class Main {
 
     /**
      * Printeaza aer fara eveniment.
-     * @param airut
-     * @param airNode
+     * @param airut aerul de pe patratica
+     * @param airNode ajuta la printare
      */
     public static void printAirWithoutEvent(final Air airut, final ObjectNode airNode) {
         if (airut.isMountain()) {
@@ -197,8 +222,8 @@ public final class Main {
 
     /**
      * Printeaza aer cu eveniment.
-     * @param airut
-     * @param airNode
+     * @param airut aerul de pe patratica
+     * @param airNode nodul pentru printare
      */
     public static void printAirWithEvent(final Air airut, final ObjectNode airNode) {
         if (airut.isMountain()) {
@@ -218,9 +243,51 @@ public final class Main {
     }
 
     /**
+     * Realiezeaza printarea entitatilor de pe patratica respectiva.
+     * @param entities lista de entitati
+     * @param okSchimbariMeteo contor daca s-a intrat pe changeEnvConditions
+     * @return nodul pentru printare
+     */
+    public static ObjectNode printEnvCond(final List<Entity> entities,
+                                          final int okSchimbariMeteo) {
+        ObjectNode env = MAPPER.createObjectNode();
+        for (int k = 0; k < entities.size(); k++) {
+            Entity entity = entities.get(k);
+            if (entity.isSoil()) {
+                Soil solulet = (Soil) entity;
+                ObjectNode soilNode = printSoil(solulet);
+                env.set("soil", soilNode);
+            } else if (entity.isPlant()) {
+                Plant plantuta = (Plant) entity;
+                if (!plantuta.getMaturityLevel().equals("out")) {
+                    ObjectNode plantNode = printPlant(plantuta);
+                    env.set("plants", plantNode);
+                }
+            } else if (entity.isAnimal()) {
+                Animal animalut = (Animal) entity;
+                ObjectNode animalNode = printAnimal(animalut);
+                env.set("animals", animalNode);
+            } else if (entity.isWater()) {
+                Water apita = (Water) entity;
+                ObjectNode waterNode = printWater(apita);
+                env.set("water", waterNode);
+            } else if (entity.isAir()) {
+                Air airut = (Air) entity;
+                ObjectNode airNode = printAir(airut);
+                if (okSchimbariMeteo == 0) {
+                    printAirWithoutEvent(airut, airNode);
+                } else {
+                    printAirWithEvent(airut, airNode);
+                }
+                env.set("air", airNode);
+            }
+        }
+        return env;
+    }
+    /**
      * Verific daca exista planta
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca exista sau nu planta
      */
     public static boolean existPlant(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -236,8 +303,8 @@ public final class Main {
 
     /**
      * Verific daca exista animal.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca exista sau nu animal
      */
     public static boolean existanimal(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -250,8 +317,8 @@ public final class Main {
 
     /**
      * Verific daca exista apa.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca exista sau nu apa
      */
     public static boolean existWater(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -264,8 +331,8 @@ public final class Main {
 
     /**
      * Caut planta in patratica de entitati.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca exista sau nu planta
      */
     public static Plant returnPlant(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -282,8 +349,8 @@ public final class Main {
 
     /**
      * Caut animal in patratica de entitati.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca exista sau nu animal
      */
     public static Animal returnAnimal(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -300,8 +367,8 @@ public final class Main {
 
     /**
      * Caut sol in patratica de entitati.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca exista sau nu sol
      */
     public static Soil returnSoil(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -315,8 +382,8 @@ public final class Main {
 
     /**
      * Caut apa in patratica de entitati
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca exista sau nu apa
      */
     public static Water returnWater(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -329,9 +396,36 @@ public final class Main {
     }
 
     /**
+     * Calculeaza probabilitatea de atac pentru fiecare patratica din matrice.
+     * @param dimension dimensiunea matricei
+     * @param mat matricea-teritoriul
+     */
+    public static void calculateAttack(final int dimension,
+                                       final List<Entity>[][] mat) {
+        for (int a = 0; a < dimension; a++) {
+            for (int b = 0; b < dimension; b++) {
+                List<Entity> entities = mat[b][a];
+                double calculProbabilitate =
+                        calculateProbabilitate(entities);
+                int obiecte = calculateObjects(entities);
+                double mean;
+                if (obiecte == 0) {
+                    mean = -1;
+                } else {
+                    mean = Math.abs(calculProbabilitate / obiecte);
+                }
+                int result = (int) Math.round(mean);
+                for (int p = 0; p < entities.size(); p++) {
+                    Entity entity = entities.get(p);
+                    entity.setAttack(result);
+                }
+            }
+        }
+    }
+    /**
      * Cauta aer in patratica de entitati.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return returneaza aerul de pe patratica
      */
     public static Air returnAir(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -345,8 +439,8 @@ public final class Main {
 
     /**
      * Se fac interactiunile automate la cate o iteratie.
-     * @param entities
-     * @param okInterAnimal
+     * @param entities lista de entitati
+     * @param okInterAnimal daca se vor realiza interactiunile animal-soil
      */
     public static void interactiuniEveryIteration(final List<Entity> entities,
                                                   final int okInterAnimal) {
@@ -394,12 +488,16 @@ public final class Main {
         }
         if (okInterAnimal == 1) {
             if (planta != null && water != null && !planta.getMaturityLevel().equals("out")) {
-                soil.setOrganicMatter(soil.getOrganicMatter()
-                        + MagicNumbersDouble.oxygenMoss.getNumar());
-            } else if (planta != null || water != null
-                    && !planta.getMaturityLevel().equals("out")) {
-                soil.setOrganicMatter(soil.getOrganicMatter()
-                        + MagicNumbersDouble.half.getNumar());
+                if (soil != null) {
+                    soil.setOrganicMatter(soil.getOrganicMatter()
+                            + MagicNumbersDouble.oxygenMoss.getNumar());
+                }
+            } else if ((planta != null
+                    && !planta.getMaturityLevel().equals("out")) || water != null) {
+                if (soil != null) {
+                    soil.setOrganicMatter(soil.getOrganicMatter()
+                            + MagicNumbersDouble.half.getNumar());
+                }
             }
         }
         if (animal != null
@@ -410,11 +508,9 @@ public final class Main {
 
     /**
      * Se fac interactiunile automate la 2 iteratii.
-     * @param entities
+     * @param entities lista de entitati
      */
     public static void interactiuniEveryTwoIterations(final List<Entity> entities) {
-        Plant planta = returnPlant(entities);
-        Animal animal = returnAnimal(entities);
         Soil soil = returnSoil(entities);
         Water water = returnWater(entities);
         Air air = returnAir(entities);
@@ -438,26 +534,61 @@ public final class Main {
     }
 
     /**
+     * Calculeaza interactiunile pentru fiecare patratica.
+     * @param dimension dimensiunea matricei
+     * @param mat matricea
+     * @param iteratii timestampul
+     * @param fostaIteratie fostul timestamp
+     * @param robotel robotul
+     * @param incepeIteratie unde incepe iteratia
+     * @param okInterAnimal daca se vor realiza interactiunile animal-soil
+     */
+    public static void doInteractions(final int dimension, final List<Entity>[][] mat,
+                                      final int iteratii, final int fostaIteratie,
+                                      final Robot robotel, final int incepeIteratie,
+                                      final int okInterAnimal) {
+        for (int a = 0; a < dimension; a++) {
+            for (int b = 0; b < dimension; b++) {
+                List<Entity> entities = mat[a][b];
+                if (iteratii - fostaIteratie > 1) {
+                    for (int p = fostaIteratie; p <= iteratii; p++) {
+                        List<Entity> enti = mat[robotel.getPozX()][robotel.getPozY()];
+                        verificaMoarteaPlantuta(enti);
+                        interactiuniEveryIteration(entities, okInterAnimal);
+                        if (iteratii > incepeIteratie
+                                && (iteratii - incepeIteratie) % 2 == 0) {
+                            interactiuniEveryTwoIterations(entities);
+                        }
+                    }
+                } else {
+                    interactiuniEveryIteration(entities, okInterAnimal);
+                    if (iteratii > incepeIteratie
+                            && (iteratii - incepeIteratie) % 2 == 0) {
+                        interactiuniEveryTwoIterations(entities);
+                    }
+                }
+            }
+        }
+    }
+    /**
      * Cum se misca animalul, ce patratica alege, si ce alege sa faca(sa manance/bea).
-     * @param mat
-     * @param animalul
-     * @param iteratii
-     * @param inceputIteratieAnimal
-     * @param robotel
-     * @param dimension
-     * @param entities
-     * @return
+     * @param mat matricea
+     * @param animalul animalul de pe patratica
+     * @param iteratii timestampul
+     * @param inceputIteratieAnimal unde e scanat animalul
+     * @param dimension dimensiunea matricei
+     * @param entities lista de entitati
+     * @return interanimal
      */
     public static int ceFaceAnimalul(final List<Entity>[][] mat, final Animal animalul,
                                      final int iteratii, final int inceputIteratieAnimal,
-                                     final Robot robotel, final int dimension,
+                                     final int dimension,
                                      final List<Entity> entities, final int a, final int b) {
         int okInterAnimal = 0;
         if (animalul != null && animalul.getisScanned()) {
             if (inceputIteratieAnimal < iteratii
                     && (iteratii - inceputIteratieAnimal)
-                    % MagicNumbersInt.doi.getNumar() == 0
-                    && animalul.getisScanned()) {
+                    % MagicNumbersInt.doi.getNumar() == 0) {
                 int existaStanga = 1;
                 int existaDreapta = 1;
                 int existaSus = 1;
@@ -490,33 +621,25 @@ public final class Main {
                 Water apaJos = null;
                 Plant plantaSus = null;
                 Water apaSus = null;
-                Animal animalJos = null;
-                Animal animalStanga = null;
-                Animal animalDreapta = null;
-                Animal animalSus = null;
                 if (existaStanga != 0) {
                     List<Entity> entitiesStanga = mat[posStangaI][posStangaJ];
                     apaStanga = returnWater(entitiesStanga);
                     plantaStanga = returnPlant(entitiesStanga);
-                    animalStanga = returnAnimal(entitiesStanga);
                 }
                 if (existaDreapta != 0) {
                     List<Entity> entitiesDreapta = mat[posDreaptaI][posDreaptaJ];
                     apaDreapta = returnWater(entitiesDreapta);
                     plantaDreapta = returnPlant(entitiesDreapta);
-                    animalDreapta = returnAnimal(entitiesDreapta);
                 }
                 if (existaJos != 0) {
                     List<Entity> entitiesJos = mat[posJosI][posJosJ];
                     apaJos = returnWater(entitiesJos);
                     plantaJos = returnPlant(entitiesJos);
-                    animalJos = returnAnimal(entitiesJos);
                 }
                 if (existaSus != 0) {
                     List<Entity> entitiesSus = mat[posSusI][posSusJ];
                     apaSus = returnWater(entitiesSus);
                     plantaSus = returnPlant(entitiesSus);
-                    animalSus = returnAnimal(entitiesSus);
                 }
                 // System.out.println("in stanga exista animal?", apaStanga);
                 double calitateApa = 0.0;
@@ -679,7 +802,6 @@ public final class Main {
                         pozY = posStangaJ;
                     }
                 }
-                if (animalul != null) {
                     if (animalul.getType().equals("Carnivores")
                             || animalul.getType().equals("Parasites")) {
                         List<Entity> patratica = mat[pozX][pozY];
@@ -692,8 +814,6 @@ public final class Main {
                             okInterAnimal = 1;
                             //interactiune animal-sol
                             animalPatratica.setType("out");
-                             // patratica.remove(animalPatratica);
-                            // animalPatratica.setType("");
                         } else {
                             Plant plantaCurenta = returnPlant(patratica);
                             Water apaCurenta = returnWater(patratica);
@@ -739,15 +859,14 @@ public final class Main {
                         }
                     }
                 }
-            }
         }
         return okInterAnimal;
     }
     /**
      * Aici se muta robotelul pe una din patratelele vecine.
-     * @param robotel
-     * @param mat
-     * @param dimension
+     * @param robotel robotul
+     * @param mat matrricea
+     * @param dimension dimensiunea matricei
      */
     public static void mutaRobotelul(final Robot robotel,
                                      final List<Entity>[][] mat,
@@ -772,21 +891,21 @@ public final class Main {
         int pozitieMutareJ = 0;
         int scorMinim = MagicNumbersInt.maximum.getNumar();
         // verific pentru STANGA
-        ObjectNode neighbors = MAPPER.createObjectNode();
         if (posJosI >= 0
                 && posJosJ >= 0 && posJosI < dimension
                 && posJosJ < dimension) {
             // iau scorul
             List<Entity> entities = mat[posJosI][posJosJ];
-            scorJos = entities.get(0).getAttack();
-            // node.put("jos", scorJos);
+            // ca sa nu mai am asa multe warninguri
+            scorJos = entities.getFirst().getAttack();
         }
         if (posDreaptaI >= 0
                 && posDreaptaJ >= 0 && posDreaptaI < dimension
                 && posDreaptaJ < dimension) {
             // iau scorul
             List<Entity> entities = mat[posDreaptaI][posDreaptaJ];
-            scorDreapta = entities.get(0).getAttack();
+            // ca sa nu mai am asa multe warninguri
+            scorDreapta = entities.getFirst().getAttack();
             // node.put("dreapta", scorDreapta);
         }
         if (posSusI >= 0
@@ -794,14 +913,16 @@ public final class Main {
                 && posSusJ < dimension) {
             // iau scorul
             List<Entity> entities = mat[posSusI][posSusJ];
-            scorSus = entities.get(0).getAttack();
+            // ca sa nu mai am asa multe warninguri
+            scorSus = entities.getFirst().getAttack();
             // node.put("sus", scorSus);
         }
         if (posStangaI >= 0
                 && posStangaJ >= 0 && posStangaI < dimension
                 && posStangaJ < dimension) {
             List<Entity> entities = mat[posStangaI][posStangaJ];
-            scorStanga = entities.get(0).getAttack();
+            // ca sa nu mai am asa multe warninguri
+            scorStanga = entities.getFirst().getAttack();
             // node.put("stanga", scorStanga);
         }
         if (scorDreapta >= 0 && scorDreapta < scorMinim) {
@@ -810,7 +931,6 @@ public final class Main {
             pozitieMutareJ = posDreaptaJ;
         }
         if (scorJos >= 0 && scorJos < scorMinim) {
-            List<Entity> entities = mat[posJosI][posJosJ];
             scorMinim = scorJos;
             pozitieMutareI = posJosI;
             pozitieMutareJ = posJosJ;
@@ -834,8 +954,8 @@ public final class Main {
 
     /**
      * Se va actualiza oxigenul.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca s-a actualizat sau nu
      */
     public static int updateazaOxigenul(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -852,9 +972,35 @@ public final class Main {
     }
 
     /**
+     * Pune in entitate subiectul(adauga in lista de subiecte).
+     * @param dimension dimensiunea matricei
+     * @param mat matricea
+     * @param fact tema
+     * @param subj subiectul pe care il adaug
+     * @return daca s-a efectuat cu succes sau nu
+     */
+    public static int seteazaSubiecte(final int dimension, final List<Entity>[][] mat,
+                                      final String fact, final String subj) {
+        int mergeSubj = 0;
+        for (int a = 0; a < dimension; a++) {
+            for (int b = 0; b < dimension; b++) {
+                List<Entity> entities = mat[a][b];
+                for (int p = 0; p < entities.size(); p++) {
+                    Entity entity = entities.get(p);
+                    if (entity.getisScanned()
+                            && entity.getName().equals(fact)) {
+                        mergeSubj = 1;
+                        entity.setSubject(subj);
+                    }
+                }
+            }
+        }
+        return mergeSubj;
+    }
+    /**
      * Se actualizeaza orgmatter, e pentru testul cu improve.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca s-a realizat cu succes sau nu
      */
     public static int updateazaFertilizarea(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -868,11 +1014,10 @@ public final class Main {
         }
         return 0;
     }
-
     /**
      * Se actualizeaza humidity, e pentru testul cu improve.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca s-a realizat cu succes sau nu
      */
     public static int updateazaUmiditatea(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -889,9 +1034,267 @@ public final class Main {
     }
 
     /**
+     * Muta animalul si seteaza mutatul animalului la true.
+     * @param dimension dimensiunea matricei
+     * @param inceputIteratieAnimal unde e aniamalul scanat
+     * @param mat matricea
+     * @param okInterAnimal contor daca a mancat
+     * @param iteratii timestampul
+     */
+    public static void moveAnimal(final int dimension, final int inceputIteratieAnimal,
+                                  final List<Entity>[][] mat,
+                                  int okInterAnimal, final int iteratii) {
+        for (int a = 0; a < dimension; a++) {
+            for (int b = 0; b < dimension; b++) {
+                List<Entity> entities = mat[a][b];
+                for (int p = 0; p < entities.size(); p++) {
+                    Entity entity = entities.get(p);
+                    if (entity.isAnimal() && inceputIteratieAnimal != -1) {
+                        Animal an =  (Animal) entity;
+                        if (!an.isMutat()) {
+                            okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
+                                    inceputIteratieAnimal, dimension,
+                                    entities, a, b);
+                            an.setMutat(true);
+                        }
+                    }
+                    verificaMoarteaPlantuta(entities);
+                }
+            }
+        }
+    }
+
+    /**
+     * Printeaza subiectele. Pentru printknowledgeBase.
+     * @param factsAndSubjects lista de subiecte si topicuri
+     * @return nodul pe care il printez
+     */
+    public static ArrayNode printSubjects(final LinkedHashMap<String,
+            List<String>> factsAndSubjects) {
+        ArrayNode subiecte = MAPPER.createArrayNode();
+        Set<Map.Entry<String, List<String>>> subjs = factsAndSubjects.entrySet();
+        Iterator<Map.Entry<String, List<String>>> iterator = subjs.iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<String>> subj = iterator.next();
+            String fact = subj.getKey();
+            List<String> subiect = subj.getValue();
+            if (subiect != null && !subiect.isEmpty()) {
+                ObjectNode adaugaS = MAPPER.createObjectNode();
+                adaugaS.put("topic", fact);
+                ArrayNode vectorSub = MAPPER.createArrayNode();
+                for (int j = 0; j < subiect.size(); j++) {
+                    vectorSub.add(subiect.get(j));
+                }
+                adaugaS.put("facts", vectorSub);
+                subiecte.add(adaugaS);
+            }
+        }
+        return subiecte;
+    }
+    public static int scanObjects(final List<Entity> entities, final String color,
+                                  final String smell, final String sound,
+                                  final int iteratii, final LinkedHashMap<String,
+                                  List<String>> factsAndSubjects, final ObjectNode node) {
+        int sePoate = 0;
+        if (existWater(entities)
+                && (color.equals("none"))
+                && (smell.equals("none")
+                && (sound.equals("none")))) {
+            sePoate = 1;
+            Water apa = returnWater(entities);
+            if (apa != null) {
+                apa.setIsScanned(true);
+                apa.setMomentScanare(iteratii);
+            }
+            node.put("message", "The scanned object is water.");
+        } else if (existPlant(entities)
+                && (!color.equals("none"))
+                && (!smell.equals("none")
+                && (sound.equals("none")))) {
+            sePoate = 1;
+            Plant planta = returnPlant(entities);
+            if (planta != null) {
+                factsAndSubjects.put(planta.getName(), new ArrayList<>());
+                planta.setMomentScanare(iteratii);
+            }
+            node.put("message", "The scanned object is a plant.");
+        } else if (existanimal(entities)
+                && (!color.equals("none"))
+                && (!smell.equals("none")
+                && (!sound.equals("none")))) {
+            sePoate = 1;
+            Animal animalul = returnAnimal(entities);
+            if (animalul != null) {
+                animalul.setIsScanned(true);
+            }
+            node.put("message",
+                    "The scanned object is an animal.");
+        } else {
+            node.put("message",
+                    "ERROR: Object not found. Cannot perform action");
+        }
+        return sePoate;
+    }
+
+    /**
+     * Seteaza noua calitate a aerului.
+     * @param entities lista de entitati
+     * @param command comanda
+     * @return daca s-a efectuat cu succes sau nu
+     */
+    public static int changeWeather(final List<Entity> entities,
+                                    final CommandInput command) {
+        int merge = 0;
+        for (int k = 0; k < entities.size(); k++) {
+            Entity entity = entities.get(k);
+            if (entity.isAir()) {
+                Air aer = (Air) entity;
+                if (aer.isTropical()) {
+                    TropicalAir trop = (TropicalAir) aer;
+                    String eveniment = command.getType();
+                    double rainfall = command.getRainfall();
+                    trop.setEvent(eveniment);
+                    trop.setRainfall(rainfall);
+                    trop.setAirQuality(trop.updateAirQuality());
+                    if (eveniment != null && eveniment.equals("rainfall")) {
+                        merge = 1;
+                    }
+                } else if (aer.isPolar()) {
+                    Polar polar = (Polar) aer;
+                    String eveniment = command.getType();
+                    double wind = command.getWindSpeed();
+                    polar.setEvent(eveniment);
+                    polar.setWindSpeed(wind);
+                    polar.setAirQuality(polar.updateAirQuality());
+                    if (eveniment != null && eveniment.equals("polarStorm")) {
+                        merge = 1;
+                    }
+                } else if (aer.isTemperate()) {
+                    TemperateAir temperate = (TemperateAir) aer;
+                    String eveniment = command.getType();
+                    String seas = command.getSeason();
+                    temperate.setEvent(eveniment);
+                    temperate.setSeason(seas);
+                    temperate.setAirQuality(temperate.updateAirQuality());
+                    if (eveniment != null && eveniment.equals("newSeason")) {
+                        merge = 1;
+                    }
+                } else if (aer.isDesert()) {
+                    DesertAir desert = (DesertAir) aer;
+                    String eveniment = command.getType();
+                    boolean deser = command.isDesertStorm();
+                    desert.setEvent(eveniment);
+                    desert.setDesertStorm(deser);
+                    desert.setAirQuality(desert.updateAirQuality());
+                    if (eveniment != null && eveniment.equals("desertStorm")) {
+                        merge = 1;
+                    }
+                } else if (aer.isMountain()) {
+                    MountainAir mountain = (MountainAir) aer;
+                    String eveniment = command.getType();
+                    int number = command.getNumberOfHikers();
+                    mountain.setEvent(eveniment);
+                    mountain.setNumberOfHikers(number);
+                    mountain.setAirQuality(mountain.updateAirQuality());
+                    if (eveniment != null && eveniment.equals("peopleHiking")) {
+                        merge = 1;
+                    }
+                }
+            }
+        }
+        return merge;
+    }
+
+    /**
+     * Vezi daca gasesti factul si daca nu, returneaza 0. Altfel, merge = 1.
+     * @param dimension dimensiunea matricei
+     * @param name numele
+     * @param mat matricea
+     * @param improvment ce fel de improve
+     * @param robotel robotul
+     * @param command comanda
+     * @param node nodul pentru printare
+     * @return daca s-a efectuat cu succes sau nu
+     */
+    public static int improveEnv(final int dimension, final String name, final List<Entity>[][] mat,
+                                 final String improvment, final Robot robotel,
+                                 final CommandInput command, final ObjectNode node) {
+        int merge = 0;
+        for (int a = 0; a < dimension; a++) {
+            for (int b = 0; b < dimension; b++) {
+                List<Entity> entities = mat[a][b];
+                for (int p = 0; p < entities.size(); p++) {
+                    Entity entity = entities.get(p);
+                    if (entity.getisScanned() && entity.getName().equals(name)
+                            && !entity.getSubject().isEmpty()) {
+                        for (int k = 0; k < entity.getSubject().size(); k++) {
+                            String subject = entity.getSubject().get(k);
+                            String[] comanda = subject.split(" ");
+                            String ceModific = comanda[comanda.length - 1];
+                            // node.put("campul", ceModific);
+                            if (improvment.equals("plantVegetation")
+                                    && entity.isPlant()
+                                    && entity.getisScanned()) {
+                                int ok = updateazaOxigenul(
+                                        mat[robotel.getPozX()]
+                                                [robotel.getPozY()]);
+                                if (ok == 1) {
+                                    merge = 1;
+                                    node.put("message",
+                                            "The " + ceModific
+                                                    + " was planted "
+                                                    + "successfully.");
+                                }
+                            } else if (improvment.equals("fertilizeSoil")) {
+                                int ok = updateazaFertilizarea(
+                                        mat[robotel.getPozX()]
+                                                [robotel.getPozY()]);
+                                if (ok == 1) {
+                                    merge = 1;
+                                    node.put("message",
+                                            "The soil was "
+                                                    + "successfully fertilized "
+                                                    + "using "
+                                                    + ceModific);
+                                }
+                            } else if (improvment.equals("increaseHumidity")) {
+                                int ok = updateazaUmiditatea(
+                                        mat[robotel.getPozX()]
+                                                [robotel.getPozY()]);
+                                if (ok == 1) {
+                                    merge = 1;
+                                    node.put("message",
+                                            "The humidity was "
+                                                    + "successfully increased "
+                                                    + "using "
+                                                    + command.getName());
+                                }
+                            } else if (improvment.equals("increaseMoisture")
+                                    && entity.isWater()
+                                    && entity.getisScanned()) {
+                                int ok = updateazaWaterret(
+                                        mat[robotel.getPozX()]
+                                                [robotel.getPozY()]);
+                                if (ok == 1) {
+                                    merge = 1;
+                                    node.put("message",
+                                            "The moisture was "
+                                                    + "successfully increased "
+                                                    + "using "
+                                                    + command.getName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return merge;
+    }
+    /**
      * Se actualizeaza waterRet, e pentru testul cu improve.
-     * @param entities
-     * @return
+     * @param entities lista de entitati
+     * @return daca s-a efectuat cu succes sau nu
      */
     public static int updateazaWaterret(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -909,9 +1312,9 @@ public final class Main {
     /**
      * Verifica daca animalul s-a mutat si ii reface valoarea.
      * Elimina planta daca e moarta/ mancata.
-     * @param dimension
-     * @param mat
-     * @param inceputIteratieAnimal
+     * @param dimension dimensiunea matricei
+     * @param mat matricea
+     * @param inceputIteratieAnimal cand e scanat animalul
      */
     public static void setAnimalAndCheckPlanta(final int dimension,
                                                final List<Entity>[][] mat,
@@ -935,7 +1338,7 @@ public final class Main {
 
     /**
      * Elimin de pe patratica planta care e moarta.
-     * @param entities
+     * @param entities lista de entitati
      */
     public static void verificaMoarteaPlantuta(final List<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -951,9 +1354,9 @@ public final class Main {
     }
     /**
      * MAIN
-     * @param inputPath
-     * @param outputPath
-     * @throws IOException
+     * @param inputPath input
+     * @param outputPath output
+     * @throws IOException erori
      */
     public static void action(final String inputPath,
                               final String outputPath) throws IOException {
@@ -977,14 +1380,6 @@ public final class Main {
          * output.add(objectNode);
          *
          */
-
-//        ObjectNode node = MAPPER.createObjectNode();
-//        node.put("command", "startSimulation");
-//        output.add(node);
-//        node.put("message", "Simulation has started.");
-//        output.add(node);
-//        node.put("timestamp", "1");
-//        output.add(node);
         int okSimulation = 0;
         List<SimulationInput> simulations = inputLoader.getSimulations();
         int contorComenzi = 0;
@@ -1002,14 +1397,8 @@ public final class Main {
                     mat[i][j] = new ArrayList<>();
                 }
             }
-            int energyPoints = simInput.getEnergyPoints();
             TerritorySectionParamsInput territory =
                     simInput.getTerritorySectionParams();
-            List<SoilInput> soil = territory.getSoil();
-            List<PlantInput> plant = territory.getPlants();
-            List<AnimalInput> animal = territory.getAnimals();
-            List<WaterInput> water = territory.getWater();
-            List<AirInput> air = territory.getAir();
             for (int i = 0; i < territory.getSoil().size(); i++) {
                 SoilInput sol = territory.getSoil().get(i);
                 for (int k = 0; k < sol.getSections().size(); k++) {
@@ -1134,11 +1523,13 @@ public final class Main {
                                 aer.getTemperature(), aer.getOxygenLevel(),
                                 aer.getAltitude(), aer.getType());
                     }
-                    aerut.setAirQuality(aerut.airQuality());
-                    mat[loc.getX()][loc.getY()].add(aerut);
+                    if (aerut != null) {
+                        aerut.setAirQuality(aerut.airQuality());
+                        mat[loc.getX()][loc.getY()].add(aerut);
+                    }
                 }
             }
-            int iteratii = 0;
+            int iteratii;
             int fostaIteratie = 0;
             int stamps = 0;
             int okSchimbariMeteo = 0;
@@ -1148,16 +1539,12 @@ public final class Main {
             int previousStamp = 0;
             int okInterAnimal = 0;
             int inceputIteratieAnimal = 0;
-            int mergeSubj = 0;
-            int timestampWeather = 0;
-            int retineX = 0;
-            int retineY = 0;
+            int mergeSubj;
             List<CommandInput> commands = inputLoader.getCommands();
             int nextSimulare = 0;
             int opresteSimulare = 0;
             for (int i = contorComenzi; i < commands.size(); i++) {
                 int okPlanta = 0;
-                double airQuality = 0.0;
                 List<Entity> entit = mat[robotel.getPozX()][robotel.getPozY()];
                 verificaMoarteaPlantuta(entit);
                 CommandInput command = commands.get(i);
@@ -1174,72 +1561,15 @@ public final class Main {
                         incepeIteratie = iteratii;
                     }
                 }
-                // iteratii++;
                 if (okScanari == 1) {
-                    for (int a = 0; a < dimension; a++) {
-                        for (int b = 0; b < dimension; b++) {
-                            List<Entity> entities = mat[a][b];
-                            if (iteratii - fostaIteratie > 1) {
-                                for (int p = fostaIteratie; p <= iteratii; p++) {
-                                    List<Entity> enti = mat[robotel.getPozX()][robotel.getPozY()];
-                                    verificaMoarteaPlantuta(enti);
-                                    interactiuniEveryIteration(entities, okInterAnimal);
-                                    if (iteratii > incepeIteratie
-                                            && (iteratii - incepeIteratie) % 2 == 0) {
-                                        interactiuniEveryTwoIterations(entities);
-                                    }
-                                }
-                            } else {
-                                interactiuniEveryIteration(entities, okInterAnimal);
-                                if (iteratii > incepeIteratie
-                                        && (iteratii - incepeIteratie) % 2 == 0) {
-//                            Water api =  return_water(entities);
-//                            node.put("message", "Am intrat");
-                                    interactiuniEveryTwoIterations(entities);
-                                }
-                            }
-                        }
-                    }
+                    // interactiuni pentru fiacre patratica + timestamps
+                    doInteractions(dimension, mat, iteratii,
+                            fostaIteratie, robotel, incepeIteratie, okInterAnimal);
                 }
-                for (int a = 0; a < dimension; a++) {
-                    for (int b = 0; b < dimension; b++) {
-                        List<Entity> entities = mat[a][b];
-                        for (int p = 0; p < entities.size(); p++) {
-                            Entity entity = entities.get(p);
-                            if (entity.isAnimal() && inceputIteratieAnimal != -1) {
-                                Animal an =  (Animal) entity;
-                                if (!an.isMutat()) {
-                                    // System.out.println("in celula " + a + "si " + b);
-                                    // System.out.println("animalul e" + an.getName());
-                                    okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
-                                            inceputIteratieAnimal, robotel, dimension,
-                                            entities, a, b);
-                                    an.setMutat(true);
-                                }
-                            }
-                            verificaMoarteaPlantuta(entities);
-                        }
-                    }
-                }
-                for (int a = 0; a < dimension; a++) {
-                    for (int b = 0; b < dimension; b++) {
-                        List<Entity> entities = mat[b][a];
-                        double calculProbabilitate =
-                                calculateProbabilitate(entities);
-                        int obiecte = calculateObjects(entities);
-                        double mean = -1, score = -1;
-                        if (obiecte == 0) {
-                            mean = -1;
-                        } else {
-                            mean = Math.abs(calculProbabilitate / obiecte);
-                        }
-                        int result = (int) Math.round(mean);
-                        for (int p = 0; p < entities.size(); p++) {
-                            Entity entity = entities.get(p);
-                            entity.setAttack(result);
-                        }
-                    }
-                }
+                // muta animalul
+                moveAnimal(dimension, inceputIteratieAnimal, mat, okInterAnimal, iteratii);
+                // calculeaza probabilitatea fiecarei patratele
+                calculateAttack(dimension, mat);
                 ObjectNode node = MAPPER.createObjectNode();
                 node.put("command", command.getCommand());
                 if (command.getCommand().equals("startSimulation")) {
@@ -1265,39 +1595,8 @@ public final class Main {
                         node.put("message",
                                 "ERROR: Robot still charging. Cannot perform action");
                     } else {
-                        ObjectNode env = MAPPER.createObjectNode();
                         List<Entity> entities = mat[robotel.getPozX()][robotel.getPozY()];
-                        for (int k = 0; k < entities.size(); k++) {
-                            Entity entity = entities.get(k);
-                            if (entity.isSoil()) {
-                                Soil solulet = (Soil) entity;
-                                ObjectNode soilNode = printSoil(solulet);
-                                env.set("soil", soilNode);
-                            } else if (entity.isPlant()) {
-                                Plant plantuta = (Plant) entity;
-                                if (!plantuta.getMaturityLevel().equals("out")) {
-                                    ObjectNode plantNode = printPlant(plantuta);
-                                    env.set("plants", plantNode);
-                                }
-                            } else if (entity.isAnimal()) {
-                                Animal animalut = (Animal) entity;
-                                ObjectNode animalNode = printAnimal(animalut);
-                                env.set("animals", animalNode);
-                            } else if (entity.isWater()) {
-                                Water apita = (Water) entity;
-                                ObjectNode waterNode = printWater(apita);
-                                env.set("water", waterNode);
-                            } else if (entity.isAir()) {
-                                Air airut = (Air) entity;
-                                ObjectNode airNode = printAir(airut);
-                                if (okSchimbariMeteo == 0) {
-                                    printAirWithoutEvent(airut, airNode);
-                                } else {
-                                    printAirWithEvent(airut, airNode);
-                                }
-                                env.set("air", airNode);
-                            }
-                        }
+                        ObjectNode env = printEnvCond(entities, okSimulation);
                         node.set("output", env);
                     }
                 } else if (command.getCommand().equals("printMap")) {
@@ -1324,29 +1623,8 @@ public final class Main {
                                 entitiesNode.add(b);
                                 entitiesNode.add(a);
                                 entityNode.set("section", entitiesNode);
-                                int contor = 0;
-                                for (int p = 0; p < entities.size(); p++) {
-                                    if (entities.get(p).isWater()) {
-                                        contor++;
-                                    }
-                                    if (entities.get(p).isPlant()) {
-                                        Plant pl =  (Plant) entities.get(p);
-//                                        entityNode.put("planta", pl.getName());
-//                                        entityNode.put("stareplanta", pl.getMaturityLevel());
-//                                        entityNode.put("crestere", pl.getNivelCrestere());
-//                                        entityNode.put("scanata", pl.getisScanned());
-                                         if (!pl.getMaturityLevel().equals("out")) {
-                                            contor++;
-                                        }
-                                    }
-                                    if (entities.get(p).isAnimal()) {
-                                        Animal anim =  (Animal) entities.get(p);
-                                        // entityNode.put("animal", anim.getType());
-                                        if (!anim.getType().equals("out")) {
-                                            contor++;
-                                        }
-                                    }
-                                }
+                                // calculeaza numarul de obiecte
+                                int contor = calculazaObiecte(entities);
                                 entityNode.put("totalNrOfObjects", contor);
                                 String airquality = null;
                                 String soilQuality = null;
@@ -1404,7 +1682,7 @@ public final class Main {
                         }
                     }
                 } else if (command.getCommand().equals("scanObject")) {
-                    int sePoate = 0;
+                    int sePoate;
                     if (okSimulation == 0) {
                         node.put("message",
                                 "ERROR: Simulation not started. Cannot perform action");
@@ -1421,41 +1699,20 @@ public final class Main {
                         String color = command.getColor();
                         String smell = command.getSmell();
                         String sound = command.getSound();
-                        if (existWater(entities)
-                                && (color.equals("none"))
-                                && (smell.equals("none")
-                                && (sound.equals("none")))) {
-                            sePoate = 1;
-                            Water apa = returnWater(entities);
-                            apa.setIsScanned(true);
-                            apa.setMomentScanare(iteratii);
-                            // node.put("apa", apa.getisScanned());
-                            node.put("message", "The scanned object is water.");
-                        } else if (existPlant(entities)
+                        if (existPlant(entities)
                                 && (!color.equals("none"))
                                 && (!smell.equals("none")
                                 && (sound.equals("none")))) {
-                            sePoate = 1;
-                            Plant planta = returnPlant(entities);
                             okPlanta = 1;
-                            factsAndSubjects.put(planta.getName(), new ArrayList<>());
-                            // planta.setIsScanned(true);
-                            planta.setMomentScanare(iteratii);
-                            node.put("message", "The scanned object is a plant.");
-                        } else if (existanimal(entities)
+                        }
+                        else if (existanimal(entities)
                                 && (!color.equals("none"))
                                 && (!smell.equals("none")
                                 && (!sound.equals("none")))) {
-                            sePoate = 1;
-                            Animal animalul = returnAnimal(entities);
-                            animalul.setIsScanned(true);
-                            node.put("message",
-                                    "The scanned object is an animal.");
                             inceputIteratieAnimal = iteratii;
-                        } else {
-                            node.put("message",
-                                    "ERROR: Object not found. Cannot perform action");
                         }
+                        // scaneaza obiectul si returneaza daca merge sau nu
+                        sePoate = scanObjects(entities, color, smell, sound, iteratii, factsAndSubjects, node);
                         if (sePoate == 1) {
                             robotel.setBattery(robotel.getBattery()
                                     - MagicNumbersInt.sapte.getNumar());
@@ -1472,22 +1729,10 @@ public final class Main {
                         node.put("message",
                                 "ERROR: Not enough battery left. Cannot perform action");
                     } else {
-                        mergeSubj = 0;
                         String fact = command.getComponents();
                         String subj = command.getSubject();
-                        for (int a = 0; a < dimension; a++) {
-                            for (int b = 0; b < dimension; b++) {
-                                List<Entity> entities = mat[a][b];
-                                for (int p = 0; p < entities.size(); p++) {
-                                    Entity entity = entities.get(p);
-                                    if (entity.getisScanned()
-                                            && entity.getName().equals(fact)) {
-                                        mergeSubj = 1;
-                                        entity.setSubject(subj);
-                                    }
-                                }
-                            }
-                        }
+                        // seteaza subiect
+                        mergeSubj = seteazaSubiecte(dimension, mat, fact, subj);
                         if (mergeSubj == 1) {
                             if (!factsAndSubjects.containsKey(fact)) {
                                 factsAndSubjects.put(fact, new ArrayList<>());
@@ -1506,24 +1751,8 @@ public final class Main {
                         node.put("message",
                                 "ERROR: Simulation not started. Cannot perform action");
                     } else {
-                        ArrayNode subiecte = MAPPER.createArrayNode();
-                        Set<Map.Entry<String, List<String>>> subjs = factsAndSubjects.entrySet();
-                        Iterator<Map.Entry<String, List<String>>> iterator = subjs.iterator();
-                        while (iterator.hasNext()) {
-                            Map.Entry<String, List<String>> subj = iterator.next();
-                            String fact = subj.getKey();
-                            List<String> subiect = subj.getValue();
-                            if (subiect != null && !subiect.isEmpty()) {
-                                ObjectNode adaugaS = MAPPER.createObjectNode();
-                                adaugaS.put("topic", fact);
-                                ArrayNode vectorSub = MAPPER.createArrayNode();
-                                for (int j = 0; j < subiect.size(); j++) {
-                                    vectorSub.add(subiect.get(j));
-                                }
-                                adaugaS.put("facts", vectorSub);
-                                subiecte.add(adaugaS);
-                            }
-                        }
+                        // printeaza lista de subiecte si factsuri
+                        ArrayNode subiecte = printSubjects(factsAndSubjects);
                         node.set("output", subiecte);
                     }
                 } else if (command.getCommand().equals("improveEnvironment")) {
@@ -1539,7 +1768,6 @@ public final class Main {
                     } else {
                         String improvment = command.getImprovementType();
                         String name = command.getName();
-                        String type = command.getType();
                         int merge = 0;
                         mergeSubj = 0;
                         if (factsAndSubjects.containsKey(name)) {
@@ -1549,76 +1777,9 @@ public final class Main {
                             node.put("message", "ERROR: Fact not yet saved. Cannot perform action");
                         }
                         if (mergeSubj == 1) {
-                            for (int a = 0; a < dimension; a++) {
-                                for (int b = 0; b < dimension; b++) {
-                                    List<Entity> entities = mat[a][b];
-                                    for (int p = 0; p < entities.size(); p++) {
-                                        Entity entity = entities.get(p);
-                                        if (entity.getisScanned() && entity.getName().equals(name)
-                                                && entity.getSubject().size() != 0
-                                                && !entity.getSubject().isEmpty()) {
-                                            for (int k = 0; k < entity.getSubject().size(); k++) {
-                                                String subject = entity.getSubject().get(k);
-                                                String[] comanda = subject.split(" ");
-                                                String ceModific = comanda[comanda.length - 1];
-                                                // node.put("campul", ceModific);
-                                                if (improvment.equals("plantVegetation")
-                                                        && entity.isPlant()
-                                                        && entity.getisScanned()) {
-                                                    int ok = updateazaOxigenul(
-                                                            mat[robotel.getPozX()]
-                                                            [robotel.getPozY()]);
-                                                    if (ok == 1) {
-                                                        merge = 1;
-                                                        node.put("message",
-                                                                "The " + ceModific
-                                                                        + " was planted "
-                                                                        + "successfully.");
-                                                    }
-                                                } else if (improvment.equals("fertilizeSoil")) {
-                                                    int ok = updateazaFertilizarea(
-                                                            mat[robotel.getPozX()]
-                                                                    [robotel.getPozY()]);
-                                                    if (ok == 1) {
-                                                        merge = 1;
-                                                        node.put("message",
-                                                                "The soil was "
-                                                                        + "successfully fertilized "
-                                                                        + "using "
-                                                                        + ceModific);
-                                                    }
-                                                } else if (improvment.equals("increaseHumidity")) {
-                                                    int ok = updateazaUmiditatea(
-                                                            mat[robotel.getPozX()]
-                                                            [robotel.getPozY()]);
-                                                    if (ok == 1) {
-                                                        merge = 1;
-                                                        node.put("message",
-                                                                "The humidity was "
-                                                                        + "successfully increased "
-                                                                        + "using "
-                                                                        + command.getName());
-                                                    }
-                                                } else if (improvment.equals("increaseMoisture")
-                                                        && entity.isWater()
-                                                        && entity.getisScanned()) {
-                                                    int ok = updateazaWaterret(
-                                                            mat[robotel.getPozX()]
-                                                            [robotel.getPozY()]);
-                                                    if (ok == 1) {
-                                                        merge = 1;
-                                                        node.put("message",
-                                                                "The moisture was "
-                                                                        + "successfully increased "
-                                                                        + "using "
-                                                                        + command.getName());
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            // printeaza daca se intampla ceva si verifica si erorile
+                            merge = improveEnv(dimension, name, mat,
+                                    improvment, robotel, command, node);
                             robotel.setBattery(robotel.getBattery()
                                     - MagicNumbersInt.zece.getNumar());
                         } else if (mergeSubj == 0) {
@@ -1654,75 +1815,16 @@ public final class Main {
                         robotel.setIsCharging(true);
                     }
                 } else if (command.getCommand().equals("changeWeatherConditions")) {
-                    int merge = 0;
+                    int merge;
                     if (okSimulation == 0) {
                         node.put("message", "ERROR: Simulation not started. Cannot perform action");
                     } else if (robotel.isCharging()) {
                         node.put("message", "ERROR: Robot still charging. Cannot perform action");
                     } else {
                         okSchimbariMeteo = 1;
-                        timestampWeather = command.getTimestamp();
-                        retineX = robotel.getPozX();
-                        retineY = robotel.getPozY();
                         List<Entity> entities = mat[robotel.getPozX()][robotel.getPozY()];
-                        for (int k = 0; k < entities.size(); k++) {
-                            Entity entity = entities.get(k);
-                            if (entity.isAir()) {
-                                Air aer = (Air) entity;
-                                double fostAer = aer.getOxygenLevel();
-                                if (aer.isTropical()) {
-                                    TropicalAir trop = (TropicalAir) aer;
-                                    String eveniment = command.getType();
-                                    double rainfall = command.getRainfall();
-                                    trop.setEvent(eveniment);
-                                    trop.setRainfall(rainfall);
-                                    trop.setAirQuality(trop.updateAirQuality());
-                                    if (eveniment != null && eveniment.equals("rainfall")) {
-                                        merge = 1;
-                                    }
-                                } else if (aer.isPolar()) {
-                                    Polar polar = (Polar) aer;
-                                    String eveniment = command.getType();
-                                    double wind = command.getWindSpeed();
-                                    polar.setEvent(eveniment);
-                                    polar.setWindSpeed(wind);
-                                    polar.setAirQuality(polar.updateAirQuality());
-                                    if (eveniment != null && eveniment.equals("polarStorm")) {
-                                        merge = 1;
-                                    }
-                                } else if (aer.isTemperate()) {
-                                    TemperateAir temperate = (TemperateAir) aer;
-                                    String eveniment = command.getType();
-                                    String seas = command.getSeason();
-                                    temperate.setEvent(eveniment);
-                                    temperate.setSeason(seas);
-                                    temperate.setAirQuality(temperate.updateAirQuality());
-                                    if (eveniment != null && eveniment.equals("newSeason")) {
-                                        merge = 1;
-                                    }
-                                } else if (aer.isDesert()) {
-                                    DesertAir desert = (DesertAir) aer;
-                                    String eveniment = command.getType();
-                                    boolean deser = command.isDesertStorm();
-                                    desert.setEvent(eveniment);
-                                    desert.setDesertStorm(deser);
-                                    desert.setAirQuality(desert.updateAirQuality());
-                                    if (eveniment != null && eveniment.equals("desertStorm")) {
-                                        merge = 1;
-                                    }
-                                } else if (aer.isMountain()) {
-                                    MountainAir mountain = (MountainAir) aer;
-                                    String eveniment = command.getType();
-                                    int number = command.getNumberOfHikers();
-                                    mountain.setEvent(eveniment);
-                                    mountain.setNumberOfHikers(number);
-                                    mountain.setAirQuality(mountain.updateAirQuality());
-                                    if (eveniment != null && eveniment.equals("peopleHiking")) {
-                                        merge = 1;
-                                    }
-                                }
-                            }
-                        }
+                        // schimba calitate aerului
+                        merge = changeWeather(entities, command);
                         if (merge == 1) {
                             node.put("message", "The weather has changed.");
                         } else {
