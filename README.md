@@ -32,7 +32,10 @@ Ma ajut de metoda mutarobotelul. Mai intai verific daca exista vecin(AM PRIMIT D
 Dupa ce gasesc scorul minim din cei maxim 4 vecini, si il pun in scorul patratelei. APoi setez x si y pentru robot si scad din baterie scorul gasit. Aici ma folosesc si de fosta baterie, sa vad daca se poate efectua mutarea. Daca nu, EROARE.
 5. SCANOBJECT
 Pentru asta creez un nou camp in entity care este false default. Acum verific daca obiectul scanat e planta, animal sau apa, dupa regula din enunt. Daca toate sunt none, atunci e apa, si asa mai departe. Dupa ce am gasit ce e, setez campul scanned la true pentru entitatea respectiva. Creez si o variabila sa retin daca se poate scana obiectul sau nu(adica daca exista apa/planta/animal in lista de entitati). Daca s-a scanat obiectul, incepe sa interactioneze cu mediul.
+CEFACEANIMALUL
+Aici am explicat ce face animalul. Mai intai cauta patratica mai buna, in functie de fiecare caz. Apoi pentru fiecare caz(daca e carnivor, parazit sau nu), face anumite mutari.
 
+Pentru toate comenzile fac verificarile pentru baterie, pentru incepere simulare si pentru reincarcare baterie.
 INTERACTIUNI LA FIECARE ITERATIE:
 sunt cele prezentate in enunt, nu am ce sa zic mai mult
 INTERACTIUNI LA CATE 2 ITERATII:
@@ -47,16 +50,22 @@ Vad daca pot dezvolta mediul. Trebuie sa am obiectul scanat, sa corespunda numel
 Imi printeaza bateria robotului. O am in clasa robot si o printez cu un getter.
 10. RECHARGEBATTERY
 Incarc robotul cu ajutorul timpului dat in inputuri. 
+
+Ce am modiciat:
+
 11. CHANGEWEATHERCONDITIONS
 Pentru aceasta comanda mai adaug la CLASELE COPIL ale aerului anumite campuri specifice(rainfall, etc.). Citesc din inputuri ce fel de eveniment se intampla si modific si calitatea aerului care are alta formula acum. 
+12. LEARN FACT
+Pentru aceasta comanda fac un linked hash map pentru ca imi trebuie ordinea si apoi adaug la fiecare learn fact cate un subiect si topicul. DACA SCANEZ CEVA, adaug in acest linked hash map DOAR SUBIECTUL si setez la NULL lista de facts.(nu trecea testul 20 altfel). Totusi am facut si pentru fiecare entitate o lista de facts, si subiectul e de fapt numele entitatii. NU ma ajuta prea tare pentru ca daca mi moare planta mi se sterge din inventar.
+13. PRINTKNOWLEDGEBASE
+Pentru aceasta comanda printez lista de chei-valoare, si verific ca valoarea sa nu fie null.
+14. IMPROVEENVIRONMENT
+Pentru aceasta comanda parcurg lista de entitati si vad daca subiectul coincide cu numele. Daca si entitatea e scanata atunci pot da improve la environment. Daca totsui nu exista lista de subiecte printez erori.
 
-CEFACEANIMALUL
-Aici am explicat ce face animalul. Mai intai cauta patratica mai buna, in functie de fiecare caz. Apoi pentru fiecare caz(daca e carnivor, parazit sau nu), face anumite mutari.
-
-Pentru toate comenzile fac verificarile pentru baterie, pentru incepere simulare si pentru reincarcare baterie.
+15. MULTIPLE SIMULATIONS
+Pentru testele multiple mai intai parcurg fiecare simulare. Daca apare end simulation si dau start simulation, apoi trebuie sa trec la urmatoarea simulare. Folosesc 2 contori pentru a sti cand se opreste si cand incepe.
 
 
-OBSERVATIE: Mi-am dat seama ca daca o planta devine dead, trebuie stearsa.
-(Se putea o explicatie mai buna in README, dar nu am mai avut timp. La deadline o sa fie mai bine;).
+OBSERVATIE: Mi-am dat seama ca daca o planta devine dead, trebuie stearsa. NU o sterg, ii pun maturitatea "out".
 
-
+Testele 19 si 21 nu mi trec. La 19 am o planta in plus cand nu ar trebui sa fie si apoi la 21 am erori la cum se muta animalul.
