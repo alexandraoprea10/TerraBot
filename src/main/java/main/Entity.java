@@ -61,6 +61,11 @@ public abstract class Entity {
     public List<String> getSubject() {
         return subject;
     }
+
+    /**
+     * Returneaza tipul de fact.
+     * @return
+     */
     public String getType() {
         return type;
     }
@@ -113,6 +118,11 @@ public abstract class Entity {
     public void setSubject(final String subj) {
         this.subject.add(subj);
     }
+
+    /**
+     * Setez tipul(gen fact-ul).
+     * @param type
+     */
     public void setType(final String type) {
         this.type = type;
     }

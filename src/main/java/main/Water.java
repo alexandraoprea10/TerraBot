@@ -22,7 +22,8 @@ public class Water extends Entity {
     }
     public Water(final String name, final double mass, final String type,
                  final double salinity, final double pH, final double purity,
-                 final double turbidity, final double contaminantIndex, final boolean isFrozen, final String typ) {
+                 final double turbidity, final double contaminantIndex,
+                 final boolean isFrozen, final String typ) {
         super(name, mass, 0, typ);
         this.type = type;
         this.salinity = salinity;
