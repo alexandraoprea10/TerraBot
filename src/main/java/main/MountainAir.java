@@ -51,8 +51,9 @@ public final class MountainAir extends Air {
         double result = Math.round(toxicityAQ
                 * MagicNumbersDouble.normalize.getNumar())
                 / MagicNumbersDouble.normalize.getNumar();
-        if (result < 0)
+        if (result < 0) {
             return 0.0;
+        }
         return result;
     }
     @Override

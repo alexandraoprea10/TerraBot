@@ -43,7 +43,8 @@ public final class Main {
                 calculProbabilitate = calculProbabilitate + sol.probabilityAttack();
             } else if (entity.isPlant()) {
                 Plant plantuta = (Plant) entity;
-                if (!plantuta.getMaturityLevel().equals("dead") || !(plantuta.getMaturityLevel().equals("out"))) {
+                if (!plantuta.getMaturityLevel().equals("dead")
+                        || !(plantuta.getMaturityLevel().equals("out"))) {
                     calculProbabilitate = calculProbabilitate + plantuta.probabilityAttack();
                 }
             } else if (entity.isAnimal()) {
@@ -71,7 +72,8 @@ public final class Main {
                 objects++;
             } else if (entity.isPlant()) {
                 Plant plantuta = (Plant) entity;
-                if (!plantuta.getMaturityLevel().equals("dead") || !(plantuta.getMaturityLevel().equals("out"))) {
+                if (!plantuta.getMaturityLevel().equals("dead")
+                        || !(plantuta.getMaturityLevel().equals("out"))) {
                     objects++;
                 }
             } else if (entity.isAnimal()) {

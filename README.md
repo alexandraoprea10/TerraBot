@@ -68,4 +68,4 @@ Pentru testele multiple mai intai parcurg fiecare simulare. Daca apare end simul
 
 OBSERVATIE: Mi-am dat seama ca daca o planta devine dead, trebuie stearsa. NU o sterg, ii pun maturitatea "out".
 
-Testele 19 si 21 nu mi trec. La 19 am o planta in plus cand nu ar trebui sa fie si apoi la 21 am erori la cum se muta animalul.
+Testul 19 nu trece.. am o planta in plus cand nu ar trebui sa fie.
