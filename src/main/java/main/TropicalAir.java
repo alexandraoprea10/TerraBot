@@ -53,6 +53,8 @@ public final class TropicalAir extends Air {
                 Math.min(MagicNumbersInt.suta.getNumar(), result));
         double res = Math.round(normalizeScore * MagicNumbersDouble.normalize.getNumar())
                 / MagicNumbersDouble.normalize.getNumar();
+        if (res < 0)
+            return 0.0;
         return res;
     }
     @Override

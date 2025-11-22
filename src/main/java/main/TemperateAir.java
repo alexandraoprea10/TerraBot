@@ -46,6 +46,8 @@ public final class TemperateAir extends Air {
                 * (1 - airQuality() / MagicNumbersDouble.airTemperate.getNumar());
         double result = Math.round(toxicityAQ * MagicNumbersDouble.normalize.getNumar())
                 / MagicNumbersDouble.normalize.getNumar();
+        if (result < 0)
+            return 0.0;
         return result;
     }
     @Override
