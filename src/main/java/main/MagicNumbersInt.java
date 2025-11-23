@@ -17,7 +17,8 @@ public enum MagicNumbersInt {
     saptezero(70),
     minusdoi(-2),
     maximum(9999),
-    sapte(7);
+    sapte(7),
+    minustrei(-3);
     private final int numar;
     MagicNumbersInt(final int numar) {
         this.numar = numar;

@@ -38,6 +38,9 @@ public final class TemperateAir extends Air {
         double result = Math.round(normalizeScore
                 * MagicNumbersDouble.normalize.getNumar())
                 / MagicNumbersDouble.normalize.getNumar();
+        if (result > MagicNumbersDouble.normalize.getNumar()) {
+            result = MagicNumbersDouble.normalize.getNumar();
+        }
         return result;
     }
     @Override

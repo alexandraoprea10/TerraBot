@@ -99,6 +99,9 @@ public abstract class Air extends Entity {
      * @param airQual
      */
     public void setAirQuality(final double airQual) {
+        if (airQual > MagicNumbersDouble.normalize.getNumar()) {
+            this.airQuality = MagicNumbersDouble.normalize.getNumar();
+        }
         this.airQuality = airQual;
     }
 

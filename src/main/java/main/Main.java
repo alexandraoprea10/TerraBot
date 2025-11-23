@@ -445,7 +445,8 @@ public final class Main {
      * @param okInterAnimal daca se vor realiza interactiunile animal-soil
      */
     public static void interactiuniEveryIteration(final List<Entity> entities,
-                                                  final int okInterAnimal) {
+                                                  final int okInterAnimal,
+                                                  final int okSchimbariMeteo) {
         Plant planta =  returnPlant(entities);
         Animal animal =  returnAnimal(entities);
         Soil soil =  returnSoil(entities);
@@ -480,9 +481,11 @@ public final class Main {
                     + planta.maturityOxigenLevel())
                     * MagicNumbersDouble.normalize.getNumar())
                     / MagicNumbersDouble.normalize.getNumar());
-            air.setAirQuality(Math.round(air.airQuality()
-                    * MagicNumbersDouble.normalize.getNumar())
-                    / MagicNumbersDouble.normalize.getNumar());
+            if (okSchimbariMeteo == 0) {
+                air.setAirQuality(Math.round(air.airQuality()
+                        * MagicNumbersDouble.normalize.getNumar())
+                        / MagicNumbersDouble.normalize.getNumar());
+            }
             if (planta.getMaturityLevel().equals("dead")
                     || planta.getMaturityLevel().equals("out")) {
                 air.setOxygenLevel(air.getOxygenLevel() - planta.oxigenFromPlant());
@@ -548,7 +551,7 @@ public final class Main {
     public static void doInteractions(final int dimension, final List<Entity>[][] mat,
                                       final int iteratii, final int fostaIteratie,
                                       final Robot robotel, final int incepeIteratie,
-                                      final int okInterAnimal) {
+                                      final int okInterAnimal, final int okSchimbariMeteo) {
         for (int a = 0; a < dimension; a++) {
             for (int b = 0; b < dimension; b++) {
                 List<Entity> entities = mat[a][b];
@@ -556,14 +559,14 @@ public final class Main {
                     for (int p = fostaIteratie; p <= iteratii; p++) {
                         List<Entity> enti = mat[robotel.getPozX()][robotel.getPozY()];
                         verificaMoarteaPlantuta(enti);
-                        interactiuniEveryIteration(entities, okInterAnimal);
+                        interactiuniEveryIteration(entities, okInterAnimal, okSchimbariMeteo);
                         if (iteratii > incepeIteratie
                                 && (iteratii - incepeIteratie) % 2 == 0) {
                             interactiuniEveryTwoIterations(entities);
                         }
                     }
                 } else {
-                    interactiuniEveryIteration(entities, okInterAnimal);
+                    interactiuniEveryIteration(entities, okInterAnimal, okSchimbariMeteo);
                     if (iteratii > incepeIteratie
                             && (iteratii - incepeIteratie) % 2 == 0) {
                         interactiuniEveryTwoIterations(entities);
@@ -1177,7 +1180,7 @@ public final class Main {
                     double rainfall = command.getRainfall();
                     trop.setEvent(eveniment);
                     trop.setRainfall(rainfall);
-                    // trop.setAirQuality(trop.updateAirQuality());
+                    trop.setAirQuality(trop.updateAirQuality());
                     if (eveniment != null && eveniment.equals("rainfall")) {
                         merge = 1;
                     }
@@ -1563,6 +1566,9 @@ public final class Main {
             int okInterAnimal = 0;
             int inceputIteratieAnimal = 0;
             int mergeSubj;
+            int iteratieAer = -1;
+            double fostaCalitate = 0.0;
+            Air aerSchimb = null;
             List<CommandInput> commands = inputLoader.getCommands();
             int nextSimulare = 0;
             int opresteSimulare = 0;
@@ -1584,10 +1590,15 @@ public final class Main {
                         incepeIteratie = iteratii;
                     }
                 }
+                if (iteratieAer + 2 == iteratii && aerSchimb != null) {
+                    aerSchimb.setAirQuality(fostaCalitate);
+                    iteratieAer = MagicNumbersInt.minustrei.getNumar();
+                }
                 if (okScanari == 1) {
                     // interactiuni pentru fiacre patratica + timestamps
                     doInteractions(dimension, mat, iteratii,
-                            fostaIteratie, robotel, incepeIteratie, okInterAnimal);
+                            fostaIteratie, robotel, incepeIteratie,
+                            okInterAnimal, okSchimbariMeteo);
                 }
                 // muta animalul
                 moveAnimal(dimension, inceputIteratieAnimal, mat, okInterAnimal, iteratii);
@@ -1855,6 +1866,9 @@ public final class Main {
                     } else {
                         okSchimbariMeteo = 1;
                         List<Entity> entities = mat[robotel.getPozX()][robotel.getPozY()];
+                        iteratieAer = command.getTimestamp();
+                        fostaCalitate = returnAir(entities).getAirQuality();
+                        aerSchimb = returnAir(entities);
                         // schimba calitate aerului
                         merge = changeWeather(entities, command);
                         if (merge == 1) {
