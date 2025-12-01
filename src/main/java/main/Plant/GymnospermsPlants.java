@@ -1,4 +1,6 @@
-package main;
+package main.Plant;
+
+import main.MagicNumbersDouble;
 
 public final class GymnospermsPlants extends Plant {
     // constructor

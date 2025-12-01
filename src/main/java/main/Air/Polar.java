@@ -1,41 +1,41 @@
-package main;
+package main.Air;
 
-public final class MountainAir extends Air {
-    private double altitude;
-    private int numberOfHikers;
+import main.MagicNumbersDouble;
+import main.MagicNumbersInt;
+
+public final class Polar extends Air {
+    private double iceCrystalConcentration;
+    private double windSpeed;
     // constructori
-    public MountainAir(final String nume, final double mass) {
+    public Polar(final String nume, final double mass) {
         super(nume, mass);
-        this.altitude = 0.0;
+        this.iceCrystalConcentration = 0.0;
     }
-    public MountainAir(final String nume, final double mass, final double humidity,
-                       final double temperature, final double oxygenLevel,
-                       final double altitude, final String typ) {
-        super(nume, mass, humidity, temperature, oxygenLevel, typ);
-        this.altitude = altitude;
+    public Polar(final String nume, final double mass, final double humidity,
+                 final double temperature, final double oxygenLevel,
+                 final double iceCrystalConcentration, final String typ) {
+        super(nume, mass,  humidity, temperature, oxygenLevel, typ);
+        this.iceCrystalConcentration = iceCrystalConcentration;
     }
     // getter
-    public double getAltitude() {
-        return altitude;
+    public double getIceCrystalConcentration() {
+        return iceCrystalConcentration;
     }
-    public int getNumberOfHikers() {
-        return numberOfHikers;
+    public double getWindSpeed() {
+        return windSpeed;
     }
     // setter
-    public void setAltitude(final double altitude) {
-        this.altitude = altitude;
+    public void setIceCrystalConcentration(final double iceCrystalConcentration) {
+        this.iceCrystalConcentration = iceCrystalConcentration;
     }
-    public void setNumberOfHikers(final int numberOfHikers) {
-        this.numberOfHikers = numberOfHikers;
+    public void setWindSpeed(final double windSpeed) {
+        this.windSpeed = windSpeed;
     }
     @Override
     public double airQuality() {
-        double oxygenFactor = getOxygenLevel()
-                - (altitude / MagicNumbersInt.mie.getNumar()
-                * MagicNumbersDouble.half.getNumar());
-        double score = oxygenFactor
-                * MagicNumbersInt.doi.getNumar()
-                + getHumidity() * MagicNumbersDouble.waterRetFor2.getNumar();
+        double score = ((getOxygenLevel() * MagicNumbersInt.doi.getNumar())
+                + (MagicNumbersInt.suta.getNumar() - Math.abs(getTemperature()))
+                - (iceCrystalConcentration * MagicNumbersDouble.half.getNumar()));
         double normalizeScore = Math.max(0,
                 Math.min(MagicNumbersInt.suta.getNumar(), score));
         double result = Math.round(normalizeScore
@@ -47,7 +47,7 @@ public final class MountainAir extends Air {
     public double airToxicity() {
         double toxicityAQ = MagicNumbersInt.suta.getNumar()
                 * (MagicNumbersInt.unu.getNumar() - airQuality()
-                / MagicNumbersDouble.sapteopt.getNumar());
+                / MagicNumbersDouble.osutapatru2.getNumar());
         double result = Math.round(toxicityAQ
                 * MagicNumbersDouble.normalize.getNumar())
                 / MagicNumbersDouble.normalize.getNumar();
@@ -60,22 +60,21 @@ public final class MountainAir extends Air {
     public String toxicity() {
         double toxicityAQ = MagicNumbersInt.suta.getNumar()
                 * (MagicNumbersInt.unu.getNumar() - airQuality()
-                / MagicNumbersDouble.sapteopt.getNumar());
+                / MagicNumbersDouble.osutapatru2.getNumar());
         if (toxicityAQ > (MagicNumbersDouble.oxygenMoss.getNumar()
-                * MagicNumbersDouble.sapteopt.getNumar())) {
+                * MagicNumbersDouble.osutapatru2.getNumar())) {
             return "toxic";
-        } else {
-            return "not toxic";
         }
+        return "not toxic";
     }
     @Override
     public String resultEvent() {
-        return "peopleHiking";
+        return "polarStorm";
     }
     @Override
     public double updateAirQuality() {
-        double result = getAirQuality() - (numberOfHikers
-                * MagicNumbersDouble.zerounu.getNumar());
+        double result = getAirQuality()
+                - (windSpeed * MagicNumbersDouble.zerodoi.getNumar());
         return result;
     }
     @Override
@@ -84,7 +83,7 @@ public final class MountainAir extends Air {
     }
     @Override
     public boolean isPolar() {
-        return false;
+        return true;
     }
     @Override
     public boolean isTemperate() {
@@ -96,6 +95,6 @@ public final class MountainAir extends Air {
     }
     @Override
     public boolean isMountain() {
-        return true;
+        return false;
     }
 }

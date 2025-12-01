@@ -1,4 +1,6 @@
-package main;
+package main.Animal;
+
+import main.Entity;
 
 public abstract class Animal extends Entity {
     private String state;

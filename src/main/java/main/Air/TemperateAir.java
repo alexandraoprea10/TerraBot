@@ -1,4 +1,7 @@
-package main;
+package main.Air;
+
+import main.MagicNumbersDouble;
+import main.MagicNumbersInt;
 
 public final class TemperateAir extends Air {
     private double pollenLevel;

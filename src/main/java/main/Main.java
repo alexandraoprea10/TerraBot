@@ -5,6 +5,33 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.*;
+import main.Air.Air;
+import main.Air.Polar;
+import main.Air.DesertAir;
+import main.Air.MountainAir;
+import main.Air.TemperateAir;
+import main.Air.TropicalAir;
+
+import main.Animal.Animal;
+import main.Animal.Parasites;
+import main.Animal.Carnivores;
+import main.Animal.Herbivores;
+import main.Animal.Detritivores;
+import main.Animal.Omnivores;
+
+import main.Plant.Plant;
+import main.Plant.FloweringPlants;
+import main.Plant.Algae;
+import main.Plant.Mosses;
+import main.Plant.GymnospermsPlants;
+import main.Plant.Ferns;
+
+import main.Soil.Soil;
+import main.Soil.DesertSoil;
+import main.Soil.ForestSoil;
+import main.Soil.SwampSoil;
+import main.Soil.GrasslandSoil;
+import main.Soil.TundraSoil;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,7 +117,7 @@ public final class Main {
      * @param entities lista de entitati
      * @return numarul de obiecte
      */
-    public static int calculazaObiecte(final List<Entity> entities) {
+    public static int calculateObject(final List<Entity> entities) {
         int contor = 0;
         for (int p = 0; p < entities.size(); p++) {
             if (entities.get(p).isWater()) {
@@ -584,7 +611,7 @@ public final class Main {
      * @param entities lista de entitati
      * @return interanimal
      */
-    public static int ceFaceAnimalul(final List<Entity>[][] mat, final Animal animalul,
+    public static int whereisAnimalGoing(final List<Entity>[][] mat, final Animal animalul,
                                      final int iteratii, final int inceputIteratieAnimal,
                                      final int dimension,
                                      final List<Entity> entities, final int a, final int b) {
@@ -876,7 +903,7 @@ public final class Main {
      * @param mat matrricea
      * @param dimension dimensiunea matricei
      */
-    public static void mutaRobotelul(final Robot robotel,
+    public static void moveRobotel(final Robot robotel,
                                      final List<Entity>[][] mat,
                                      final int dimension) {
         int posStangaI = robotel.getPozX();
@@ -1060,7 +1087,7 @@ public final class Main {
                     if (entity.isAnimal() && inceputIteratieAnimal != -1) {
                         Animal an =  (Animal) entity;
                         if (!an.isMutat()) {
-                            okInterAnimal = ceFaceAnimalul(mat, (Animal) entity, iteratii,
+                            okInterAnimal = whereisAnimalGoing(mat, (Animal) entity, iteratii,
                                     inceputIteratieAnimal, dimension,
                                     entities, a, b);
                             an.setMutat(true);
@@ -1296,9 +1323,7 @@ public final class Main {
                             } else if (improvment.equals("increaseMoisture")
                                     && entity.isWater()
                                     && entity.getisScanned()) {
-                                int ok = updateazaWaterret(
-                                        mat[robotel.getPozX()]
-                                                [robotel.getPozY()]);
+                                int ok = updateazaWaterret(entities);
                                 if (ok == 1) {
                                     merge = 1;
                                     node.put("message",
@@ -1657,7 +1682,7 @@ public final class Main {
                                 entitiesNode.add(a);
                                 entityNode.set("section", entitiesNode);
                                 // calculeaza numarul de obiecte
-                                int contor = calculazaObiecte(entities);
+                                int contor = calculateObject(entities);
                                 entityNode.put("totalNrOfObjects", contor);
                                 String airquality = null;
                                 String soilQuality = null;
@@ -1701,7 +1726,7 @@ public final class Main {
                                 "ERROR: Robot still charging. Cannot perform action");
                     } else {
                         robotel.setFostaBaterie(robotel.getBattery());
-                        mutaRobotelul(robotel, mat, dimension);
+                        moveRobotel(robotel, mat, dimension);
                         node.put("command", command.getCommand());
                         if (robotel.getBattery() < 0) {
                             robotel.setBattery(robotel.getFostaBaterie());

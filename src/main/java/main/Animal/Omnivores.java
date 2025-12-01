@@ -1,4 +1,6 @@
-package main;
+package main.Animal;
+
+import main.MagicNumbersDouble;
 
 public final class Omnivores extends Animal {
     // constructor

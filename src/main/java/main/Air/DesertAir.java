@@ -1,4 +1,7 @@
-package main;
+package main.Air;
+
+import main.MagicNumbersDouble;
+import main.MagicNumbersInt;
 
 public final class DesertAir extends Air {
     private double dustParticles;

@@ -1,4 +1,7 @@
-package main;
+package main.Soil;
+
+import main.Entity;
+import main.MagicNumbersInt;
 
 public abstract class Soil extends Entity {
     private double nitrogen;

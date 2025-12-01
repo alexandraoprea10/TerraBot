@@ -1,3 +1,81 @@
+commit 7348fd560461d41d423a400b85907919ebeeafd7
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Mon Nov 24 17:44:46 2025 +0200
+
+    Am adaugat checkstyle.
+
+commit 2c72c479cdb25d56b30d5ff745a88729789809b5
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Sun Nov 23 14:21:28 2025 +0200
+
+    Facusem un nou clone la tema si nu trecea testul 21. Acum trece.
+
+commit 965bbe5e7f75698398eb45500f65e00107db67c2
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Sat Nov 22 13:05:56 2025 +0200
+
+    Plus Checkstyle
+
+commit 73df7d537388499e6c0d1e2cdd295448964baae9
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Sat Nov 22 12:58:20 2025 +0200
+
+    MI-a iesit si testul 21. Era problema la learnfact si mi returna toxicitate negativa. Am rezolvat.
+
+commit fb7d2736703a9f7af5c13a5d211d7071b047088b
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Fri Nov 21 23:20:50 2025 +0200
+
+    Updated README.md
+
+commit 0ea8f4dccbdcc4277c9f55e167756b267085cc78
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Fri Nov 21 23:11:21 2025 +0200
+
+    Tema este gata. Am rezolvat checkstyle + am asezat codul + am rezolvat niste warninguri ca sa nu mai am asa multe.
+
+commit edeeed2801df42a9dbbecc4edfe23344a3ef4cff
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Fri Nov 21 13:51:56 2025 +0200
+
+    Am rezolvat checkstyle si am mai asezat codul.
+
+commit 7a7d3f7a6bc93e6459f5d81327fb44b8234f24d1
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Fri Nov 21 12:47:59 2025 +0200
+
+    A TRECUT TESTUL 20git add .git add .git add .
+
+commit f52161b8858e466eaad9cf76d64984a0b33c3b91
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Fri Nov 21 12:44:47 2025 +0200
+
+    Am mai rezolvat o eroare.
+
+commit 1c55bc468a053baf93f93685c2a534d379a85049
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Fri Nov 21 01:06:54 2025 +0200
+
+    innebunescu nu mai merge niciun test
+
+commit b94169c8218d89e05060c79774eaa44ba7d5420b
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Wed Nov 19 11:16:12 2025 +0200
+
+    TRECE TESTUL 16 IN SFARSIT DAAAAA
+
+commit dfb6e84b3d30160959aaafcddb2df297d89056a3
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Mon Nov 17 16:33:33 2025 +0200
+
+    Asta merge pana la t16.
+
+commit 48653068d2a9a2960649cacf418bc0d8a6b0ad9c
+Author: Alexandra Oprea <adrianaalex07@gmail.com>
+Date:   Sat Nov 15 20:55:35 2025 +0200
+
+    Am facut testele pentru simulari multiple. NU INTELEG DE CE NU MERGE TESTUL 16. Nu calculeaza bine o patratica.
+
 commit fb1aba8ef8a3de1f8de27f7a0fae8884352e9480
 Author: Alexandra Oprea <adrianaalex07@gmail.com>
 Date:   Fri Nov 14 22:50:12 2025 +0200

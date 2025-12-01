@@ -69,3 +69,6 @@ Pentru testele multiple mai intai parcurg fiecare simulare. Daca apare end simul
 OBSERVATIE: Mi-am dat seama ca daca o planta devine dead, trebuie stearsa. NU o sterg, ii pun maturitatea "out".
 
 Testul 19 nu trece.. am o planta in plus cand nu ar trebui sa fie.
+
+FEEDBACK TEMA:
+Tema a fost super interesanta, dar este punctata mult prea putin in comparatie cu complexitatea/ gradul de dificultate destul de ridicat.

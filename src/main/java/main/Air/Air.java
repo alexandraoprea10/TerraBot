@@ -1,4 +1,8 @@
-package main;
+package main.Air;
+
+import main.Entity;
+import main.MagicNumbersDouble;
+import main.MagicNumbersInt;
 
 public abstract class Air extends Entity {
     private double humidity;

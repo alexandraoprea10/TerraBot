@@ -1,4 +1,7 @@
-package main;
+package main.Air;
+
+import main.MagicNumbersDouble;
+import main.MagicNumbersInt;
 
 public final class TropicalAir extends Air {
     private double co2Level;

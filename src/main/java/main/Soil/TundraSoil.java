@@ -1,4 +1,7 @@
-package main;
+package main.Soil;
+
+import main.MagicNumbersDouble;
+import main.MagicNumbersInt;
 
 public final class TundraSoil extends Soil {
     private double permafrostDepth;

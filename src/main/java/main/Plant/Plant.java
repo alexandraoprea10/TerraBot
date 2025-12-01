@@ -1,4 +1,7 @@
-package main;
+package main.Plant;
+
+import main.Entity;
+import main.MagicNumbersDouble;
 
 public abstract class Plant extends Entity {
     private String maturityLevel;
