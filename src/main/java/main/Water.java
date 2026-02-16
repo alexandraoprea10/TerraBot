@@ -1,5 +1,8 @@
 package main;
 
+import main.magicNumbers.MagicNumbersDouble;
+import main.magicNumbers.MagicNumbersInt;
+
 public class Water extends Entity {
     private String type;
     private double salinity;
