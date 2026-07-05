@@ -1,73 +1,84 @@
+# Ecosystem Simulation & Robot Exploration Project
+
+## 📖 How I Read Data
+Input reading is handled via the skeleton classes located in `target -> classes -> fileio`. These classes manage the raw input and provide the necessary data structures to initialize entities, the map, and ecosystem commands.
 
 
-**CUM CITESC?**
-Ma folosesc de clasele implementate in schelet (target -> classes -> fileio).
-Acestea gestioneaza citirea inputului si imi furnizeaza datele necesare pentru initializarea entitatilor si a comenzilor.
+## 📦 Project Architecture & Package Structure
 
-**STRUCTURA PE PACHETE**
+### 🗺️ Core Architecture
+*   **`Entity`**: The base class containing general information about every object in the ecosystem: name, type, a `scanned` flag (defaulting to `false`), and a list of associated facts.
+*   **`Robot`**: Represents the exploration robot. Keeps track of `battery`, current coordinates (`position`), charging state, and `previousBattery` (used for rollback/validation checks).
+*   **`Main`**: The entry point of the application. Handles matrix creation, parses entities/commands, and orchestrates the core simulation loop.
 
-1. **Pachetul air**
-a) **Air** - Clasa abstracta care defineste metodele generale pentru aer. Aceste metode sunt implementate diferit in functie de tipul concret de aer.
-b) **DesertAir, MountainAir, PolarAir, TemperateAir, TropicalAir** - Clasele copil implementeaza formulele specifice pentru calitatea aerului. Pentru comanda de schimbare a vremii am adaugat campuri suplimentare (ex: rainfall) si am modificat formula calitatii aerului.
 
-2. **Pachetul animal**
-a) **Animal** - Clasa abstracta ce defineste comportamentul general al animalelor.
-b) **Carnivores, Detritivores, Herbivores, Omnivores, Parasites** - Clasele copil implementeaza comportamente specifice fiecarui tip de animal. La interactiune, animalul cauta o patratica mai buna in functie de fiecare caz. Apoi, in functie de tip (carnivor, parazit etc.), executa mutari si interactiuni specifice.
+### 🌿 Ecosystem Entities
 
-3. **Pachetul plant**
-a) **Plant** - Clasa abstracta care defineste metodele generale pentru plante.
-b) **Algae, Ferns, FloweringPlants, GymnospermsPlants, Mosses** - Clasele sunt de tip final deoarece contin suficiente informatii si nu mai trebuie extinse.
-Observatie: daca o planta devine dead, nu o sterg din lista, ci ii setez maturitatea la "out".
+#### Package: `air`
+*   **`Air` `[Abstract]`**: Defines general atmospheric methods. Behavior varies based on the concrete environment.
+*   **`DesertAir`, `MountainAir`, `PolarAir`, `TemperateAir`, `TropicalAir`**: Subclasses implementing specific air quality formulas. 
+*   *Note:* For weather-changing commands, extra fields (e.g., `rainfall`) were introduced, dynamically modifying the air quality calculations.
 
-4. **Pachetul soil**
-a) **Soil** - Clasa abstracta care defineste comportamentul general al solului.
-b) **DesertSoil, ForestSoil, GrasslandSoil, SwampSoil, TundraSoil** - Clasele copil implementeaza formulele specifice pentru calitatea solului.
+#### Package: `animal`
+*   **`Animal` `[Abstract]`**: Outlines core animal behaviors and lifecycle states.
+*   **`Carnivores`, `Detritivores`, `Herbivores`, `Omnivores`, `Parasites`**: Subclasses implementing specific dietary and movement logic. 
+*   *Interaction Mechanics:* Upon interaction, animals actively search for a better neighboring tile. Depending on their type (e.g., predator vs. parasite), they execute specific movements and survival behaviors.
 
-5. **Pachetul commands**
-Acest pachet contine anumite comenzi din simulare.
+#### Package: `plant`
+*   **`Plant` `[Abstract]`**: Defines growth and environmental baseline methods.
+*   **`Algae`, `Ferns`, `FloweringPlants`, `GymnospermsPlants`, `Mosses` `[Final]`**: Final classes since they hold sufficient self-contained logic and do not require further extension.
+*   *Observation:* When a plant dies (`dead`), it is not removed from the ecosystem list; instead, its maturity state is set to `"out"`.
 
-a) **PRINT ENV CONDITIONS** - Afisez detalii despre patratica pe care se afla robotul. Parcurg lista de entitati si verific tipul fiecareia in ordinea din enunt. Am creat metode separate pentru printare pentru a evita repetarea codului.
-b) **PRINT MAP** - Parcurg fiecare patratica din matrice. Trebuie sa printez numarul de obiecte de pe patratica (numar doar water, plant, animal). Calculez calitatea aerului si a solului folosind metodele abstracte implementate in clasele copil.
-c) **MOVE ROBOT** - Verific mai intai daca exista vecini pentru a evita IndexOutOfBounds. Pentru fiecare vecin calculez scorul patratelei. Setez probabilitatea de atac pentru toate entitatile din lista, astfel incat sa pot folosi valoarea din entities(0) ulterior. Aleg scorul minim dintre cei maxim 4 vecini, mut robotul si scad bateria. Ma folosesc si de fosta baterie pentru a verifica daca mutarea este posibila. Daca nu este, afisez eroare.
-d) **PRINT KNOWLEDGE BASE** - Parcurg matricea si printez cheile si valorile daca valoarea nu este null. La un test nu functiona deoarece nu era in ordine, asa ca am sortat alfabetic.
-e) **GET ENERGY STATUS** - Printez bateria robotului folosind getter-ul din clasa Robot.
+#### Package: `soil`
+*   **`Soil` `[Abstract]`**: Defines baseline ground and nutrient behaviors.
+*   **`DesertSoil`, `ForestSoil`, `GrasslandSoil`, `SwampSoil`, `TundraSoil`**: Subclasses implementing climate-specific soil quality formulas.
 
-**CE COMENZI NU AM IMPLEMENTAT IN PACHET, dar am implementat in Main:**
-a) **START SIMULATION** - Porneste simularea. Setez o variabila pentru a sti daca simularea a inceput. Aceasta este necesara pentru tratarea erorilor (ex: daca se vrea printarea hartii inainte de start). Afisez mesajul corespunzator.
-b) **END SIMULATION** - Se termina simularea. Setez variabila de start la 0 pentru a putea trata erorile daca se incearca alte operatii dupa terminare.
-c) **SCAN OBJECT** - Creez un camp nou in Entity, scanned, setat false implicit. Verific daca obiectul scanat este planta, animal sau apa conform regulilor din enunt. Dupa identificare, setez scanned la true. Creez si o variabila care verifica daca scanarea este posibila (daca exista entitate valida in lista). Daca obiectul a fost scanat, incepe sa interactioneze cu mediul.
-d) **LEARN FACT** - Verific daca obiectul este scanat si daca numele corespunde cu cel din entitate. Folosesc un LinkedHashMap pentru a pastra ordinea. Adaug topicul si subiectul primit din input. Daca scanez ceva, adaug in LinkedHashMap doar subiectul si setez lista de facts la null (altfel nu trecea testul 20). Totusi, fiecare entitate are si o lista proprie de facts, dar daca entitatea dispare, lista se pierde.
-e) **IMPROVE ENVIRONMENT** - Verific daca entitatea este scanata, daca numele corespunde si daca lista de subiecte nu este goala. Exista 4 cazuri (plantvegetation, fertilizesoil etc.). Am creat metode separate pentru fiecare caz, care fac modificarile corespunzatoare. Daca nu sunt indeplinite conditiile, afisez mesaj de eroare.
-f) **RECHARGE BATTERY** - Incarc robotul folosind timpul primit din input.
-g) **CHANGE WEATHER CONDITIONS** - Adaug campuri specifice in clasele copil ale aerului (ex: rainfall). Citesc evenimentul din input si modific formula de calcul a calitatii aerului.
-h) **MULTIPLE SIMULATIONS** - Pentru testele multiple parcurg fiecare simulare separat. Folosesc doi contori pentru a sti cand se opreste o simulare si cand incepe urmatoarea.
 
-6. **Pachetul createTerritory**
-Aceste clase sunt folosite pentru construirea initiala a matricei. Matricea contine patratele, iar fiecare patratica include o lista de entitati (plante, animale, sol, apa, aer). Pentru fiecare obiect citit creez o noua instanta si o adaug in lista corespunzatoare.
+### 🛠️ Actions and Commands
 
-a) **AddAir** - adauga Aer pe patratica
-b) **AddAnimals** - adauga Animal pe patratica
-c) **AddPlants** - adauga Planta pe patratica
-d) **AddSoil** - adauga Sol pe patratica
-e) **AddWater** - adauga Apa pe patratica
+#### Package: `commands` (Robot Actions)
+Contains specific modular simulation commands:
+*   **`PRINT ENV CONDITIONS`**: Displays details of the tile currently occupied by the robot. It iterates through the entity list following the exact order specified in the requirements. Clean code practice: modularized into separate print methods to avoid redundancy.
+*   **`PRINT MAP`**: Iterates through the entire matrix grid. Counts and prints the number of dynamic objects (filtering only `water`, `plant`, and `animal`). Computes air/soil quality on the fly using abstract methods from subclasses.
+*   **`MOVE ROBOT`**: Validates neighbor coordinates first to prevent `IndexOutOfBoundsException`. Evaluates a score for each neighbor, sets the attack probability for all entities in the list (storing it in `entities(0)` for later use), and picks the optimal tile (out of max 4 neighbors). Moves the robot and consumes battery. If the energy required exceeds the `previousBattery` state, it throws an error.
+*   **`PRINT KNOWLEDGE BASE`**: Iterates through the knowledge matrix, printing valid keys and values. Data is sorted alphabetically to ensure consistency across tests.
+*   **`GET ENERGY STATUS`**: Prints the current battery status using the `Robot` getter.
 
-7. **Pachetul helpers**
-a) **CalculateHelper** - clasa ce contine metode ajutatoare pentru calcul
-b) **ExistingHelper** - clasa ce contine metode ajutatoare pentru verificarea existentei unei entitati pe patratica.
-c) **InteractionsHelper** - clasa ce contine metode ajutatoare pentru interactiuni intre entitati.
-d) **MovingAnimalHelper** - clasa ce contine metode ajutatoare pentru mutarea animalului.
-e) **MovingRobotHelper** - clasa ce contine metode ajutatoare pentru mutarea robotului.
-f) **PrintHelper** - clasa ce contine metode ajutatoare pentru printare
-g) **ReturnHelper** - clasa ce contine metode ajutatoare pentru returnarea unor entitati
-h) **SetHelper** - clasa ce contine metode ajutatoare pentru setarea anumitor campuri
-i) **UpdateHelper** - clasa ce contine metode ajutatoare pentru updatare.
-j) **WeatherUpdateHelper** - clasa ce contine metode ajutatoare pentru updatarea conditiilor meteo
-]
-8. **Pachetul magicNumbers**
-a) **MagicNumbersDouble** - clasa ce contine numere de tip Double
-b) **MagicNumbersInt** - clasa ce contine numere de tip Integer
+#### Core System Commands
+These global commands orchestrate the simulation state directly within the execution loop:
+*   **`START SIMULATION`**: Toggles the active simulation state variable. Used for strict error handling (e.g., blocking map printing prior to initialization).
+*   **`END SIMULATION`**: Terminates the loop and resets the state flag to prevent subsequent operations.
+*   **`SCAN OBJECT`**: Standardizes the `scanned` flag (default `false`) inside `Entity`. Identifies if the target is a plant, animal, or water. Once scanned, the entity begins actively interacting with the surrounding environment.
+*   **`LEARN FACT`**: Checks scan status and matches entity names. Uses a `LinkedHashMap` to preserve insertion order. Special fix for Test 20: scanning an object clears prior fact lists to prevent state pollution.
+*   **`IMPROVE ENVIRONMENT`**: Validates requirements and executes one of 4 environment upgrades (e.g., `plantvegetation`, `fertilizesoil`). Handled via decoupled helper methods.
+*   **`RECHARGE BATTERY`**: Replenishes the robot's energy based on input ticks.
+*   **`CHANGE WEATHER CONDITIONS`**: Injects new parameters (like `rainfall`) into the air subclasses, modifying live calculations.
+*   **`MULTIPLE SIMULATIONS`**: Loops through independent test simulations using precise counters to track boundaries.
 
-9. **Clase din radacina**
-a) **Entity** - Contine informatii generale despre fiecare obiect: nume, tip, scanned (false implicit), lista de facts
-b) **Robot** - Contine: baterie, pozitie, stare incarcare, fosta baterie (folosita pentru verificari)
-c) **Main** - Creez matricea, citesc entitatile si comenzile si tratez fiecare caz in parte.
+
+### 🌐 Map & Map Construction
+
+#### Package: `createTerritory`
+These classes are responsible for building the initial simulation grid. The matrix consists of cells (tiles), where each tile contains a list of entities (plants, animals, soil, water, air).
+*   **`AddAir`** – Instantiates and assigns air properties to a tile.
+*   **`AddAnimals`** – Spawns and adds animals to a tile's entity list.
+*   **`AddPlants`** – Spawns and adds plants to a tile's entity list.
+*   **`AddSoil`** – Assigns soil composition to a tile.
+*   **`AddWater`** – Adds water bodies to a tile.
+
+
+### ⚡ Helpers & Constants
+
+#### Package: `helpers`
+Decoupled utility classes designed to keep core logic clean and maintainable:
+*   **`CalculateHelper`** – Mathematical and formula calculations.
+*   **`ExistingHelper`** – Entity presence validation on specific tiles.
+*   **`InteractionsHelper`** – Cross-entity logic and environmental events.
+*   **`MovingAnimalHelper` & `MovingRobotHelper`** – Pathfinding, scoring, and position updates.
+*   **`PrintHelper`** – Console output formatting.
+*   **`ReturnHelper` & `SetHelper`** – Getters, filters, and field setters.
+*   **`UpdateHelper` & `WeatherUpdateHelper`** – Live state updates and environmental tick updates.
+
+#### Package: `magicNumbers`
+*   **`MagicNumbersDouble`** – Stores constant `Double` values used in simulation formulas.
+*   **`MagicNumbersInt`** – Stores configuration `Integer` values.
